@@ -4,19 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <script>
-      // Mark mobile browsers before styles load, without changing the viewport.
+      // Alguns visualizadores incorporados ignoram o viewport responsivo e
+      // apresentam uma largura virtual de desktop (ex.: 980px em 320px).
+      // Ajustar a meta antes do CSS evita aplicar zoom ao documento depois.
       (function () {
         if (!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) return;
         document.documentElement.classList.add('mobile-device');
-        // Corrige visualizadores Android que usam layout de desktop.
-        // Executa antes do React; navegadores com escala normal nao mudam.
-        var screenWidth = window.screen.width;
+        var physicalWidth = window.screen.width;
         var layoutWidth = window.innerWidth;
-        var factor = layoutWidth / screenWidth;
-        if (screenWidth > 0 && screenWidth < 600 && factor > 1.7 && factor < 5) {
-          document.documentElement.style.width = screenWidth + 'px';
-          document.documentElement.style.zoom = String(factor);
-          document.documentElement.classList.add('embedded-viewport-correction');
+        if (physicalWidth > 0 && physicalWidth < 600 && layoutWidth > physicalWidth * 1.7) {
+          var viewport = document.querySelector('meta[name="viewport"]');
+          if (viewport) viewport.setAttribute('content', 'width=' + Math.round(physicalWidth) + ', initial-scale=1.0, viewport-fit=cover');
         }
       })();
     </script>
