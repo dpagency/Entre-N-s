@@ -76,15 +76,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   return (
     <div className="flex flex-col items-center justify-start min-h-0 py-3 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full mobile-welcome">
       {/* Hero presentation */}
-      <div className="text-center max-w-2xl mx-auto mb-3 mobile-welcome-hero sm:mb-8 space-y-2 sm:space-y-3">
+      <div className="text-center w-full min-w-0 max-w-2xl mx-auto mb-3 mobile-welcome-hero sm:mb-8 space-y-2 sm:space-y-3">
         <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wide">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
         </div>
 
-        <h1 className="text-2xl sm:text-5xl font-black tracking-tight text-slate-100">
+        <h1 className="text-2xl sm:text-5xl font-black tracking-tight text-slate-100 break-words">
           Entre Nós
-          <span className="block text-lg sm:text-3xl font-bold text-amber-400 mt-1">
+          <span className="block text-lg sm:text-3xl font-bold text-amber-400 mt-1 break-words">
             Guardiões da Convivência
           </span>
         </h1>
@@ -95,7 +95,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
 
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl mobile-welcome-card p-3 sm:p-8 shadow-2xl space-y-3 sm:space-y-6">
+      <div className="w-full min-w-0 bg-slate-900 border border-slate-800 rounded-3xl mobile-welcome-card p-3 sm:p-8 shadow-2xl space-y-3 sm:space-y-6">
         {/* O multiplayer permanece no código para uma etapa futura. */}
         {false && <div>
         <div className="grid grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
@@ -147,7 +147,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-1">
               <label className="text-sm font-bold text-slate-300">
                 Seu Apelido na Sessão:
               </label>
@@ -172,7 +172,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
               {CHARACTER_LIST.map((char) => {
                 const isSelected = characterId === char.id;
                 return (
