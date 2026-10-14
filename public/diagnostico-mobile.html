@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entre Nós — Diagnóstico de tela</title>
+<style>
+*{box-sizing:border-box}html{font-family:system-ui,-apple-system,sans-serif;background:#020617;color:#f8fafc}body{margin:0;padding:20px;max-width:100%;overflow-x:hidden}main{max-width:520px;margin:0 auto}h1{font-size:26px;line-height:1.2}p{font-size:16px;line-height:1.5}.panel{background:#172033;border:1px solid #64748b;border-radius:16px;padding:18px;margin:16px 0}.metric{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #334155;font-size:15px}.metric strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:right}button{min-height:52px;width:100%;background:#14b8a6;color:#042f2e;border:0;border-radius:12px;font-weight:800;font-size:18px}.swatch{width:100px;height:100px;background:#f59e0b;border-radius:12px;margin:16px auto;text-align:center;display:grid;place-items:center;color:#111827;font-weight:700}.small{font-size:13px;color:#cbd5e1}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.two div{background:#334155;padding:16px;border-radius:10px;text-align:center;font-size:16px}#events{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;color:#cbd5e1} 
+</style>
+</head>
+<body>
+<main>
+<h1>Entre Nós: teste de tela</h1>
+<p>Esta página não altera o jogo. Abra diretamente pelo link, sem escolher outro navegador.</p>
+<div class="panel" id="metrics"></div>
+<div class="two"><div>Alex</div><div>Joana</div><div>Ravi</div><div>Bia</div></div>
+<div class="swatch">100 × 100</div>
+<button id="test">Botão de teste</button>
+<p id="result" role="status">Aguardando toque.</p>
+<div class="panel"><strong>Eventos de tamanho</strong><div id="events"></div></div>
+<p class="small">Não há coleta ou envio de dados. Os números aparecem apenas nesta tela.</p>
+</main>
+<script>
+(function(){
+const metrics=document.getElementById('metrics'),events=document.getElementById('events');let last='',log=[];
+function render(){
+const vv=window.visualViewport;
+const data=[
+['screen.width',screen.width],['screen.height',screen.height],
+['window.innerWidth',innerWidth],['document.clientWidth',document.documentElement.clientWidth],
+['visualViewport.width',vv?vv.width.toFixed(1):'indisponível'],
+['visualViewport.scale',vv?vv.scale.toFixed(3):'indisponível'],
+['devicePixelRatio',devicePixelRatio],
+['CSS viewport 100vw',getComputedStyle(document.documentElement).width],
+['orientação',screen.orientation?.type||'não informada']
+];
+metrics.innerHTML=data.map(([k,v])=>'<div class="metric"><span>'+k+'</span><strong>'+v+'</strong></div>').join('');
+const key=data.map(x=>x[1]).join('|');if(key!==last){last=key;log.push(new Date().toLocaleTimeString('pt-BR')+' — '+innerWidth+'px / escala '+(vv?vv.scale.toFixed(2):'?'));events.textContent=log.slice(-12).join('\n')}
+}
+render();addEventListener('resize',render);addEventListener('orientationchange',render);visualViewport?.addEventListener('resize',render);
+document.getElementById('test').addEventListener('click',()=>{document.getElementById('result').textContent='Toque reconhecido. Largura: '+innerWidth+'px.';render()});
+})();
+</script>
+</body>
+</html>
