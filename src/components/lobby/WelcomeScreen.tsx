@@ -249,11 +249,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           >
             <span>Painel do Organizador</span>
           </button>
-          {/*
-            className="hover:text-indigo-300 transition-colors flex items-center gap-1.5"
-          >
-            <span>Painel do Organizador</span>
-          </button>
         </div>
       </div>
     </div>
