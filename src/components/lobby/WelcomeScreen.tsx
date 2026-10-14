@@ -74,28 +74,28 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const selectedChar = CHARACTERS[characterId];
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-0 py-4 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full mobile-welcome">
+    <div className="flex flex-col items-center justify-start min-h-0 py-3 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full mobile-welcome">
       {/* Hero presentation */}
-      <div className="text-center max-w-2xl mx-auto mb-5 mobile-welcome-hero sm:mb-8 space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wide">
+      <div className="text-center max-w-2xl mx-auto mb-3 mobile-welcome-hero sm:mb-8 space-y-2 sm:space-y-3">
+        <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wide">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-100">
+        <h1 className="text-2xl sm:text-5xl font-black tracking-tight text-slate-100">
           Entre Nós
-          <span className="block text-2xl sm:text-3xl font-bold text-amber-400 mt-1">
+          <span className="block text-lg sm:text-3xl font-bold text-amber-400 mt-1">
             Guardiões da Convivência
           </span>
         </h1>
 
-        <p className="text-base sm:text-base text-slate-300 leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
           Na <strong>Vila dos Encontros</strong>, suas escolhas revelam diferentes caminhos para a convivência ética.
         </p>
       </div>
 
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl mobile-welcome-card p-4 sm:p-8 shadow-2xl space-y-6">
+      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl mobile-welcome-card p-3 sm:p-8 shadow-2xl space-y-3 sm:space-y-6">
         {/* O multiplayer permanece no código para uma etapa futura. */}
         {false && <div>
         <div className="grid grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
@@ -127,7 +127,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </div>
 
         </div>}
-        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-5">
+        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-3 sm:space-y-5">
           {/* Room Code input (if joining) */}
           {mode === 'join' && (
             <div className="space-y-1.5">
@@ -164,7 +164,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </div>
 
           {/* Character selection cards */}
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-sm font-bold text-slate-300">
                 Escolha seu Personagem:
@@ -180,7 +180,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                     key={char.id}
                     type="button"
                     onClick={() => setCharacterId(char.id)}
-                    className={`mobile-character-card p-3 min-h-32 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
+                    className={`mobile-character-card p-2 sm:p-3 min-h-28 sm:min-h-32 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
                       isSelected
                         ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                         : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
@@ -196,7 +196,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
             {/* Character power info preview */}
             {selectedChar && (
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-slate-300 flex items-start gap-3">
+              <div className="hidden sm:flex p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-slate-300 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 shrink-0">
                   <Sparkles className="w-4 h-4" />
                 </div>
@@ -223,7 +223,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </form>
 
         {/* Informational quick links */}
-        <div className="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300">
+        <div className="pt-2 sm:pt-4 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300">
           <button
             type="button"
             onClick={onOpenRules}
@@ -241,10 +241,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Guia de Canais Éticos</span>
           </button>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <button
             type="button"
             onClick={onOpenOrganizer}
+            className="hidden sm:flex hover:text-indigo-300 transition-colors items-center gap-1.5"
+          >
+            <span>Painel do Organizador</span>
+          </button>
+          {/*
             className="hover:text-indigo-300 transition-colors flex items-center gap-1.5"
           >
             <span>Painel do Organizador</span>
