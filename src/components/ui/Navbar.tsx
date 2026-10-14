@@ -22,11 +22,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLeaveRoom,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 text-slate-100">
+    <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-4 py-2 sm:py-3 text-slate-100">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-md select-none">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-md select-none">
             EN
           </div>
           <div>
@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
 
         {/* Right Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Connection status dot */}
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-colors ${
@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Institutional Guide Button */}
           <button
             onClick={onOpenInstitutionalGuide}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="p-2.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
             title="Guia de Canais Institucionais"
           >
             <Scale className="w-4 h-4 text-teal-400" />
