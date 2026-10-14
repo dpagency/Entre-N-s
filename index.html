@@ -8,7 +8,16 @@
       (function () {
         if (!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) return;
         document.documentElement.classList.add('mobile-device');
-        // Keep the viewport meta tag unchanged to avoid a second layout pass.
+        // Corrige visualizadores Android que usam layout de desktop.
+        // Executa antes do React; navegadores com escala normal nao mudam.
+        var screenWidth = window.screen.width;
+        var layoutWidth = window.innerWidth;
+        var factor = layoutWidth / screenWidth;
+        if (screenWidth > 0 && screenWidth < 600 && factor > 1.7 && factor < 5) {
+          document.documentElement.style.width = screenWidth + 'px';
+          document.documentElement.style.zoom = String(factor);
+          document.documentElement.classList.add('embedded-viewport-correction');
+        }
       })();
     </script>
     <title>Entre Nós — Guardiões da Convivência</title>
