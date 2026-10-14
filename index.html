@@ -3,21 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <script>
-      // Alguns visualizadores incorporados ignoram o viewport responsivo e
-      // apresentam uma largura virtual de desktop (ex.: 980px em 320px).
-      // Ajustar a meta antes do CSS evita aplicar zoom ao documento depois.
-      (function () {
-        if (!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) return;
-        document.documentElement.classList.add('mobile-device');
-        var physicalWidth = window.screen.width;
-        var layoutWidth = window.innerWidth;
-        if (physicalWidth > 0 && physicalWidth < 600 && layoutWidth > physicalWidth * 1.7) {
-          var viewport = document.querySelector('meta[name="viewport"]');
-          if (viewport) viewport.setAttribute('content', 'width=' + Math.round(physicalWidth) + ', initial-scale=1.0, viewport-fit=cover');
-        }
-      })();
-    </script>
     <title>Entre Nós — Guardiões da Convivência</title>
     <meta name="description" content="Jogo cooperativo de cartas e tabuleiro sobre ética no cotidiano do serviço público na Vila dos Encontros." />
     <meta property="og:title" content="Entre Nós — Guardiões da Convivência" />
