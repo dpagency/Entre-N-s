@@ -4,16 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <script>
-      // Some in-app browsers ignore width=device-width and open at desktop layout width.
-      // Use the actual device screen width before the app's CSS is evaluated.
+      // Mark mobile browsers before styles load, without changing the viewport.
       (function () {
         if (!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) return;
         document.documentElement.classList.add('mobile-device');
-        var viewport = document.querySelector('meta[name="viewport"]');
-        var width = Math.round(window.screen.width);
-        if (viewport && width >= 280 && width <= 768) {
-          viewport.setAttribute('content', 'width=' + width + ', initial-scale=1.0, viewport-fit=cover');
-        }
+        // Keep the viewport meta tag unchanged to avoid a second layout pass.
       })();
     </script>
     <title>Entre Nós — Guardiões da Convivência</title>
