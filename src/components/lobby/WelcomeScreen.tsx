@@ -74,10 +74,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const selectedChar = CHARACTERS[characterId];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-80px)] py-5 px-3 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-start min-h-0 py-4 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full">
       {/* Hero presentation */}
-      <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
+      <div className="text-center max-w-2xl mx-auto mb-5 sm:mb-8 space-y-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wide">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
         </div>
@@ -127,7 +127,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </div>
 
         </div>}
-        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-6">
+        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-5">
           {/* Room Code input (if joining) */}
           {mode === 'join' && (
             <div className="space-y-1.5">
@@ -188,7 +188,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                   >
                     <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="md" showBadge={false} />
                     <div className="font-bold text-base">{char.name}</div>
-                    <div className="text-xs sm:text-sm text-slate-300 leading-snug">{char.title}</div>
+                    <div className="text-sm text-slate-300 leading-snug">{char.title}</div>
                   </button>
                 );
               })}
@@ -215,7 +215,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           {/* Submit button */}
           <button
             type="submit"
-            className="w-full min-h-14 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
+            className="w-full min-h-14 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
           >
             <Play className="w-5 h-5 fill-current" />
             <span>{mode === 'solo' ? 'Começar' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
