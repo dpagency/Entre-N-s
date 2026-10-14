@@ -12,12 +12,12 @@ export const MISSIONS: MissionDef[] = [
     missionType: 'reflexiva',
     pedagogicalGoal: 'Reconhecer o valor da escuta e da urbanidade ao acolher contribuições de servidores e colaboradores, sem pressionar por exposição pública.',
     situation: {
-      context: 'Na sala comunitária da Vila dos Encontros, a equipe debate a reformulação dos fluxos de atendimento aos cidadãos. Entre os presentes está Lucas, servidor recém-empossado há três semanas.',
-      trigger: 'Durante toda a reunião de 45 minutos, decisões cruciais foram debatidas por colegas mais experientes, enquanto Lucas permaneceu em silêncio contínuo, apenas anotando em seu caderno.',
+      context: 'A equipe discute melhorias no atendimento. Lucas chegou há três semanas e acompanha sua primeira reunião de planejamento.',
+      trigger: 'A reunião está terminando. Todos falaram, menos Lucas, que apenas fez anotações.',
       knownFacts: [
-        'Lucas veio de outro órgão e tem experiência prévia em triagem digital.',
-        'A pauta avançou rapidamente com opiniões fortes de dois colegas antigos.',
-        'A reunião está nos 10 minutos finais e a ata será concluída em breve.'
+        'Lucas já trabalhou com atendimento digital em outro órgão.',
+        'Colegas experientes dominaram a conversa.',
+        'Faltam dez minutos para fechar a ata.'
       ],
       uncertainties: [
         'Lucas está tímido, desconfortável com o ritmo da equipe, ou prefere estudar antes de opinar?',
@@ -32,7 +32,7 @@ export const MISSIONS: MissionDef[] = [
         actorRole: 'Servidor Recém-Chegado',
         actorAvatar: '🧑‍💻',
         summary: 'Quer contribuir com suas observações, mas teme parecer presunçoso ou contradizer normas locais que ainda não domina.',
-        details: '“No meu órgão anterior, tínhamos problemas idênticos neste sistema. Eu vi onde os gargalos aconteciam. Mas sou novo aqui; a equipe parece ter convicções consolidadas e não quero soar arrogante no meu primeiro mês.”'
+        details: '“Eu já vi esse problema antes… Mas será que vão achar que estou querendo ensinar a equipe?”'
       },
       {
         id: 'persp-1-2',
@@ -40,7 +40,7 @@ export const MISSIONS: MissionDef[] = [
         actorRole: 'Coordenadora da Reunião',
         actorAvatar: '👩‍💼',
         summary: 'Focada em cumprir a pauta no prazo, interpreta o silêncio como falta de objeção ou necessidade de adaptação gradual.',
-        details: '“Temos 15 minutos para fechar o cronograma. Se Lucas não levantou a mão, imagino que prefira primeiro acompanhar a dinâmica antes de assumir posicionamentos mais complexos.”'
+        details: '“Estamos sem tempo. Será que Lucas prefere observar antes de participar?”'
       },
       {
         id: 'persp-1-3',
@@ -48,7 +48,7 @@ export const MISSIONS: MissionDef[] = [
         actorRole: 'Colega de Equipe Veterano',
         actorAvatar: '🧔',
         summary: 'Acredita que quem tem algo a dizer deve se manifestar de pronto, sem formalismos.',
-        details: '“Aqui todo mundo fala o que pensa. Se ele não falar agora na reunião, depois que a decisão for publicada vai ficar mais difícil mudar o rumo das coisas.”'
+        details: '“Se ele tem uma ideia, por que não fala? Depois pode ser tarde para mudar.”'
       }
     ],
     additionalContexts: [
