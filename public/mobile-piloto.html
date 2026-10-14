@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050a1e">
+<title>Entre Nós — Piloto de interface móvel</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0;background:#050a1e;color:#f5f7ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}button,input{font:inherit}button{cursor:pointer}header{border-bottom:1px solid #26314b;padding:14px 16px;display:flex;align-items:center;gap:12px}header b{background:#04c8aa;color:#061421;border-radius:12px;padding:9px;font-size:20px}header span{font-weight:800}main{width:min(100% - 32px,640px);margin:0 auto;padding:32px 0 50px}h1{text-align:center;font-size:clamp(32px,8vw,48px);line-height:1.1;margin:8px 0}h1 small{display:block;font-size:clamp(20px,5vw,28px);color:#ffbf18;margin-top:8px}p.lead{text-align:center;color:#cbd5e1;margin:18px 0 28px}.panel{background:#111a30;border:1px solid #29334b;border-radius:22px;padding:20px}label{display:block;font-weight:700;margin-bottom:8px}input{width:100%;padding:14px;border:1px solid #455370;border-radius:12px;background:#070d20;color:white;min-height:48px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 22px}.character{min-width:0;min-height:152px;border:2px solid #2b3650;background:#080f24;color:white;border-radius:16px;padding:12px 6px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px}.character[aria-pressed=true]{border-color:#03d7bb;background:#073837}.character img{width:76px;height:76px;object-fit:cover;border-radius:50%;background:#26344a}.character strong{font-size:17px}.character small{font-size:13px;color:#cbd5e1}.primary{width:100%;min-height:54px;border:0;border-radius:14px;background:#08c5a9;color:#04121b;font-weight:850;font-size:18px}.note{font-size:13px;color:#b8c6d8;margin-top:18px}.hidden{display:none}h2{font-size:24px} .choice{width:100%;display:block;text-align:left;border:1px solid #52627c;border-radius:12px;padding:15px;background:#17243b;color:white;margin:10px 0;min-height:50px}.choice:focus-visible,.primary:focus-visible,.character:focus-visible{outline:3px solid #ffbf18;outline-offset:3px}#response{background:#0d3040;border-radius:12px;padding:16px;margin:16px 0} @media(min-width:700px){main{padding-top:48px}.panel{padding:30px}} 
+</style>
+</head>
+<body>
+<header><b>EN</b><span>Entre Nós <span style="display:block;font-size:12px;color:#31dec9">Guardiões da Convivência</span></span></header>
+<main>
+<section id="welcome">
+<h1>Entre Nós<small>Guardiões da Convivência</small></h1>
+<p class="lead">Na Vila dos Encontros, suas escolhas abrem caminhos para uma convivência ética.</p>
+<div class="panel"><label for="nick">Seu apelido (opcional)</label><input id="nick" maxlength="20" placeholder="Como gostaria de ser chamado?">
+<p style="font-weight:700;margin:24px 0 6px">Escolha seu personagem</p>
+<div class="grid" id="characters"></div>
+<button class="primary" id="start">Começar</button>
+<p class="note">Protótipo independente para validar leitura e navegação no celular. Não altera o jogo atual.</p></div>
+</section>
+<section id="story" class="hidden">
+<h1>Vila dos Encontros<small>Uma voz ainda não ouvida</small></h1>
+<div class="panel"><p>Durante uma reunião, uma colega tenta apresentar uma ideia, mas é interrompida repetidamente. O grupo está prestes a decidir.</p><h2>O que você faria?</h2>
+<button class="choice" data-answer="Ouvir antes de decidir amplia a participação e ajuda o grupo a considerar perspectivas que ainda não apareceram.">Propor que a colega conclua sua fala.</button>
+<button class="choice" data-answer="A pressa pode deixar contribuições importantes de fora. Que espaço o grupo poderia criar para ouvir a colega?">Seguir com a decisão para não atrasar.</button>
+<button class="choice" data-answer="Conversar em particular pode ajudar, mas também vale refletir sobre como o grupo pode garantir espaço para todas as vozes.">Conversar com a colega depois da reunião.</button>
+<div id="response" class="hidden" role="status"></div><button class="primary" id="back">Voltar ao início</button>
+</div></section>
+</main>
+<script>
+const people=[["alex","Alex","Explorador"],["joana","Joana","Acolhedora"],["ravi","Ravi","Analista"],["bia","Bia","Conselheira"]];
+let selected="alex";
+const cards=document.getElementById("characters");
+function draw(){cards.innerHTML=people.map(([id,name,title])=>'<button type="button" class="character" aria-pressed="'+(selected===id)+'" data-id="'+id+'"><img src="/characters/'+id+'.webp" alt="" onerror="this.style.display=\'none\'"><strong>'+name+'</strong><small>'+title+'</small></button>').join("");cards.querySelectorAll("button").forEach(b=>b.onclick=()=>{selected=b.dataset.id;draw()})}draw();
+document.getElementById("start").onclick=()=>{document.getElementById("welcome").classList.add("hidden");document.getElementById("story").classList.remove("hidden");window.scrollTo(0,0)};
+document.querySelectorAll("[data-answer]").forEach(b=>b.onclick=()=>{const r=document.getElementById("response");r.textContent=b.dataset.answer;r.classList.remove("hidden")});
+document.getElementById("back").onclick=()=>{document.getElementById("story").classList.add("hidden");document.getElementById("welcome").classList.remove("hidden");document.getElementById("response").classList.add("hidden");window.scrollTo(0,0)};
+</script></body></html>
