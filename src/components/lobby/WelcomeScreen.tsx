@@ -74,9 +74,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const selectedChar = CHARACTERS[characterId];
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-0 py-4 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-start min-h-0 py-4 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full mobile-welcome">
       {/* Hero presentation */}
-      <div className="text-center max-w-2xl mx-auto mb-5 sm:mb-8 space-y-3">
+      <div className="text-center max-w-2xl mx-auto mb-5 mobile-welcome-hero sm:mb-8 space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wide">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
@@ -95,7 +95,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
 
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-8 shadow-2xl space-y-6">
+      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl mobile-welcome-card p-4 sm:p-8 shadow-2xl space-y-6">
         {/* O multiplayer permanece no código para uma etapa futura. */}
         {false && <div>
         <div className="grid grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
@@ -172,7 +172,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {CHARACTER_LIST.map((char) => {
                 const isSelected = characterId === char.id;
                 return (
@@ -180,7 +180,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                     key={char.id}
                     type="button"
                     onClick={() => setCharacterId(char.id)}
-                    className={`p-3 min-h-32 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
+                    className={`mobile-character-card p-3 min-h-32 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
                       isSelected
                         ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                         : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
