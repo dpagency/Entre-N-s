@@ -157,7 +157,7 @@ export default function App() {
       />
 
       {/* Main content body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
+      <main className="flex-1 max-w-7xl w-full min-w-0 mx-auto px-3 py-4 sm:p-6 flex flex-col">
         {!state || !myPlayerId ? (
           /* Welcome screen when not in a room */
           <WelcomeScreen
