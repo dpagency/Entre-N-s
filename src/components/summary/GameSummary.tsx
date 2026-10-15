@@ -30,6 +30,18 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     (h) => h.reconsiderationOccurred
   ).length;
 
+  // Pontos de navegação: nunca derivados de qual alternativa ética foi escolhida.
+  // Quatro missões, até 25 pontos por dimensão; critérios auditáveis no histórico.
+  const progress = Math.min(4, completedMissions.length);
+  const dimensions = [
+    { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, state.historyLog.length)), explanation: 'Avanço e conclusão das etapas da jornada.' },
+    { label: 'Confiança', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + (h.voteType === 'unanimous' ? 5 : h.voteType === 'majority' ? 3 : 2), 0)), explanation: 'Construção de acordos; divergências também geram aprendizagem.' },
+    { label: 'Equilíbrio', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(4, h.perspectivesExploredCount) + (h.reconsiderationOccurred ? 2 : 0), 0)), explanation: 'Perspectivas consideradas e disposição para reconsiderar.' },
+    { label: 'Participação', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Compartilhamento de perspectivas ao longo das missões.' },
+  ];
+  const journeyPoints = dimensions.reduce((sum, d) => sum + d.points, 0);
+  const journeyLevel = journeyPoints < 40 ? 'Percurso inicial' : journeyPoints < 70 ? 'Percurso em desenvolvimento' : 'Percurso avançado';
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto text-slate-100 animate-in fade-in">
       {/* Header Banner */}
@@ -60,6 +72,23 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <p className="rounded-xl bg-slate-950 p-3"><strong className="block text-amber-300">O que aprendemos?</strong>O que faríamos diferente diante de um novo dilema?</p>
         </div>
       </section>
+      <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Pontuação da jornada">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="text-lg font-black text-amber-200">Seu percurso pela Vila</h2>
+          <span className="text-xl font-black text-amber-300">{journeyPoints}/100 pontos</span>
+        </div>
+        <div className="h-3 rounded-full bg-slate-700 overflow-hidden"><div className="h-full rounded-full bg-teal-400 transition-all" style={{ width: `${journeyPoints}%` }} /></div>
+        <p className="text-sm font-bold text-teal-300">{journeyLevel}</p>
+        <p className="text-xs text-slate-300">Os pontos reconhecem a navegação, a exploração e a colaboração — não avaliam seus valores nem classificam suas escolhas éticas como boas ou ruins. As cartas de sorte não geram punição moral.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {dimensions.map((d) => <div key={d.label} className="rounded-xl bg-slate-950 p-3 border border-slate-800">
+            <div className="flex justify-between gap-2 text-sm font-bold"><span>{d.label}</span><span className="text-amber-300">{d.points}/25</span></div>
+            <p className="text-xs text-slate-400 mt-1">{d.explanation}</p>
+          </div>)}
+        </div>
+        <p className="text-xs text-slate-400">Escala experimental do piloto: inicial (0–39), desenvolvimento (40–69), avançado (70–100). O máximo representa o teto da escala, não uma nota ética.</p>
+      </section>
+
       {/* Aggregate Collective Indicators (No moral ranking!) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center shadow-lg">
