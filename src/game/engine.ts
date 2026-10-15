@@ -94,6 +94,7 @@ function getSanitizedState(room: RoomState, viewerPlayerId: string): SanitizedRo
     tfAnsweredPlayers: room.tfAnsweredPlayers,
     unlockedDiscoveries: room.unlockedDiscoveries,
     historyLog: room.historyLog,
+    fortuneCards: room.fortuneCards || {},
     myChoice: room.individualChoices[viewerPlayerId],
   };
 
@@ -220,6 +221,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       tfAnsweredPlayers: {},
       unlockedDiscoveries: [],
       historyLog: [],
+      fortuneCards: {},
     };
 
     rooms.set(roomCode, newRoom);
@@ -633,6 +635,25 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     return;
   }
 
+  // Carta de sorte: escolha visual entre três cartas fechadas; sorteio não depende da decisão ética.
+  if (msg.type === 'DRAW_FORTUNE_CARD') {
+    if (room.phase !== 'MISSION_CONSEQUENCE' || room.hostId !== playerId ||
+        !Number.isInteger(msg.cardIndex) || msg.cardIndex < 0 || msg.cardIndex > 2 || !room.activeMissionId) return;
+    room.fortuneCards ||= {};
+    if (room.fortuneCards[room.activeMissionId]) return;
+    const outcomes = ['sorte', 'reves', 'segunda_chance'] as const;
+    const shuffled = [...outcomes];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const bytes = new Uint32Array(1);
+      crypto.getRandomValues(bytes);
+      const j = bytes[0] % (i + 1);
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    room.fortuneCards[room.activeMissionId] = {cardIndex: msg.cardIndex, outcome: shuffled[msg.cardIndex]};
+    broadcastRoomState(room, 'Uma carta do destino foi revelada!', 'success');
+    return;
+  }
+
   // 16. PROCEED_AFTER_CONSEQUENCE
   if (msg.type === 'PROCEED_AFTER_CONSEQUENCE') {
     if (room.hostId !== playerId) return;
@@ -644,6 +665,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     }
 
     if (room.phase === 'MISSION_CONSEQUENCE') {
+      if (!room.activeMissionId || !room.fortuneCards?.[room.activeMissionId]) return;
       // Record completed mission
       if (room.activeMissionId && !room.completedMissionIds.includes(room.activeMissionId)) {
         room.completedMissionIds.push(room.activeMissionId);
