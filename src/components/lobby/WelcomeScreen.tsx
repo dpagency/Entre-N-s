@@ -17,6 +17,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onOpenOrganizer,
 }) => {
   const [mode, setMode] = useState<'create' | 'join' | 'solo'>('solo');
+  const [starting, setStarting] = useState(false);
   const [nickname, setNickname] = useState(
     localStorage.getItem('guardioes_nickname') || ''
   );
@@ -41,6 +42,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
+    setStarting(true);
+    window.setTimeout(() => setStarting(false), 4500);
     const cleanNick = nickname.trim() || 'Guardião';
     localStorage.setItem('guardioes_nickname', cleanNick);
     localStorage.setItem('guardioes_character', characterId);
@@ -57,6 +60,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
   const handleJoinRoom = (e: React.FormEvent) => {
     e.preventDefault();
+    setStarting(true);
+    window.setTimeout(() => setStarting(false), 4500);
     const cleanNick = nickname.trim() || 'Guardião';
     socketService.setSoloMode(false);
     const cleanCode = roomCode.trim().toUpperCase();
@@ -101,9 +106,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       {/* Main interaction card */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
         <button type="button" onClick={() => setMode('solo')} className="w-full py-3 rounded-xl bg-amber-500 text-slate-950 font-bold">Jogar sozinho com companheiros virtuais</button>
-        {mode === 'solo' && <p className="text-sm text-amber-200">Partida neste dispositivo, com três personagens controlados pelo computador. O progresso fica salvo nesta aba. As avaliações não são enviadas ao organizador.</p>}
+        {mode === 'solo' && <p className="text-xs text-amber-200">Você e três companheiros virtuais. Sua jornada fica neste dispositivo.</p>}
+        {/* Multiplayer depende de configuração de infraestrutura e permanece indisponível neste piloto. */}
         {/* Toggle mode: Criar Sala vs Entrar em Sala */}
-        <div className="grid grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
+        <div className="hidden grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
           <button
             type="button"
             onClick={() => setMode('create')}
@@ -243,10 +249,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           {/* Submit button */}
           <button
             type="submit"
+            disabled={starting}
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
           >
             <Play className="w-5 h-5 fill-current" />
-            <span>{mode === 'solo' ? 'Começar com o computador' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
+            <span>{starting ? 'Preparando sua jornada…' : mode === 'solo' ? 'Começar com o computador' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
           </button>
         </form>
 
@@ -269,7 +276,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Guia de Canais Éticos</span>
           </button>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <button
             type="button"
             onClick={onOpenOrganizer}
