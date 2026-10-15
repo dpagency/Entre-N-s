@@ -39,18 +39,27 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
 
         <span className="text-xs font-bold uppercase tracking-widest text-teal-300 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30">
-          Jornada Concluída com Sucesso
+          Jornada concluída • momento de reflexão
         </span>
 
         <h1 className="text-2xl sm:text-4xl font-black text-slate-100 mt-2 mb-2">
-          Guardiões da Convivência
+          O Círculo dos Encontros
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-          A equipe atuou colaborativamente na Vila dos Encontros, articulando escuta atenta, urbanidade e responsabilidade com o interesse público.
+          Um espaço de reflexão sobre as decisões, seus efeitos e os vínculos que construímos. Cada escolha convida a examinar responsabilidades, riscos e possibilidades de reparação.
         </p>
       </div>
 
+      <section className="rounded-3xl border border-teal-500/30 bg-slate-900 p-5 space-y-3">
+        <h2 className="text-lg font-bold text-teal-200">O que levamos desta jornada?</h2>
+        <p className="text-sm text-slate-300">Revisite as decisões e seus efeitos. Os indicadores abaixo registram participação e descobertas, não uma classificação moral.</p>
+        <div className="grid sm:grid-cols-3 gap-3 text-sm">
+          <p className="rounded-xl bg-slate-950 p-3"><strong className="block text-amber-300">O que decidimos?</strong>Quais alternativas escolhemos e quais deixamos de lado?</p>
+          <p className="rounded-xl bg-slate-950 p-3"><strong className="block text-amber-300">O que aconteceu?</strong>Quem foi afetado e quais riscos permaneceram?</p>
+          <p className="rounded-xl bg-slate-950 p-3"><strong className="block text-amber-300">O que aprendemos?</strong>O que faríamos diferente diante de um novo dilema?</p>
+        </div>
+      </section>
       {/* Aggregate Collective Indicators (No moral ranking!) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center shadow-lg">
