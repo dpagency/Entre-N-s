@@ -21,3 +21,17 @@ h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-s
   .game-welcome input { padding: 8px 10px; }
   .game-welcome .game-title { font-size: 2rem; }
 }
+
+/* Leitura confortável no celular: prevalece sobre utilitários tipográficos antigos. */
+@media (max-width: 639px) {
+  html { font-size: 17px; }
+  body { overflow-x: hidden; }
+  #root { width: 100%; min-width: 0; overflow-x: clip; }
+  main, main > div { min-width: 0; max-width: 100%; }
+  main .text-\\[10px\\], main .text-\\[11px\\], main .text-xs { font-size: 0.875rem; line-height: 1.45; }
+  main .text-sm { font-size: 1rem; line-height: 1.5; }
+  main .text-base { font-size: 1.0625rem; line-height: 1.5; }
+  main button { min-height: 44px; }
+  main button, main p, main span, main h1, main h2, main h3 { overflow-wrap: break-word; }
+  main .line-clamp-1 { -webkit-line-clamp: 2; }
+}
