@@ -192,6 +192,8 @@ export interface RoomState {
   tfAnsweredPlayers: Record<string, boolean>; // playerId -> answer
   // Discoveries acquired by team
   unlockedDiscoveries: DiscoveryKey[];
+  // Sorteio registrado por missão: independente das respostas éticas.
+  fortuneCards?: Record<string, { cardIndex: number; outcome: 'sorte' | 'reves' | 'segunda_chance' }>;
   // History
   historyLog: {
     timestamp: number;
@@ -231,6 +233,7 @@ export type ClientMessage =
   | { type: 'SUBMIT_COLLECTIVE_VOTE'; actionId: string }
   | { type: 'CONTINUE_WITHOUT_DISCONNECTED' }
   | { type: 'SUBMIT_TF_ANSWER'; answer: boolean }
+  | { type: 'DRAW_FORTUNE_CARD'; cardIndex: number }
   | { type: 'PROCEED_AFTER_CONSEQUENCE' }
   | { type: 'SUBMIT_POST_TEST'; answers: Record<string, string> }
   | { type: 'SUBMIT_FEEDBACK'; usability: number; clarity: number; interest: number; comment?: string }
