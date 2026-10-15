@@ -16,7 +16,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onOpenInstitutionalGuide,
   onOpenOrganizer,
 }) => {
-  const [mode, setMode] = useState<'create' | 'join' | 'solo'>('create');
+  const [mode, setMode] = useState<'create' | 'join' | 'solo'>('solo');
   const [nickname, setNickname] = useState(
     localStorage.getItem('guardioes_nickname') || ''
   );
@@ -78,28 +78,28 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const selectedChar = CHARACTERS[characterId];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] py-6 px-4 text-slate-100 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-center min-h-0 py-2 sm:py-4 px-2 text-slate-100 max-w-5xl mx-auto w-full game-welcome">
       {/* Hero presentation */}
-      <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">
+      <div className="text-center max-w-2xl mx-auto mb-3 space-y-1">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-100">
+        <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-100">
           Entre Nós
-          <span className="block text-2xl sm:text-3xl font-bold text-amber-400 mt-1">
+          <span className="block text-base sm:text-2xl font-bold text-amber-400 mt-1">
             Guardiões da Convivência
           </span>
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-serif">
-          Bem-vindos à <strong>Vila dos Encontros</strong>. Reúna sua equipe (2 a 6 participantes) para vivenciar e debater dilemas éticos reais do cotidiano do serviço público com respeito, escuta e integridade.
+          Na <strong>Vila dos Encontros</strong>, cada escolha abre caminhos para refletir sobre a convivência ética.
         </p>
       </div>
 
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
         <button type="button" onClick={() => setMode('solo')} className="w-full py-3 rounded-xl bg-amber-500 text-slate-950 font-bold">Jogar sozinho com companheiros virtuais</button>
         {mode === 'solo' && <p className="text-sm text-amber-200">Partida neste dispositivo, com três personagens controlados pelo computador. O progresso fica salvo nesta aba. As avaliações não são enviadas ao organizador.</p>}
         {/* Toggle mode: Criar Sala vs Entrar em Sala */}
@@ -131,10 +131,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </button>
         </div>
 
-        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-6">
+        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="hidden sm:block space-y-2">
           {/* Room Code input (if joining) */}
           {mode === 'join' && (
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                 Código da Sala (Ex: VILA-7K4):
               </label>
@@ -163,7 +163,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               maxLength={16}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="Ex: Guardião Alex, Carol, Lucas..."
+              placeholder="Ex: Guardião, Lua, Sol..."
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
@@ -177,7 +177,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <span className="text-[11px] text-teal-400">Permite personagens repetidos</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-2">
               {CHARACTER_LIST.map((char) => {
                 const isSelected = characterId === char.id;
                 return (
@@ -191,7 +191,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                         : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
                     }`}
                   >
-                    <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="md" showBadge={false} />
+                    <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="sm" showBadge={false} />
                     <div className="font-bold text-xs sm:text-sm">{char.name}</div>
                     <div className="text-[10px] text-slate-400 leading-tight">{char.title}</div>
                   </button>
@@ -201,7 +201,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
             {/* Character power info preview */}
             {selectedChar && (
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
+              <div className="hidden sm:flex p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 shrink-0">
                   <Sparkles className="w-4 h-4" />
                 </div>
@@ -252,7 +252,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </form>
 
         {/* Informational quick links */}
-        <div className="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
+        <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
           <button
             type="button"
             onClick={onOpenRules}
