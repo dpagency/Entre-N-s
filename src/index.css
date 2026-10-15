@@ -1,7 +1,7 @@
-@import "tailwindcss";
 
 /* Identidade tipográfica de jogo: títulos expressivos e texto legível. */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pirata+One&display=swap');
+@import "tailwindcss";
 :root { font-family: 'Nunito', system-ui, sans-serif; }
 body, button, input, textarea { font-family: 'Nunito', system-ui, sans-serif; }
 h1, h2, h3, .game-title { font-family: 'Pirata One', Georgia, serif; letter-spacing: .025em; font-weight: 400; }
