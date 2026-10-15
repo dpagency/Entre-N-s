@@ -378,9 +378,9 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       p.hasUsedPower = false; p.preTestCompleted = !!p.isBot; p.postTestCompleted = !!p.isBot;
       p.preTestScore = undefined; p.postTestScore = undefined;
     }
-    // Move to PRE_TEST
-    room.phase = 'PRE_TEST';
-    broadcastRoomState(room, 'A jornada começou! Responda à breve avaliação inicial.');
+    // The four missions now form the complete journey; no mandatory diagnostic questionnaire.
+    room.phase = 'BOARD_SELECT';
+    broadcastRoomState(room, 'A jornada começou! Escolha o primeiro destino no mapa.');
     return;
   }
 
@@ -651,8 +651,8 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
       // Check if 4 missions are completed
       if (room.completedMissionIds.length >= 4) {
-        room.phase = 'POST_TEST';
-        broadcastRoomState(room, 'Parabéns aos guardiões! 4 missões concluídas. Agora responda à avaliação final.');
+        room.phase = 'GAME_SUMMARY';
+        broadcastRoomState(room, 'Parabéns! As quatro missões foram concluídas. Veja suas descobertas e o resumo da jornada.');
       } else {
         // Return to board for next destination
         room.phase = 'BOARD_SELECT';

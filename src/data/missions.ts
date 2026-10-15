@@ -10,14 +10,14 @@ export const MISSIONS: MissionDef[] = [
     title: 'Uma voz ainda não ouvida',
     regionId: 'praca',
     missionType: 'reflexiva',
-    pedagogicalGoal: 'Compreender a diferença entre pressionar por participação e construir condições reais de acolhimento e autonomia para colegas novatos.',
+    pedagogicalGoal: 'Reconhecer o valor da escuta e da urbanidade ao acolher contribuições de servidores e colaboradores, sem pressionar por exposição pública.',
     situation: {
-      context: 'Na sala comunitária da Vila dos Encontros, a equipe debate a reformulação dos fluxos de atendimento aos cidadãos. Entre os presentes está Lucas, servidor recém-empossado há três semanas.',
-      trigger: 'Durante toda a reunião de 45 minutos, decisões cruciais foram debatidas por colegas mais experientes, enquanto Lucas permaneceu em silêncio contínuo, apenas anotando em seu caderno.',
+      context: 'A equipe discute melhorias no atendimento. Lucas chegou há três semanas e acompanha sua primeira reunião de planejamento.',
+      trigger: 'A reunião está terminando. Todos falaram, menos Lucas, que apenas fez anotações.',
       knownFacts: [
-        'Lucas veio de outro órgão e tem experiência prévia em triagem digital.',
-        'A pauta avançou rapidamente com opiniões fortes de dois colegas antigos.',
-        'A reunião está nos 10 minutos finais e a ata será concluída em breve.'
+        'Lucas já trabalhou com atendimento digital em outro órgão.',
+        'Colegas experientes dominaram a conversa.',
+        'Faltam dez minutos para fechar a ata.'
       ],
       uncertainties: [
         'Lucas está tímido, desconfortável com o ritmo da equipe, ou prefere estudar antes de opinar?',
@@ -32,7 +32,7 @@ export const MISSIONS: MissionDef[] = [
         actorRole: 'Servidor Recém-Chegado',
         actorAvatar: '🧑‍💻',
         summary: 'Quer contribuir com suas observações, mas teme parecer presunçoso ou contradizer normas locais que ainda não domina.',
-        details: '“No meu órgão anterior, tínhamos problemas idênticos neste sistema. Eu vi onde os gargalos aconteciam. Mas sou novo aqui; a equipe parece ter convicções consolidadas e não quero soar arrogante no meu primeiro mês.”'
+        details: '“Eu já vi esse problema antes… Mas será que vão achar que estou querendo ensinar a equipe?”'
       },
       {
         id: 'persp-1-2',
@@ -40,7 +40,7 @@ export const MISSIONS: MissionDef[] = [
         actorRole: 'Coordenadora da Reunião',
         actorAvatar: '👩‍💼',
         summary: 'Focada em cumprir a pauta no prazo, interpreta o silêncio como falta de objeção ou necessidade de adaptação gradual.',
-        details: '“Temos 15 minutos para fechar o cronograma. Se Lucas não levantou a mão, imagino que prefira primeiro acompanhar a dinâmica antes de assumir posicionamentos mais complexos.”'
+        details: '“Estamos sem tempo. Será que Lucas prefere observar antes de participar?”'
       },
       {
         id: 'persp-1-3',
@@ -48,7 +48,7 @@ export const MISSIONS: MissionDef[] = [
         actorRole: 'Colega de Equipe Veterano',
         actorAvatar: '🧔',
         summary: 'Acredita que quem tem algo a dizer deve se manifestar de pronto, sem formalismos.',
-        details: '“Aqui todo mundo fala o que pensa. Se ele não falar agora na reunião, depois que a decisão for publicada vai ficar mais difícil mudar o rumo das coisas.”'
+        details: '“Se ele tem uma ideia, por que não fala? Depois pode ser tarde para mudar.”'
       }
     ],
     additionalContexts: [
@@ -102,7 +102,7 @@ export const MISSIONS: MissionDef[] = [
       title: 'Escuta Ativa e Inclusão Segura',
       subtitle: 'Convivência não é forçar a fala, mas abrir espaço seguro',
       description: 'A inclusão real no serviço público reconhece que nem todo mundo se expressa no mesmo ritmo ou diante de plateias dominadas por veteranos. O acolhimento inteligente oferece múltiplos canais para a circulação de saberes.',
-      reflectionQuestion: 'Como criamos em nosso dia a dia espaços em que servidores novatos possam questionar sem receio de parecerem inadequados?',
+      reflectionQuestion: 'Como abrir espaço para que servidores, estagiários e colaboradores contribuam sem receio de exposição?',
       icon: 'Ear'
     },
     editorialInfo: {
@@ -121,20 +121,20 @@ export const MISSIONS: MissionDef[] = [
     title: 'Discordar sem diminuir',
     regionId: 'sala',
     missionType: 'fundamentada',
-    pedagogicalGoal: 'Compreender que divergências técnicas e erros operacionais não justificam ataques à honra ou desqualificação pessoal no ambiente institucional.',
+    pedagogicalGoal: 'Reconhecer o dever de urbanidade nas relações com servidores e colaboradores, distinguindo a correção técnica legítima de ironias e desqualificações pessoais.',
     situation: {
       context: 'No grupo de mensagens de trabalho da equipe de análise de processos, o prazo para envio de um levantamento de impacto orçamentário se esgotava.',
       trigger: 'Um colega (Tiago) cometeu um equívoco na planilha de cálculo de prazos. Em vez de apontar a divergência numérica, Roberto enviou no grupo: “Impressionante como tem gente aqui que parece não saber nem fazer conta de padaria. Falta total de competência”.',
       knownFacts: [
         'A planilha de Tiago continha de fato uma fórmula desatualizada que alterava uma coluna.',
-        'A mensagem com adjetivos desqualificantes foi enviada no grupo oficial de 14 servidores.',
+        'A mensagem com ironias e adjetivos depreciativos foi enviada ao grupo de trabalho, que reúne servidores e colaboradores.',
         'Tiago visualizou a mensagem e saiu do grupo sem responder.'
       ],
       uncertainties: [
         'A equipe deve ignorar o tom agressivo sob pretexto da urgência da entrega?',
         'Como separar a correção técnica inadiável do repúdio inequívoco à ofensa pessoal?'
       ],
-      institutionalNote: 'O respeito à dignidade é dever irrevogável no serviço público. O estresse ou o erro alheio jamais legitimam condutas humilhantes.'
+      institutionalNote: 'O dever de urbanidade orienta o tratamento de todas as pessoas no ambiente institucional, independentemente do vínculo. A urgência não justifica ironias ou desqualificações pessoais.'
     },
     perspectives: [
       {
@@ -156,9 +156,9 @@ export const MISSIONS: MissionDef[] = [
       {
         id: 'persp-2-3',
         actorName: 'Camila',
-        actorRole: 'Colega de Equipe que testemunhou a cena',
+        actorRole: 'Colaboradora terceirizada que testemunhou a conversa',
         actorAvatar: '👩‍🏫',
-        summary: 'Preocupa-se com o clima tóxico, mas teme que intervir piore o conflito ou atrase a planilha.',
+        summary: 'Preocupa-se com o respeito na equipe, mas receia que intervir piore o conflito ou afete sua relação de trabalho.',
         details: '“Todo mundo viu o absurdo do comentário, mas ninguém escreveu nada no grupo. O silêncio pareceu concordância com a agressão, o que me deixou muito mal.”'
       }
     ],
@@ -184,7 +184,7 @@ export const MISSIONS: MissionDef[] = [
         isPreferableInContext: true,
         description: 'No próprio grupo: corrigir prontamente o erro na planilha para salvar a entrega, e posicionar com firmeza que divergências devem ser tratadas tecnicamente, sem ataques pessoais. Em seguida, acolher Tiago no privado.',
         justification: 'Protege a entrega pública sem validar a humilhação coletiva, restabelecendo os limites de convivência diante de todas as testemunhas.',
-        pedagogicalFeedback: 'Resposta modelar. Mostra que a integridade do trabalho público não requer crueldade, e que a ofensa testemunhada em público requer demarcação de limites no mesmo espaço.',
+        pedagogicalFeedback: 'A correção técnica pode ser firme e respeitosa. Reconhecer o limite da urbanidade também ajuda a proteger as relações com servidores e colaboradores.',
         consequenceSummary: 'A planilha é consertada em minutos; o clima é estabilizado com limites éticos claros e Tiago retorna ao projeto amparado.',
         consequenceDetails: 'A postura serena e firme impede a naturalização da grosseria. Roberto é chamado pela chefia para alinhamento de conduta, e Tiago recupera a confiança no suporte da equipe.'
       },
@@ -206,15 +206,15 @@ export const MISSIONS: MissionDef[] = [
         justification: 'Sentimento de indignação imediata para defender o colega ofendido com veemência.',
         pedagogicalFeedback: 'A indignação contra a ofensa é legítima, mas responder com nova desqualificação pessoal amplifica a escalada do conflito e desvirtua o canal institucional.',
         consequenceSummary: 'O grupo se converte em um bate-boca acalorado; o foco na entrega pública se perde e o relatório atrasa.',
-        consequenceDetails: 'Ambos os servidores são chamados para apuração, e a situação desgasta a unidade inteira sem resolver a fórmula nem educar para a convivência.'
+        consequenceDetails: 'A discussão se prolonga, prejudica a entrega e exige intervenção da chefia para restabelecer o diálogo e organizar a correção técnica.'
       }
     ],
     tfChallenge: {
       id: 'tf-2',
-      statement: 'No serviço público, quando um colega comete um erro técnico relevante sob prazo crítico, é justificável usar expressões duras e desqualificantes para demonstrar a gravidade da situação à equipe.',
-      isTrue: false,
-      explanation: 'FALSO. A urbanidade e o respeito à pessoa são deveres absolutos do servidor público. Erros técnicos devem ser apontados com precisão e clareza objetiva, sem qualquer ataque à dignidade pessoal.',
-      sourceNote: 'Orientação Pedagógica Proposta / Código de Conduta e Ética Profissional no Serviço Público.'
+      statement: 'A Lei nº 8.112/1990 estabelece, entre os deveres do servidor público federal abrangido por ela, tratar com urbanidade as pessoas.',
+      isTrue: true,
+      explanation: 'VERDADEIRO. O art. 116, inciso XI, da Lei nº 8.112/1990 prevê o dever de tratar com urbanidade as pessoas. Na situação de Tiago e Roberto, a cobrança por precisão técnica não dispensa o respeito no trato profissional.',
+      sourceNote: 'Lei nº 8.112/1990, art. 116, XI (servidores públicos federais abrangidos pela lei). Fonte oficial: https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm'
     },
     discovery: {
       key: 'respeito',
@@ -240,7 +240,7 @@ export const MISSIONS: MissionDef[] = [
     title: 'O erro na entrega',
     regionId: 'oficina',
     missionType: 'fundamentada',
-    pedagogicalGoal: 'Compreender que o dever de transparência e correção tempestiva no serviço público supera o receio pessoal de exposição ou o ímpeto de ocultar falhas.',
+    pedagogicalGoal: 'Reconhecer o dever de zelo e responsabilidade com registros públicos, distinguindo erro corrigível de ocultação deliberada de informação.',
     situation: {
       context: 'A equipe da Oficina Coletiva acabou de consolidar o inventário anual de patrimônio e equipamentos tecnológicos distribuídos nas unidades de ensino da região.',
       trigger: 'Faltando 40 minutos para o envio oficial ao órgão central de controle, Helena percebe que uma fórmula somou em duplicidade 120 computadores que na verdade já haviam sido desativados.',
@@ -303,7 +303,7 @@ export const MISSIONS: MissionDef[] = [
         isPreferableInContext: true,
         description: 'Informar imediatamente a chefia e a área técnica sobre a inconsistência identificada, suspender o envio dos dados errados, aplicar o protocolo de retificação justificada e apoiar Helena na conferência dos números.',
         justification: 'Prioriza a veracidade da informação pública, evita que servidores assinem relatórios com dados falsificados e demonstra responsabilidade institucional.',
-        pedagogicalFeedback: 'Decisão ética e juridicamente irretocável. A transparência tempestiva transforma uma falha técnica em demonstração de responsabilidade e integridade coletiva.',
+        pedagogicalFeedback: 'Comunicar o erro e buscar sua correção favorece a confiabilidade dos registros e a responsabilidade compartilhada. O procedimento concreto deve observar as regras do órgão.',
         consequenceSummary: 'O envio é corrigido com duas horas de atraso mediante nota técnica justificativa, preservando a fidelidade patrimonial e a segurança da equipe.',
         consequenceDetails: 'A auditoria externa elogiou a prontidão na retificação. Helena sentiu-se amparada pelo grupo e uma nova rotina de conferência em pares foi implementada na Oficina.'
       },
@@ -313,9 +313,9 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'cautela',
         description: 'Seguir a sugestão de Marcos: submeter o documento com o valor incorreto às 16h59 e tentar maquiar os números em relatórios futuros para não prejudicar as metas.',
         justification: 'Evitar o desconforto de perder o prazo no sistema e proteger temporariamente a nota do setor.',
-        pedagogicalFeedback: 'Conduta inaceitável. Ocultar conscientemente erro em documento público compromete a probidade, fere o interesse coletivo e expõe os servidores a graves sanções disciplinares.',
+        pedagogicalFeedback: 'Ocultar deliberadamente uma inconsistência conhecida compromete a confiabilidade dos registros e pode exigir apuração pelas instâncias competentes.',
         consequenceSummary: 'Três meses depois, o cruzamento automático de notas fiscais apontou a divergência de 120 máquinas inexistentes.',
-        consequenceDetails: 'A Corregedoria abriu sindicância investigatória para apurar se houve desvio ou falsidade ideológica. Todos os que assinaram foram chamados a depor com grande desgaste pessoal e institucional.'
+        consequenceDetails: 'A divergência exigiu conferência documental e encaminhamento aos setores responsáveis para verificar os fatos e adotar as providências cabíveis.'
       },
       {
         id: 'act-3-c',
@@ -352,7 +352,7 @@ export const MISSIONS: MissionDef[] = [
     title: 'O atendimento que está terminando',
     regionId: 'portal',
     missionType: 'reflexiva',
-    pedagogicalGoal: 'Refletir sobre o equilíbrio delicado entre humanização do acolhimento ao cidadão vulnerável, equidade de atendimento e limites legítimos da jornada de trabalho do servidor.',
+    pedagogicalGoal: 'Reconhecer o dever de urbanidade no atendimento a cidadãos, equilibrando orientação clara, respeito às pessoas e limites operacionais legítimos.',
     situation: {
       context: 'No balcão presencial do Portal do Atendimento da Vila dos Encontros, o horário de encerramento do expediente é às 17h.',
       trigger: 'Às 16h53, chega Dona Conceição, senhora idosa que pegou dois ônibus da zona rural, trazendo uma pasta com papéis para tentar solicitar um benefício assistencial essencial.',
@@ -414,7 +414,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'orientacao',
         description: 'Dedicar os 7 minutos finais para olhar com carinho os documentos principais, circular com caneta clara o que está correto e o que falta na lista impressa, e agendar horário prioritário garantido no dia seguinte (ou informar o posto perto da casa dela).',
         justification: 'Entrega valor real à cidadã, poupa-a de viagens inúteis e respeita com clareza o limite de horário da servidora.',
-        pedagogicalFeedback: 'Excelente equilíbrio entre humanização, empatia e sustentabilidade do trabalho público. Trata o cidadão como sujeito de direitos e não abandona os limites funcionais.',
+        pedagogicalFeedback: 'A orientação clara oferece um caminho possível à cidadã e respeita os limites do atendimento. A solução depende dos serviços efetivamente disponíveis.',
         consequenceSummary: 'Dona Conceição sai aliviada sabendo exatamente o que providenciar; Renata consegue buscar seu filho no horário.',
         consequenceDetails: 'Dona Conceição retornou dois dias depois diretamente com os documentos certos e foi atendida em 10 minutos. O balcão funcionou com dignidade para ambas as partes.'
       },

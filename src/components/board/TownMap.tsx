@@ -19,6 +19,7 @@ export const TownMap: React.FC<TownMapProps> = ({
   const isVoting = state.phase === 'BOARD_SELECT';
   const myVote = state.destinationVotes[myPlayerId];
   const isHost = state.hostId === myPlayerId;
+  const isSolo = Object.values(state.players).filter(player => !player.isBot).length === 1;
 
   const currentRegion = REGIONS[state.currentRegionId] || REGIONS.praca;
 
@@ -81,9 +82,9 @@ export const TownMap: React.FC<TownMapProps> = ({
           <h2 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight mt-1">
             Mapa Territorial da Convivência
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-sm sm:text-base text-slate-300">
             {isVoting
-              ? 'Deliberação Coletiva: Votem no próximo destino de atuação do grupo.'
+              ? 'Escolha o próximo destino da sua equipe.'
               : `Local Atual: ${currentRegion.name} (${currentRegion.subtitle})`}
           </p>
         </div>
@@ -118,7 +119,7 @@ export const TownMap: React.FC<TownMapProps> = ({
       </div>
 
       {/* SVG Map Canvas */}
-      <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[520px] rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
+      <div className="relative w-full hidden sm:block aspect-[16/10] sm:aspect-[16/9] max-h-[520px] rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
         <svg
           viewBox="0 0 1000 600"
           className="w-full h-full pointer-events-none"
@@ -331,17 +332,31 @@ export const TownMap: React.FC<TownMapProps> = ({
         })}
       </div>
 
+      {/* Mobile-first region selection: no tiny cards squeezed onto the map. */}
+      <div className="grid grid-cols-1 gap-3 sm:hidden" aria-label="Destinos da Vila dos Encontros">
+        {REGION_LIST.map(region => {
+          const missions = MISSIONS.filter(m => m.regionId === region.id);
+          const completed = missions.filter(m => state.completedMissionIds.includes(m.id)).length;
+          const selected = myVote === region.id;
+          return <button type="button" key={region.id} onClick={() => handleVote(region.id)} aria-pressed={isVoting ? selected : undefined} className={`min-h-24 rounded-2xl border-2 p-4 text-left flex items-center gap-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-teal-300 ${selected ? 'border-teal-400 bg-teal-950/70' : 'border-slate-700 bg-slate-900'}`}>
+            <span className="shrink-0 rounded-xl bg-slate-800 p-3 text-teal-300" aria-hidden="true">{getIcon(region.iconName)}</span>
+            <span className="flex-1 min-w-0"><span className="block font-bold text-base leading-snug">{region.name}</span><span className="block text-sm text-slate-300 mt-1">{region.subtitle}</span><span className="block text-sm text-amber-300 mt-2">{completed} de {missions.length} missões</span></span>
+            <span className="text-sm font-bold text-teal-300">{selected ? '✓ Escolhido' : isVoting ? 'Escolher' : 'Ver'}</span>
+          </button>;
+        })}
+      </div>
+
       {/* Deliberation Footer for Voting Phase */}
       {isVoting && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/90 border border-teal-500/30 p-3 sm:p-4 rounded-xl shadow-lg">
           <div className="text-xs sm:text-sm text-slate-300">
             {myVote ? (
               <span className="text-teal-300">
-                Você votou em <strong>{REGIONS[myVote]?.name}</strong>. Converse com o grupo antes de confirmar.
+                Você votou em <strong>{REGIONS[myVote]?.name}</strong>. Você pode mudar a escolha antes de confirmar.
               </span>
             ) : (
               <span className="text-amber-300">
-                Clique em uma das quatro regiões acima para registrar o seu voto deliberado.
+                Escolha uma região para continuar a jornada.
               </span>
             )}
           </div>
@@ -353,7 +368,7 @@ export const TownMap: React.FC<TownMapProps> = ({
                 disabled={Object.keys(state.destinationVotes).length === 0}
                 className="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-slate-950 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
-                Confirmar Destino da Equipe →
+                Confirmar destino →
               </button>
             )}
             {!isHost && (

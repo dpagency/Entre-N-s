@@ -24,6 +24,9 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   className = '',
 }) => {
   const char = CHARACTERS[characterId] || CHARACTERS.alex;
+  const [imageFormat, setImageFormat] = React.useState<'webp' | 'png' | 'svg'>('webp');
+  React.useEffect(() => setImageFormat('webp'), [characterId]);
+  const avatarSrc = `/characters/${characterId}.${imageFormat === 'webp' ? 'webp' : 'png'}`;
   const variant = AVATAR_VARIANTS[variantIndex % AVATAR_VARIANTS.length];
 
   const sizeDimensions = {
@@ -133,10 +136,15 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   return (
     <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
       <div className={`relative rounded-full overflow-hidden shadow-lg border-2 ${char.borderColor} ${sizeDimensions}`}>
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          {renderCharacterSvg()}
-        </svg>
+        {imageFormat !== 'svg' ? (
+          <img src={avatarSrc} alt={char.name} className="w-full h-full object-cover" onError={() => setImageFormat(current => current === 'webp' ? 'png' : 'svg')} />
+        ) : (
+          <svg viewBox="0 0 100 100" className="w-full h-full" aria-label={char.name} role="img">
+            {renderCharacterSvg()}
+          </svg>
+        )}
 
+        {/* Approved artwork in WebP; legacy PNG and SVG remain as safe fallbacks. */}
         {/* Variant color highlight aura */}
         <div
           className="absolute inset-0 rounded-full opacity-20 pointer-events-none mix-blend-color-burn"

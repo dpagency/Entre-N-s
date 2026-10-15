@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { NarrationControl } from './NarrationControl';
 import { MissionDef, RoomState } from '../../types/game';
-import { PerspectiveCard } from '../cards/CardView';
 import { REGIONS } from '../../data/regions';
 import { socketService } from '../../services/socket';
-import { AlertCircle, HelpCircle, ArrowRight, ShieldCheck, BookOpen, Share2 } from 'lucide-react';
+import { HelpCircle, ArrowRight, ArrowLeft, ShieldCheck, BookOpen, Info } from 'lucide-react';
 
 interface MissionSituationProps {
   mission: MissionDef;
@@ -16,7 +16,13 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
   state,
   myPlayerId,
 }) => {
-  const isHost = state.hostId === myPlayerId;
+  const [step, setStep] = useState(0);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showFullText, setShowFullText] = useState(false);
+  const [thoughtIndex, setThoughtIndex] = useState(0);
+  const [expandedThought, setExpandedThought] = useState<string | null>(null);
+  useEffect(() => { setStep(0); setShowHelp(false); setShowFullText(false); setThoughtIndex(0); setExpandedThought(null); }, [mission.id]);
+  const isSolo = Object.values(state.players).filter(p => !p.isBot).length === 1;
   const region = REGIONS[mission.regionId];
 
   // Perspectives visible to me: either shared with group or assigned privately to me
@@ -25,17 +31,6 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
     (p) => state.perspectiveAssignments?.[p.id] === myPlayerId
   );
 
-  const sharedPerspectives = mission.perspectives.filter((p) =>
-    state.sharedPerspectiveIds.includes(p.id)
-  );
-
-  const handleShare = (perspId: string) => {
-    socketService.send({
-      type: 'SHARE_PERSPECTIVE',
-      perspectiveId: perspId,
-    });
-  };
-
   const handleProceedToExplore = () => {
     // In server, can jump to explore or directly individual choice
     socketService.send({
@@ -43,153 +38,63 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
     });
   };
 
+  const steps = ['A história', 'O que sabemos', 'O que pensam', 'Hora de decidir'];
+  const availablePerspectives = mission.perspectives.filter(p => isSolo || state.sharedPerspectiveIds.includes(p.id) || state.perspectiveAssignments?.[p.id] === myPlayerId);
+  const activeThought = availablePerspectives[thoughtIndex];
+  const thoughtText = (text: string) => text.replace(/^[“\"]|[”\"]$/g, '').trim();
+  const next = () => { setShowHelp(false); setShowFullText(false); setStep(n => Math.min(n + 1, 3)); };
   return (
-    <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto text-slate-100">
-      {/* Top Banner with Mission Info */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
-              Missão {mission.code} • {region.name}
-            </span>
-            <span
-              className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                mission.missionType === 'fundamentada'
-                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-              }`}
-            >
-              Questão {mission.missionType === 'fundamentada' ? 'Fundamentada' : 'Reflexiva'}
-            </span>
-          </div>
-
-          <div className="text-xs text-slate-400">
-            Fase 1 de 4 • Leitura do Cenário e Perspectivas
-          </div>
+    <div className="flex flex-col gap-5 w-full max-w-3xl mx-auto text-slate-100">
+      <header className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7">
+        <p className="text-xs text-teal-300 font-bold uppercase">Missão {mission.code} · {region.name}</p>
+        <h1 className="text-2xl sm:text-3xl font-black mt-2">{mission.title}</h1>
+        <div className="flex gap-2 mt-5" aria-label={`Etapa ${step + 1} de 4`}>
+          {steps.map((label, index) => <div key={label} className={`h-2 rounded-full flex-1 ${index <= step ? 'bg-teal-400' : 'bg-slate-700'}`} />)}
         </div>
-
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight mb-2">
-          {mission.title}
-        </h1>
-
-        <p className="text-xs sm:text-sm text-teal-300/90 font-medium mb-4">
-          <strong>Objetivo Pedagógico:</strong> {mission.pedagogicalGoal}
-        </p>
-
-        {/* Narrative Context & Trigger */}
-        <div className="space-y-3 bg-slate-950/70 border border-slate-800 p-4 sm:p-5 rounded-2xl mb-5">
-          <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-serif">
-            {mission.situation.context}
-          </p>
-          <div className="p-3 rounded-xl bg-amber-950/30 border-l-4 border-amber-500 text-xs sm:text-sm text-amber-200/90">
-            <strong className="text-amber-300 block mb-0.5">O Dilema em Questão:</strong>
-            {mission.situation.trigger}
-          </div>
+        <div className="flex justify-between items-center mt-3 gap-3">
+          <span className="text-sm font-semibold text-teal-200">{steps[step]} · {step + 1}/4</span>
+          <button type="button" onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-label="Explicar os símbolos" className="rounded-full border border-slate-600 p-2 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-300"><Info className="w-5 h-5" /></button>
         </div>
-
-        {/* Known Facts & Uncertainties Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-2xl bg-slate-950/50 border border-slate-800">
-            <div className="flex items-center gap-2 text-xs font-bold text-teal-300 uppercase tracking-wide mb-2">
-              <ShieldCheck className="w-4 h-4 text-teal-400" />
-              Fatos Conhecidos:
-            </div>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-300 list-disc list-inside">
-              {mission.situation.knownFacts.map((fact, i) => (
-                <li key={i}>{fact}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-slate-950/50 border border-slate-800">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wide mb-2">
-              <HelpCircle className="w-4 h-4 text-amber-400" />
-              Incertezas a Considerar:
-            </div>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-300 list-disc list-inside">
-              {mission.situation.uncertainties.map((unc, i) => (
-                <li key={i}>{unc}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Institutional Note */}
-        <div className="mt-4 p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-2.5 text-xs text-slate-400">
-          <AlertCircle className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-          <span>
-            <strong className="text-slate-300">Nota Institucional:</strong> {mission.situation.institutionalNote}
-          </span>
-        </div>
-      </div>
-
-      {/* Perspectives Section */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-teal-400" />
-              Perspectivas dos Atores Envolvidos
-            </h3>
-            <p className="text-xs text-slate-400">
-              Cada guardião recebe inicialmente uma visão do cenário. Você pode compartilhar a sua com os colegas.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {mission.perspectives.map((persp) => {
-            const isAssignedToMe = state.perspectiveAssignments?.[persp.id] === myPlayerId;
-            const isShared = state.sharedPerspectiveIds.includes(persp.id);
-
-            // If not shared and not assigned to me, show anonymized sealed card
-            if (!isShared && !isAssignedToMe) {
-              return (
-                <div
-                  key={persp.id}
-                  className="bg-slate-900/60 border border-slate-800/80 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center text-center text-slate-500 min-h-[200px]"
-                >
-                  <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-xl mb-2">
-                    🔒
-                  </div>
-                  <div className="font-bold text-xs text-slate-400">
-                    Perspectiva de {persp.actorName}
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Esta perspectiva foi distribuída a outro colega ou pode ser revelada pelo poder de Bia.
-                  </p>
-                </div>
-              );
-            }
-
-            return (
-              <PerspectiveCard
-                key={persp.id}
-                perspective={persp}
-                isPrivateToMe={isAssignedToMe}
-                isSharedWithGroup={isShared}
-                onShareWithGroup={() => handleShare(persp.id)}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Action to proceed to individual choice */}
-      <div className="bg-slate-900/80 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-xs sm:text-sm text-slate-300">
-          Quando todos tiverem lido e compartilhado suas impressões, passem para a{' '}
-          <strong className="text-teal-300">escolha individual em sigilo</strong>.
-        </div>
-
-        <button
-          onClick={handleProceedToExplore}
-          className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
-        >
-          <span>Ir para Escolha Individual</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
+        {showHelp && <div className="mt-3 p-3 bg-slate-950 rounded-xl text-sm text-slate-200" role="note">📖 História: conheça a situação. ◈ Fatos: observe o que sabemos e o que ainda é incerto. 👥 Pensamentos: conheça um ponto de vista por vez. 💡 Reflexão: pense antes de decidir. Toque no símbolo de informação sempre que quiser rever este guia.</div>}
+      </header>
+      <NarrationControl key={`${mission.id}-${step}`} text={step === 0 ? [mission.situation.context, mission.situation.trigger].join(" ") : step === 1 ? [...mission.situation.knownFacts, ...mission.situation.uncertainties].join(" ") : step === 2 ? activeThought ? `${activeThought.actorName} pensa: ${thoughtText(activeThought.details)}` : 'Conheça as perspectivas da situação' : `Para refletir. O que você considera importante antes de escolher?`} />
+      <section className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 space-y-4" aria-live="polite">
+        {step === 0 && <>
+          <div className="flex items-center gap-3"><BookOpen className="w-7 h-7 text-teal-300" aria-hidden="true"/><span className="text-sm text-teal-300">A história</span></div>
+          <p className="text-base leading-relaxed">{mission.situation.context}</p>
+          <p className="text-base leading-relaxed border-l-4 border-amber-400 pl-4">{mission.situation.trigger}</p>
+        </>}
+        {step === 1 && <>
+          <div className="flex items-center gap-3"><ShieldCheck className="w-7 h-7 text-teal-300" aria-hidden="true"/><span className="text-sm text-teal-300">O que sabemos</span></div>
+          <ul className="list-disc pl-5 space-y-2 text-sm leading-relaxed">{mission.situation.knownFacts.map((fact, i) => <li key={i}>{fact}</li>)}</ul>
+          <details className="rounded-xl bg-slate-950 p-3"><summary className="cursor-pointer text-amber-300 flex gap-2 items-center"><HelpCircle className="w-4 h-4"/> O que ainda não sabemos?</summary><ul className="list-disc pl-5 mt-3 space-y-2 text-sm">{mission.situation.uncertainties.map((item, i) => <li key={i}>{item}</li>)}</ul></details>
+        </>}
+        {step === 2 && <>
+          <div className="flex items-center gap-3"><BookOpen className="w-7 h-7 text-teal-300" aria-hidden="true"/><span className="text-sm text-teal-300">O que pensam os envolvidos</span></div>
+          <p className="text-sm text-slate-300">Cada pessoa enxerga a situação de um jeito. Conheça um pensamento por vez.</p>
+          {activeThought ? <article className="rounded-2xl border border-teal-500/30 bg-slate-950 p-5 space-y-3" aria-live="polite">
+            <div className="flex items-center gap-3"><span className="text-3xl" aria-hidden="true">{activeThought.actorAvatar}</span><div><p className="font-bold">{activeThought.actorName}</p><p className="text-xs text-slate-400">{activeThought.actorRole} · Pensamento {thoughtIndex + 1} de {availablePerspectives.length}</p></div></div>
+            <blockquote className="border-l-2 border-teal-400 pl-4 text-base italic leading-relaxed text-slate-100">{thoughtText(activeThought.details)}</blockquote>
+            <button type="button" onClick={() => setExpandedThought(v => v === activeThought.id ? null : activeThought.id)} aria-expanded={expandedThought === activeThought.id} className="text-sm text-teal-300 underline underline-offset-4">{expandedThought === activeThought.id ? 'Ocultar contexto' : 'Entender o ponto de vista'}</button>
+            {expandedThought === activeThought.id && <p className="text-sm text-slate-300">{activeThought.summary}</p>}
+            {!isSolo && <button type="button" onClick={() => socketService.send({type:'SHARE_PERSPECTIVE', perspectiveId:activeThought.id})} className="block text-sm text-teal-300 underline">Compartilhar perspectiva</button>}
+          </article> : <p className="text-sm text-slate-300">Nenhuma perspectiva disponível no momento.</p>}
+          {availablePerspectives.length > 1 && <div className="flex justify-between gap-3">
+            <button type="button" disabled={thoughtIndex === 0} onClick={() => {setThoughtIndex(i=>Math.max(0,i-1));setExpandedThought(null);}} className="rounded-lg bg-slate-800 px-4 py-2 text-sm disabled:opacity-40">Pensamento anterior</button>
+            <button type="button" disabled={thoughtIndex === availablePerspectives.length - 1} onClick={() => {setThoughtIndex(i=>Math.min(availablePerspectives.length-1,i+1));setExpandedThought(null);}} className="rounded-lg bg-slate-800 px-4 py-2 text-sm disabled:opacity-40">Próximo pensamento</button>
+          </div>}
+        </>}
+        {step === 3 && <>
+          <div className="flex items-center gap-3"><HelpCircle className="w-7 h-7 text-violet-300" aria-hidden="true"/><span className="text-sm text-violet-300">Para refletir</span></div>
+          <p className="text-base leading-relaxed">O que você considera importante antes de escolher?</p>
+        </>}
+        <button type="button" onClick={() => setShowFullText(v => !v)} aria-expanded={showFullText} className="text-sm text-teal-300 underline underline-offset-4">{showFullText ? 'Ocultar conteúdo completo' : 'Consultar conteúdo completo e nota institucional'}</button>
+        {showFullText && <div className="space-y-3 rounded-xl bg-slate-950 p-4 text-sm leading-relaxed"><p>{mission.situation.context}</p><p>{mission.situation.trigger}</p><strong>Fatos conhecidos</strong><ul className="list-disc pl-5">{mission.situation.knownFacts.map((x,i)=><li key={i}>{x}</li>)}</ul><strong>Incertezas</strong><ul className="list-disc pl-5">{mission.situation.uncertainties.map((x,i)=><li key={i}>{x}</li>)}</ul><p><strong>Nota institucional:</strong> {mission.situation.institutionalNote}</p><p><strong>Objetivo pedagógico:</strong> {mission.pedagogicalGoal}</p></div>}
+      </section>
+      <nav className="flex items-center justify-between gap-3 rounded-2xl bg-slate-900 border border-slate-800 p-4" aria-label="Navegação do cenário">
+        <button type="button" disabled={step === 0} onClick={() => {setStep(n=>Math.max(0,n-1));setShowFullText(false);}} className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-800 disabled:opacity-40"><ArrowLeft className="w-4 h-4"/> Voltar</button>
+        {step < 3 ? <button type="button" onClick={next} className="flex items-center gap-2 px-5 py-3 rounded-xl bg-teal-500 text-slate-950 font-bold">Continuar <ArrowRight className="w-4 h-4"/></button> : <button type="button" onClick={handleProceedToExplore} className="flex items-center gap-2 px-5 py-3 rounded-xl bg-teal-500 text-slate-950 font-bold">Ir para escolha individual <ArrowRight className="w-4 h-4"/></button>}
+      </nav>
     </div>
   );
 };

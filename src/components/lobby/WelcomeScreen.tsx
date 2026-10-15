@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterId } from '../../types/game';
-import { CHARACTER_LIST, AVATAR_VARIANTS, CHARACTERS } from '../../data/characters';
+import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { socketService } from '../../services/socket';
-import { Play, PlusCircle, LogIn, Sparkles, BookOpen, Users, Compass, HelpCircle } from 'lucide-react';
+import { Play, PlusCircle, LogIn, Sparkles, BookOpen, Compass, HelpCircle } from 'lucide-react';
 
 interface WelcomeScreenProps {
   onOpenRules: () => void;
@@ -16,16 +16,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onOpenInstitutionalGuide,
   onOpenOrganizer,
 }) => {
-  const [mode, setMode] = useState<'create' | 'join' | 'solo'>('create');
+  const [mode, setMode] = useState<'create' | 'join' | 'solo'>('solo');
   const [nickname, setNickname] = useState(
     localStorage.getItem('guardioes_nickname') || ''
   );
   const [characterId, setCharacterId] = useState<CharacterId>(
     (localStorage.getItem('guardioes_character') as any) || 'alex'
   );
-  const [variantIndex, setVariantIndex] = useState(
-    Number(localStorage.getItem('guardioes_variant')) || 0
-  );
+  const variantIndex = 0;
   const [roomCode, setRoomCode] = useState('');
 
   // Check URL query params for ?room=CODE
@@ -43,7 +41,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     const cleanNick = nickname.trim() || 'Guardião';
     localStorage.setItem('guardioes_nickname', cleanNick);
     localStorage.setItem('guardioes_character', characterId);
-    localStorage.setItem('guardioes_variant', String(variantIndex));
 
     socketService.setSoloMode(mode === 'solo');
     socketService.send({
@@ -77,36 +74,35 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const selectedChar = CHARACTERS[characterId];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] py-6 px-4 text-slate-100 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-start min-h-0 py-3 sm:py-8 px-0 sm:px-4 text-slate-100 max-w-4xl mx-auto w-full mobile-welcome">
       {/* Hero presentation */}
-      <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
+      <div className="text-center w-full min-w-0 max-w-2xl mx-auto mb-3 mobile-welcome-hero sm:mb-8 space-y-2 sm:space-y-3">
+        <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wide">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-100">
+        <h1 className="text-2xl sm:text-5xl font-black tracking-tight text-slate-100 break-words">
           Entre Nós
-          <span className="block text-2xl sm:text-3xl font-bold text-amber-400 mt-1">
+          <span className="block text-lg sm:text-3xl font-bold text-amber-400 mt-1 break-words">
             Guardiões da Convivência
           </span>
         </h1>
 
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-serif">
-          Bem-vindos à <strong>Vila dos Encontros</strong>. Reúna sua equipe (2 a 6 participantes) para vivenciar e debater dilemas éticos reais do cotidiano do serviço público com respeito, escuta e integridade.
+        <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+          Na <strong>Vila dos Encontros</strong>, suas escolhas revelam diferentes caminhos para a convivência ética.
         </p>
       </div>
 
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-        <button type="button" onClick={() => setMode('solo')} className="w-full py-3 rounded-xl bg-amber-500 text-slate-950 font-bold">Jogar sozinho com companheiros virtuais</button>
-        {mode === 'solo' && <p className="text-sm text-amber-200">Partida neste dispositivo, com três personagens controlados pelo computador. O progresso fica salvo nesta aba. As avaliações não são enviadas ao organizador.</p>}
-        {/* Toggle mode: Criar Sala vs Entrar em Sala */}
+      <div className="w-full min-w-0 bg-slate-900 border border-slate-800 rounded-3xl mobile-welcome-card p-3 sm:p-8 shadow-2xl space-y-3 sm:space-y-6">
+        {/* O multiplayer permanece no código para uma etapa futura. */}
+        {false && <div>
         <div className="grid grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
           <button
             type="button"
             onClick={() => setMode('create')}
-            className={`py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
+            className={`py-3 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all ${
               mode === 'create'
                 ? 'bg-teal-600 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-slate-200'
@@ -119,7 +115,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <button
             type="button"
             onClick={() => setMode('join')}
-            className={`py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
+            className={`py-3 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all ${
               mode === 'join'
                 ? 'bg-teal-600 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-slate-200'
@@ -130,11 +126,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </button>
         </div>
 
-        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-6">
+        </div>}
+        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-3 sm:space-y-5">
           {/* Room Code input (if joining) */}
           {mode === 'join' && (
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <label className="text-sm font-bold text-slate-300 flex items-center gap-1.5">
                 Código da Sala (Ex: VILA-7K4):
               </label>
               <input
@@ -150,33 +147,32 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-300">
+            <div className="flex flex-wrap items-center justify-between gap-1">
+              <label className="text-sm font-bold text-slate-300">
                 Seu Apelido na Sessão:
               </label>
-              <span className="text-[11px] text-slate-500">Não exige nome real</span>
+              <span className="text-xs text-slate-400">Não exige nome real</span>
             </div>
             <input
               type="text"
-              required
               maxLength={16}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder="Ex: Guardião Alex, Carol, Lucas..."
-              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-base focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
 
           {/* Character selection cards */}
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-300">
+              <label className="text-sm font-bold text-slate-300">
                 Escolha seu Personagem:
               </label>
-              <span className="text-[11px] text-teal-400">Permite personagens repetidos</span>
+
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
               {CHARACTER_LIST.map((char) => {
                 const isSelected = characterId === char.id;
                 return (
@@ -184,15 +180,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                     key={char.id}
                     type="button"
                     onClick={() => setCharacterId(char.id)}
-                    className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
+                    className={`mobile-character-card p-2 sm:p-3 min-h-28 sm:min-h-32 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
                       isSelected
                         ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                         : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
                     }`}
                   >
                     <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="md" showBadge={false} />
-                    <div className="font-bold text-xs sm:text-sm">{char.name}</div>
-                    <div className="text-[10px] text-slate-400 leading-tight">{char.title}</div>
+                    <div className="font-bold text-base">{char.name}</div>
+                    <div className="text-sm text-slate-300 leading-snug">{char.title}</div>
                   </button>
                 );
               })}
@@ -200,7 +196,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
             {/* Character power info preview */}
             {selectedChar && (
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
+              <div className="hidden sm:flex p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-slate-300 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 shrink-0">
                   <Sparkles className="w-4 h-4" />
                 </div>
@@ -208,7 +204,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                   <div className="font-bold text-slate-100">
                     Poder Único: “{selectedChar.powerName}”
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-0.5">
+                  <p className="text-slate-300 text-sm mt-1 leading-relaxed">
                     {selectedChar.powerDescription} (Uso único por partida)
                   </p>
                 </div>
@@ -216,42 +212,18 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             )}
           </div>
 
-          {/* Visual Variant Selector */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-300">
-              Variante Visual do Avatar:
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {AVATAR_VARIANTS.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => setVariantIndex(v.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 ${
-                    variantIndex === v.id
-                      ? 'bg-teal-500 text-slate-950 border-teal-400 shadow-sm'
-                      : 'bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-850'
-                  }`}
-                >
-                  <span className={`w-2.5 h-2.5 rounded-full ${v.badgeColor}`} />
-                  <span>{v.label} ({v.suffix})</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Submit button */}
           <button
             type="submit"
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
+            className="w-full min-h-14 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
           >
             <Play className="w-5 h-5 fill-current" />
-            <span>{mode === 'solo' ? 'Começar com o computador' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
+            <span>{mode === 'solo' ? 'Começar' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
           </button>
         </form>
 
         {/* Informational quick links */}
-        <div className="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
+        <div className="pt-2 sm:pt-4 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300">
           <button
             type="button"
             onClick={onOpenRules}
@@ -269,11 +241,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Guia de Canais Éticos</span>
           </button>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <button
             type="button"
             onClick={onOpenOrganizer}
-            className="hover:text-indigo-300 transition-colors flex items-center gap-1.5"
+            className="hidden sm:flex hover:text-indigo-300 transition-colors items-center gap-1.5"
           >
             <span>Painel do Organizador</span>
           </button>

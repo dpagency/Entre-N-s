@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+/* O navegador interno de alguns aplicativos anuncia uma largura de layout
+   maior que a largura util do telefone. Priorizamos o dispositivo real. */
+html.mobile-device { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html.mobile-device .mobile-welcome { max-width: 540px; width: 100%; }
+html.mobile-device .mobile-welcome-hero { max-width: 100%; }
+html.mobile-device .mobile-welcome-card { padding: 12px; }
+html.mobile-device .mobile-welcome-card .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html.mobile-device .mobile-character-card { min-height: 112px; }
+html.mobile-device .mobile-character-card img { width: 52px; height: 52px; }
+html.mobile-device .mobile-navbar { max-width: 540px; }
+html.mobile-device .mobile-navbar-actions > button { min-width: 40px; min-height: 40px; }
+html.mobile-device .mobile-welcome-hero p { font-size: 14px; line-height: 1.4; }
+html.mobile-device .mobile-welcome-card label { font-size: 14px; line-height: 1.4; }
+html.mobile-device .mobile-welcome-card input { font-size: 16px; }
+@media (max-width: 1023px) {
+  .mobile-welcome { max-width: 540px; }
+  .mobile-welcome-card .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
