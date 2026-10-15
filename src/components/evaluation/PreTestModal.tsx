@@ -40,10 +40,10 @@ export const PreTestModal: React.FC<PreTestModalProps> = ({ isOpen, onCompleted 
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in"
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-6 overflow-y-auto overflow-x-hidden bg-slate-950/85 backdrop-blur-md animate-in fade-in"
     >
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col text-slate-100">
-        <div className="flex items-center justify-between gap-3 mb-4 border-b border-slate-800 pb-4">
+      <div className="relative w-full min-w-0 max-w-2xl my-auto bg-slate-900 border border-slate-700 rounded-3xl p-3 sm:p-8 shadow-2xl flex flex-col min-w-0 max-h-[calc(100dvh-1rem)] overflow-y-auto text-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/40">
               <ClipboardList className="w-5 h-5" />
@@ -68,7 +68,7 @@ export const PreTestModal: React.FC<PreTestModalProps> = ({ isOpen, onCompleted 
         </p>
 
         {/* Situation prompt */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 text-sm sm:text-base text-slate-200 leading-relaxed font-serif mb-5 shadow-inner">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 text-sm sm:text-base text-slate-200 leading-relaxed font-sans mb-5 shadow-inner">
           {currentQ.situation}
         </div>
 
@@ -80,7 +80,7 @@ export const PreTestModal: React.FC<PreTestModalProps> = ({ isOpen, onCompleted 
               <button
                 key={opt.id}
                 onClick={() => handleSelectOption(opt.id)}
-                className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start gap-3 ${
+                className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start gap-3 min-w-0 break-words ${
                   isSelected
                     ? 'bg-teal-950/80 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                     : 'bg-slate-850 hover:bg-slate-800 border-slate-700/80 text-slate-300'
@@ -95,14 +95,14 @@ export const PreTestModal: React.FC<PreTestModalProps> = ({ isOpen, onCompleted 
                 >
                   {isSelected && <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />}
                 </div>
-                <span>{opt.text}</span>
+                <span className="min-w-0 flex-1 break-words">{opt.text}</span>
               </button>
             );
           })}
         </div>
 
         {/* Footer controls */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
           <button
             onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}
             disabled={currentIdx === 0}
