@@ -131,7 +131,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </button>
         </div>
 
-        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="hidden sm:block space-y-2">
+        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-2">
           {/* Room Code input (if joining) */}
           {mode === 'join' && (
             <div className="space-y-1">
@@ -159,7 +159,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             </div>
             <input
               type="text"
-              required
               maxLength={16}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
@@ -169,7 +168,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </div>
 
           {/* Character selection cards */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-300">
                 Escolha seu Personagem:
@@ -177,7 +176,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <span className="text-[11px] text-teal-400">Permite personagens repetidos</span>
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CHARACTER_LIST.map((char) => {
                 const isSelected = characterId === char.id;
                 return (
@@ -218,7 +217,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </div>
 
           {/* Visual Variant Selector */}
-          <div className="space-y-2">
+          <div className="hidden sm:block space-y-2">
             <label className="text-xs font-bold text-slate-300">
               Variante Visual do Avatar:
             </label>
