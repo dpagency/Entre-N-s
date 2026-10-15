@@ -27,6 +27,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     Number(localStorage.getItem('guardioes_variant')) || 0
   );
   const [roomCode, setRoomCode] = useState('');
+  const [previewCharacter, setPreviewCharacter] = useState<CharacterId | null>(null);
 
   // Check URL query params for ?room=CODE
   useEffect(() => {
@@ -183,7 +184,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                   <button
                     key={char.id}
                     type="button"
-                    onClick={() => setCharacterId(char.id)}
+                    onClick={() => setPreviewCharacter(char.id)}
                     className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
                       isSelected
                         ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
@@ -279,6 +280,31 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </button>
         </div>
       </div>
+      {previewCharacter && (
+        <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setPreviewCharacter(null); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="persona-title" className="w-full max-w-md rounded-3xl border border-teal-500/50 bg-slate-900 p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-start gap-3">
+              <div className="flex items-center gap-4">
+                <CharacterAvatar characterId={previewCharacter} variantIndex={variantIndex} size="lg" showBadge={false} />
+                <div><h2 id="persona-title" className="text-2xl font-black">{CHARACTERS[previewCharacter].name}</h2><p className="text-teal-300">{CHARACTERS[previewCharacter].title}</p></div>
+              </div>
+              <button type="button" aria-label="Fechar apresentação" onClick={() => setPreviewCharacter(null)} className="text-slate-300 hover:text-white text-2xl">×</button>
+            </div>
+            <p className="text-sm text-slate-200 leading-relaxed">{CHARACTERS[previewCharacter].description}</p>
+            <p className="italic text-amber-200 text-sm">{CHARACTERS[previewCharacter].quote}</p>
+            <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-2 text-sm">
+              <p className="font-bold text-teal-300">Perspectiva: {CHARACTERS[previewCharacter].role}</p>
+              <p className="font-bold text-amber-300">Habilidade: {CHARACTERS[previewCharacter].powerName}</p>
+              <p className="text-slate-300">{CHARACTERS[previewCharacter].powerDescription}</p>
+              <p className="text-xs text-slate-400">A persona amplia o olhar, mas não determina a resposta ética.</p>
+            </div>
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setPreviewCharacter(null)} className="flex-1 rounded-xl border border-slate-600 p-3">Voltar</button>
+              <button type="button" autoFocus onClick={() => {setCharacterId(previewCharacter);setPreviewCharacter(null);}} className="flex-1 rounded-xl bg-teal-400 text-slate-950 font-bold p-3">Escolher personagem</button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };
