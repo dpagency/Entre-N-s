@@ -33,8 +33,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   // Pontos de navegação: nunca derivados de qual alternativa ética foi escolhida.
   // Quatro missões, até 25 pontos por dimensão; critérios auditáveis no histórico.
   const progress = Math.min(4, completedMissions.length);
+  const fortuneOutcomes = Object.values(state.fortuneCards || {});
+  const favorableCards = fortuneOutcomes.filter(card => card.outcome !== 'reves').length;
+  const reversals = fortuneOutcomes.filter(card => card.outcome === 'reves').length;
   const dimensions = [
-    { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, state.historyLog.length)), explanation: 'Avanço e conclusão das etapas da jornada.' },
+    { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, favorableCards)), explanation: 'Avanço e conclusão das etapas da jornada.' },
     { label: 'Confiança', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + (h.voteType === 'unanimous' ? 5 : h.voteType === 'majority' ? 3 : 2), 0)), explanation: 'Construção de acordos; divergências também geram aprendizagem.' },
     { label: 'Equilíbrio', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(4, h.perspectivesExploredCount) + (h.reconsiderationOccurred ? 2 : 0), 0)), explanation: 'Perspectivas consideradas e disposição para reconsiderar.' },
     { label: 'Participação', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Compartilhamento de perspectivas ao longo das missões.' },
@@ -86,6 +89,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <p className="text-xs text-slate-400 mt-1">{d.explanation}</p>
           </div>)}
         </div>
+        <p className="text-xs text-amber-200">Cartas reveladas: {fortuneOutcomes.length} · Favoráveis ou segunda chance: {favorableCards} · Reveses: {reversals}. Os reveses não retiram pontos.</p>
         <p className="text-xs text-slate-400">Escala experimental do piloto: inicial (0–39), desenvolvimento (40–69), avançado (70–100). O máximo representa o teto da escala, não uma nota ética.</p>
       </section>
 
