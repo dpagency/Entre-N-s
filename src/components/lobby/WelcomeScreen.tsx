@@ -81,6 +81,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   };
 
   const selectedChar = CHARACTERS[characterId];
+  const [characterConfirmed, setCharacterConfirmed] = useState(false);
+  const confirmCharacter = (id: CharacterId) => {
+    setCharacterId(id);
+    localStorage.setItem('guardioes_character', id);
+    setCharacterConfirmed(true);
+    setPreviewCharacter(null);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-0 py-2 sm:py-4 px-2 text-slate-100 max-w-5xl mx-auto w-full game-welcome">
@@ -204,6 +211,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               })}
             </div>
 
+            <div role="status" aria-live="polite" className="rounded-xl border border-teal-500/40 bg-teal-950/40 px-4 py-3 text-sm text-teal-200">
+              {characterConfirmed ? '✓ Personagem escolhido: ' : 'Personagem atual: '}
+              <strong>{selectedChar.name}</strong>. {characterConfirmed ? 'Agora você pode começar sua jornada.' : 'Toque em um personagem para conhecer e confirmar sua escolha.'}
+            </div>
+
             {/* Character power info preview */}
             {selectedChar && (
               <div className="hidden sm:flex p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
@@ -306,7 +318,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             </div>
             <div className="flex gap-3">
               <button type="button" onClick={() => setPreviewCharacter(null)} className="flex-1 rounded-xl border border-slate-600 p-3">Voltar</button>
-              <button type="button" autoFocus onClick={() => {setCharacterId(previewCharacter);setPreviewCharacter(null);}} className="flex-1 rounded-xl bg-teal-400 text-slate-950 font-bold p-3">Escolher personagem</button>
+              <button type="button" autoFocus onClick={() => confirmCharacter(previewCharacter)} className="flex-1 rounded-xl bg-teal-400 text-slate-950 font-bold p-3">Escolher personagem</button>
             </div>
           </section>
         </div>
