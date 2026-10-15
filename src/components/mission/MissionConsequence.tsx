@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MissionDef, RoomState } from '../../types/game';
 import { DiscoveryCard } from '../cards/CardView';
 import { socketService } from '../../services/socket';
@@ -15,6 +15,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   state,
   myPlayerId,
 }) => {
+  const [celebrationSeen, setCelebrationSeen] = useState(false);
   const isHost = state.hostId === myPlayerId;
   const chosenActionId = state.chosenCollectiveActionId || mission.actions[0].id;
   const chosenAction = mission.actions.find((a) => a.id === chosenActionId) || mission.actions[0];
@@ -105,6 +106,15 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         )}
       </div>
 
+      {!celebrationSeen && (
+        <div role="status" className="relative overflow-hidden rounded-3xl border border-amber-400/50 bg-gradient-to-r from-amber-950/70 via-slate-900 to-teal-950/70 p-5 text-center shadow-xl animate-in zoom-in duration-500">
+          <div className="text-4xl mb-2" aria-hidden="true">✨🏅✨</div>
+          <h3 className="text-xl font-black text-amber-200">Marco de aprendizagem desbloqueado!</h3>
+          <p className="text-sm text-slate-200 mt-2">Missão {completedCount} de 4: você explorou escolhas e suas consequências.</p>
+          <p className="text-xs text-slate-400 mt-2">Celebramos a reflexão, não uma pontuação moral.</p>
+          <button type="button" onClick={() => setCelebrationSeen(true)} className="mt-4 px-5 py-2 rounded-xl bg-amber-400 text-slate-950 font-bold">Continuar reflexão</button>
+        </div>
+      )}
       {/* Discovery unlocked card */}
       <DiscoveryCard discovery={mission.discovery} />
 
