@@ -20,7 +20,7 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     title: 'Guardiã da Convivência',
     role: 'Escuta · Respeito · Diálogo',
     description: 'Wa acolhe diferentes perspectivas e procura caminhos de diálogo, respeito e colaboração, sem ignorar conflitos.',
-    quote: '“Uma decisão não termina quando é assinada, mas quando seus efeitos alcançam as pessoas.”',
+    quote: '“Escutar também é construir caminhos para seguir juntos.”',
     powerName: 'Olhar Adiante',
     powerDescription: 'Antecipa duas consequências plausíveis para escolhas em debate, sem impor a resposta.',
     color: '#3b82f6', // blue-500
@@ -33,7 +33,7 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     title: 'Guardião do Discernimento',
     role: 'Evidências · Reflexão · Consequências',
     description: 'Satori conecta informações, questiona simplificações e avalia causas e consequências antes de decidir.',
-    quote: '“Quando escutamos de verdade, o conflito deixa de ser batalha e vira construção.”',
+    quote: '“Antes de decidir, vamos examinar o que sabemos e o que ainda falta compreender.”',
     powerName: 'Nova Escuta',
     powerDescription: 'Abre uma rodada extra de reconsideração das escolhas após ouvir novas perspectivas.',
     color: '#f59e0b', // amber-500
@@ -46,7 +46,7 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     title: 'Guardiã da Coragem',
     role: 'Coragem · Ação · Responsabilidade',
     description: 'Yūki encontra disposição para agir diante de situações difíceis, mesmo quando fazer o correto exige enfrentar desconfortos.',
-    quote: '“Se ninguém fez a pergunta difícil, a decisão ainda não está madura.”',
+    quote: '“Mesmo quando é difícil, podemos agir com responsabilidade.”',
     powerName: 'Outro Olhar',
     powerDescription: 'Revela a perspectiva oculta de um ator da instituição que ainda não havia sido ouvido.',
     color: '#f43f5e', // rose-500
