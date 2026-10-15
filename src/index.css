@@ -1,10 +1,10 @@
 
 /* Identidade tipográfica de jogo: títulos expressivos e texto legível. */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pirata+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 @import "tailwindcss";
 :root { font-family: 'Nunito', system-ui, sans-serif; }
 body, button, input, textarea { font-family: 'Nunito', system-ui, sans-serif; }
-h1, h2, h3, .game-title { font-family: 'Pirata One', Georgia, serif; letter-spacing: .025em; font-weight: 400; }
+h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-spacing: -.015em; font-weight: 900; }
 .game-welcome { max-width: 1080px; }
 @media (max-height: 850px) and (min-width: 640px) {
   .game-welcome { padding-top: 0; padding-bottom: 0; }
@@ -15,9 +15,9 @@ h1, h2, h3, .game-title { font-family: 'Pirata One', Georgia, serif; letter-spac
 @media (max-width: 639px) {
   .game-welcome { padding: 0 4px; }
   .game-welcome > div:first-child p { display: none; }
-  .game-welcome .grid.grid-cols-4 { gap: 5px; }
-  .game-welcome .grid.grid-cols-4 button { padding: 5px 2px; gap: 3px; }
-  .game-welcome .grid.grid-cols-4 button div { font-size: 12px; }
+  .game-welcome .grid { gap: 5px; }
+  .game-welcome .grid button { padding: 5px 2px; gap: 3px; }
+  .game-welcome .grid button div { font-size: 12px; }
   .game-welcome input { padding: 8px 10px; }
   .game-welcome .game-title { font-size: 2rem; }
 }
