@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { RoomState, SanitizedRoomState } from './types/game';
 import { MISSIONS } from './data/missions';
 import { socketService } from './services/socket';
@@ -27,15 +27,21 @@ export default function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [myPlayerId, setMyPlayerId] = useState<string | null>(socketService.myPlayerId);
 
-  // Ao mudar de etapa, o jogador deve ler a nova tela desde o início.
-  useEffect(() => {
+  // A transição de fase deve reposicionar a leitura antes de pintar a nova tela.
+  // Repetimos após a atualização de layout para evitar restauração de scroll no mobile.
+  useLayoutEffect(() => {
     if (!state?.phase) return;
-    const frame = window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const resetScroll = () => {
+      window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-    });
-    return () => window.cancelAnimationFrame(frame);
+      const main = document.querySelector('main');
+      if (main) main.scrollTop = 0;
+    };
+    resetScroll();
+    const frame = window.requestAnimationFrame(resetScroll);
+    const delayed = window.setTimeout(resetScroll, 100);
+    return () => { window.cancelAnimationFrame(frame); window.clearTimeout(delayed); };
   }, [state?.phase, state?.activeMissionId]);
 
   // Modals
