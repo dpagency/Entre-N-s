@@ -555,7 +555,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     } else if (msg.powerType === 'ravi') {
       // Ravi: triggers extra deliberation round
       room.isRaviSecondRoundActive = true;
-      if (!Object.values(room.players).some(p => p.isBot)) { room.individualChoices = {}; room.phase = 'MISSION_INDIVIDUAL_CHOICE'; }
+      // A second reflection never reopens or erases a confirmed choice, in solo or multiplayer.
       powerDetails = 'Satori convida a reconsiderar os fatos e as consequências. Sua decisão permanece preservada.';
     } else if (msg.powerType === 'bia') {
       // Bia: reveals third actor perspective
