@@ -29,7 +29,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                 Manual do Guardião
               </span>
               <h2 id="rules-title" className="text-xl font-black text-slate-100">
-                Regras e Dinâmica de “Entre Nós”
+                Como jogar · Entre Nós
               </h2>
             </div>
           </div>
@@ -43,70 +43,38 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="space-y-6 text-xs sm:text-sm text-slate-300 leading-relaxed">
-          {/* Section 1: Objective */}
-          <div className="space-y-2">
-            <h3 className="font-bold text-base text-teal-300 flex items-center gap-2">
-              <Compass className="w-4 h-4" />
-              1. O Cenário: Vila dos Encontros
-            </h3>
-            <p>
-              A Vila dos Encontros representa uma instituição pública fictícia onde servidores e cidadãos convivem diariamente. A proposta é cooperativa: o grupo vence junto ao desvendar quatro missões éticas, explorando perspectivas plurais e deliberando sobre decisões que impactam a sociedade. Partidas duram de 15 a 25 minutos.
-            </p>
-          </div>
-
-          {/* Section 2: Flow of each mission */}
-          <div className="space-y-2">
-            <h3 className="font-bold text-base text-teal-300 flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              2. As 10 Etapas de Cada Missão
-            </h3>
-            <ol className="space-y-1.5 list-decimal list-inside bg-slate-950 p-4 rounded-2xl border border-slate-800 text-slate-300">
-              <li><strong>Cenário & Fatos:</strong> Apresentação do dilema, fatos conhecidos e incertezas.</li>
-              <li><strong>Perspectivas Privadas:</strong> Distribuição de visões dos atores entre os guardiões, que decidem compartilhá-las.</li>
-              <li><strong>Exploração & Poderes:</strong> Uso facultativo de poderes únicos dos personagens para desvendar novos dados.</li>
-              <li><strong>Escolha Individual em Sigilo:</strong> Cada participante define sua ação em privado.</li>
-              <li><strong>Revelação Simultânea:</strong> As escolhas de todos aparecem juntas na tela.</li>
-              <li><strong>Conversa da Equipe:</strong> Discussão oral ou em chamada a partir de roteiro reflexivo guiado.</li>
-              <li><strong>Votação Coletiva:</strong> O grupo vota na ação da instituição, podendo reconsiderar.</li>
-              <li><strong>Tratamento de Empates:</strong> Rodada extra; se persistir, ambos os caminhos são analisados sem favorecer ninguém.</li>
-              <li><strong>Consequência & Descoberta:</strong> Desdobramentos narrativos, retorno pedagógico e conquista de pilar ético.</li>
-              <li><strong>Retorno ao Mapa:</strong> O grupo escolhe o próximo território até cumprir 4 missões.</li>
+        <div className="space-y-6 text-sm sm:text-base text-slate-300 leading-relaxed">
+          <section className="space-y-2">
+            <h3 className="font-bold text-lg text-teal-300">Como jogar</h3>
+            <p>Você percorre a Vila dos Encontros em quatro missões. Em cada uma, conhece uma história, considera diferentes perspectivas e escolhe como agir. Não há necessidade de acertar a resposta de um Guardião: a decisão é sua.</p>
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>Escolha seu Guardião e comece a jornada.</li>
+              <li>No mapa, selecione uma região e leia ou ouça o dilema.</li>
+              <li>Explore as informações disponíveis e escolha sua ação.</li>
+              <li>Conheça outras perspectivas. Se o Guardião escolhido preferiria outra ação, ele poderá compartilhar uma reflexão, sem mudar sua decisão.</li>
+              <li>Observe as consequências e escolha uma das três cartas do destino.</li>
+              <li>Ao concluir a missão, descubra o aprendizado desbloqueado e siga para a próxima região.</li>
             </ol>
-          </div>
-
-          {/* Section 3: Characters and Powers */}
-          <div className="space-y-2">
-            <h3 className="font-bold text-base text-teal-300 flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              3. Personagens e Poderes Únicos (Uso Único por Partida)
-            </h3>
+            <p className="text-teal-200">Você pode pausar a narração e ajustar sua velocidade. As cartas trazem elementos de sorte, revés ou segunda chance, sem representar punição moral.</p>
+          </section>
+          <section className="space-y-2 border-t border-slate-700 pt-5">
+            <h3 className="font-bold text-lg text-teal-300">Os quatro Guardiões</h3>
+            <p>Cada Guardião simboliza uma maneira de observar dilemas. Eles são guias de reflexão, não juízes das suas escolhas.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {CHARACTER_LIST.map((c) => (
+              {CHARACTER_LIST.map(c => (
                 <div key={c.id} className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <strong className="text-slate-100">{c.name}, {c.title}:</strong>
-                  <div className="text-amber-400 font-semibold text-xs mt-0.5">Poder “{c.powerName}”</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">{c.powerDescription}</div>
+                  <strong className="text-slate-100">{c.name} — {c.title}</strong>
+                  <p className="text-sm mt-1">{c.description}</p>
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-slate-400 italic">
-              * O servidor valida o consumo único de cada poder. Poderes ampliam informações e reflexões; não garantem superioridade moral e todas as missões continuam resolvíveis sem eles.
-            </p>
-          </div>
-
-          {/* Section 4: Pedagogical Principles */}
-          <div className="space-y-2">
-            <h3 className="font-bold text-base text-teal-300 flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4" />
-              4. Diretrizes Éticas Essenciais
-            </h3>
-            <ul className="space-y-1 list-disc list-inside bg-slate-950 p-4 rounded-2xl border border-slate-800 text-slate-300 text-xs">
-              <li><strong>Sem ranking de virtude:</strong> O jogo avalia a construção de consenso e a exploração de perspectivas, não pontua moral individual.</li>
-              <li><strong>Diferenciação clara:</strong> Em <em>questões fundamentadas</em>, há conduta recomendada clara; em <em>questões reflexivas</em>, diferentes caminhos têm méritos e desafios legítimos.</li>
-              <li><strong>Competências institucionais:</strong> A Comissão de Ética não substitui a Corregedoria, Ouvidoria ou RH. Cada canal tem limites e fluxos próprios.</li>
-            </ul>
-          </div>
+          </section>
+          <section className="space-y-2 border-t border-slate-700 pt-5">
+            <h3 className="font-bold text-lg text-teal-300">Por trás da jornada: proposta pedagógica</h3>
+            <p>As missões foram construídas para exercitar escuta, respeito, responsabilidade, orientação e discernimento diante de situações institucionais. Seus objetivos pedagógicos orientam a criação das histórias, mas não antecipam a resposta do jogador.</p>
+            <p>Alguns dilemas envolvem responsabilidades e competências institucionais definidas; outros apresentam alternativas com vantagens e riscos legítimos. A reflexão sobre consequências é mais importante que uma classificação moral de pessoas.</p>
+            <p>A Comissão de Ética, a Corregedoria, a Ouvidoria e a gestão de pessoas possuem atribuições distintas. As situações são ficcionais e não substituem orientações oficiais.</p>
+          </section>
         </div>
 
         <div className="pt-4 mt-4 border-t border-slate-800 flex justify-end">
