@@ -373,7 +373,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       for (const characterId of ['alex','joana','ravi','bia'] as CharacterId[]) {
         if (characterId === player.characterId) continue;
         const id = `bot_${characterId}`;
-        room.players[id] = {id, nickname: `${characterId.toUpperCase()} • computador`, characterId, variantIndex: 0, isBot: true, isHost: false, isReady: true, isConnected: true, hasUsedPower: false};
+        room.players[id] = {id, nickname: `${CHARACTERS[characterId].name} • computador`, characterId, variantIndex: 0, isBot: true, isHost: false, isReady: true, isConnected: true, hasUsedPower: false};
       }
     }
     room.completedMissionIds = []; room.historyLog = []; room.unlockedDiscoveries = []; room.destinationVotes = {};
@@ -689,15 +689,15 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
       // Check if 4 missions are completed
       if (room.completedMissionIds.length >= 4) {
-        room.phase = 'POST_TEST';
-        broadcastRoomState(room, 'Parabéns aos guardiões! 4 missões concluídas. Agora responda à avaliação final.');
+        room.phase = 'GAME_SUMMARY';
+        broadcastRoomState(room, 'Jornada concluída! Quatro missões realizadas. Conheça suas descobertas e seu reconhecimento final.');
       } else {
         // Return to board for next destination
         room.phase = 'BOARD_SELECT';
         room.destinationVotes = {};
         broadcastRoomState(
           room,
-          `Missão concluída com sucesso! Missões cumpridas: ${room.completedMissionIds.length}/4. Escolham o próximo destino.`
+          `Missão concluída! ${room.completedMissionIds.length}/4 etapas realizadas. Escolha o próximo destino.`
         );
       }
       return;
