@@ -74,12 +74,12 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
 
         {/* Narrative Context & Trigger */}
         <div className="space-y-3 bg-slate-950/70 border border-slate-800 p-4 sm:p-5 rounded-2xl mb-5">
-          <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-serif">
+          <p data-narration="story" className="text-sm sm:text-base text-slate-200 leading-relaxed font-serif">
             {mission.situation.context}
           </p>
           <div className="p-3 rounded-xl bg-amber-950/30 border-l-4 border-amber-500 text-xs sm:text-sm text-amber-200/90">
             <strong className="text-amber-300 block mb-0.5">O Dilema em Questão:</strong>
-            {mission.situation.trigger}
+            <p data-narration="story">{mission.situation.trigger}</p>
           </div>
         </div>
 
