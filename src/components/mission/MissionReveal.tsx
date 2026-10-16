@@ -160,6 +160,12 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                 <h4 className="font-bold text-base text-amber-200">{CHARACTERS[guardian.characterId]?.name}</h4>
                 <p className="text-base font-semibold">{action.title}</p>
                 <p className="text-sm text-slate-300 leading-relaxed">{action.description}</p>
+                {chosenAction && action.id !== chosenAction.id && (
+                  <p className="mt-3 rounded-xl border border-teal-700/50 bg-teal-950/40 p-3 text-sm text-teal-100" aria-label={`Reflexão de ${CHARACTERS[guardian.characterId]?.name}`}>
+                    “Eu seguiria por este caminho. {guardianQuestion[guardian.characterId]}”
+                    <span className="block mt-2 text-xs text-slate-300">Você pode continuar com sua própria decisão; esta reflexão não altera sua escolha.</span>
+                  </p>
+                )>
               </div>
             </div>;
           })}
