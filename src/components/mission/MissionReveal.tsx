@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MissionDef, SanitizedRoomState } from '../../types/game';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { PerspectiveCard } from '../cards/CardView';
@@ -17,6 +17,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
   state,
   myPlayerId,
 }) => {
+  const [showPerspectives, setShowPerspectives] = useState(false);
   const isHost = state.hostId === myPlayerId;
   const revealedChoices: Record<string, string> = state.revealedIndividualChoices || {};
   const myGuardian = state.players[myPlayerId];
@@ -136,7 +137,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                   {action.actionType}
                 </span>
                 <span className="text-xs font-black px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                  {count} {count === 1 ? 'escolha' : 'escolhas'}
+                  {solo ? `${count} ${count === 1 ? "Guardião" : "Guardiões"}` : `${count} ${count === 1 ? "escolha" : "escolhas"}`}
                 </span>
               </div>
 
@@ -174,7 +175,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                             size="sm"
                             showBadge={false}
                           />
-                          <span className="font-medium">{p.nickname}</span>
+                          <span className="font-medium">{CHARACTERS[p.characterId]?.name || p.nickname}</span>
                         </div>
                       );
                     })}
@@ -186,6 +187,10 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         })}
       </div>
 
+      {solo && <button type="button" onClick={() => setShowPerspectives(v => !v)} className="w-full rounded-2xl border border-teal-500/40 bg-slate-900 px-5 py-4 text-left font-bold text-teal-200">
+        {showPerspectives ? 'Ocultar perspectivas anteriores' : 'Voltar e consultar perspectivas anteriores'}
+      </button>}
+      {(!solo || showPerspectives) && (
       {/* Full Actor Perspectives Reference for Deliberation */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-2xl">
         <h3 className="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
@@ -204,6 +209,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         </div>
       </div>
 
+      )}
       {/* Footer bar to move to Collective Voting */}
       {!solo && <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
