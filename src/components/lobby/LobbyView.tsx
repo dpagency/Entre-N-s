@@ -22,7 +22,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
   const totalConnected = connectedPlayers.length;
   const allReady = connectedPlayers.length >= 1 && connectedPlayers.every((p) => p.isReady);
 
-  const isSolo = state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
+  const isSolo = sessionStorage.getItem('entre-nos-mode') === 'solo' || state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
   const inviteUrl = `${window.location.origin}?room=${state.roomCode}`;
 
   const handleCopyLink = () => {
@@ -47,6 +47,16 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto text-slate-100 animate-in fade-in">
+      {/* Solo sessions do not show the multiplayer waiting room. */}
+      {isSolo ? (
+        <section className="w-full max-w-xl mx-auto rounded-3xl border border-teal-500/40 bg-slate-900 p-5 sm:p-8 space-y-5 text-center">
+          <h1 className="text-2xl sm:text-3xl font-black">Sua jornada na Vila dos Encontros</h1>
+          <p className="text-base text-slate-200">Você vai explorar quatro missões com três companheiros virtuais. Pode jogar pelo celular ou pelo computador.</p>
+          <div className="flex flex-col items-center gap-2"><CharacterAvatar characterId={myPlayer?.characterId || 'alex'} variantIndex={myPlayer?.variantIndex || 0} size="xl"/><p className="font-bold text-lg">{myPlayer?.nickname || 'Guardião'}</p><p className="text-sm text-teal-300">Seu personagem está pronto</p></div>
+          <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
+          {onOpenRules && <button type="button" onClick={onOpenRules} className="text-sm text-teal-300 underline">Como jogar</button>}
+        </section>
+      ) : <>
       {/* Top Welcome & Room Invitation Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -259,6 +269,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
           </div>
         </div>
       </div>
+      </>}
     </div>
   );
 };
