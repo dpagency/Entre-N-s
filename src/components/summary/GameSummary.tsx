@@ -67,6 +67,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </p>
       </div>
 
+      {completedMissions.length >= 4 && <section aria-label="Medalha da jornada" className="rounded-3xl border border-amber-400/50 bg-amber-950/20 p-6 text-center space-y-3"><div className="text-6xl" role="img" aria-label="Medalha">🏅</div><h2 className="text-2xl font-black text-amber-200">Medalha Caminhos da Escuta</h2><p className="text-sm text-slate-200">Você concluiu as quatro missões. Esta medalha reconhece a jornada e a reflexão, não respostas certas ou erradas.</p></section>}
       <section className="rounded-3xl border border-teal-500/30 bg-slate-900 p-5 space-y-3">
         <h2 className="text-lg font-bold text-teal-200">O que levamos desta jornada?</h2>
         <p className="text-sm text-slate-300">Revisite as decisões e seus efeitos. Os indicadores abaixo registram participação e descobertas, não uma classificação moral.</p>
