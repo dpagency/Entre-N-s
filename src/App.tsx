@@ -3,6 +3,7 @@ import { RoomState, SanitizedRoomState } from './types/game';
 import { MISSIONS } from './data/missions';
 import { socketService } from './services/socket';
 import { Navbar } from './components/ui/Navbar';
+import { JourneyAudio } from './components/ui/JourneyAudio';
 import { AccessibilityModal } from './components/ui/AccessibilityModal';
 import { RulesModal } from './components/ui/RulesModal';
 import { InstitutionalCardModal } from './components/cards/InstitutionalCardModal';
@@ -172,6 +173,8 @@ export default function App() {
         onOpenOrganizer={() => setIsOrganizerOpen(true)}
         onLeaveRoom={handleLeaveRoom}
       />
+
+      <JourneyAudio phase={state?.phase} missionId={state?.activeMissionId} />
 
       {/* Main content body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
