@@ -22,6 +22,7 @@ export const TownMap: React.FC<TownMapProps> = ({
   const isSolo = state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
 
   const currentRegion = REGIONS[state.currentRegionId] || REGIONS.praca;
+  const completedRegions = new Set(state.completedMissionIds.map(id => MISSIONS.find(m => m.id === id)?.regionId));
 
   // Count votes per region
   const voteCounts: Record<RegionId, number> = {
@@ -35,6 +36,7 @@ export const TownMap: React.FC<TownMapProps> = ({
   });
 
   const handleVote = (regionId: RegionId) => {
+    if (isSolo && completedRegions.has(regionId)) return;
     if (!isVoting) {
       if (onSelectRegionDetails) onSelectRegionDetails(regionId);
       return;
@@ -228,7 +230,7 @@ export const TownMap: React.FC<TownMapProps> = ({
           const isCurrent = state.currentRegionId === region.id;
           const votes = voteCounts[region.id];
           const hasVotedForThis = myVote === region.id;
-          const missionsInRegion = MISSIONS.filter((m) => m.regionId === region.id);
+          const missionsInRegion = isSolo ? MISSIONS.filter((m) => m.regionId === region.id).slice(0, 1) : MISSIONS.filter((m) => m.regionId === region.id);
           const completedInRegion = missionsInRegion.filter((m) =>
             state.completedMissionIds.includes(m.id)
           ).length;
@@ -237,6 +239,7 @@ export const TownMap: React.FC<TownMapProps> = ({
             <button
               key={region.id}
               onClick={() => handleVote(region.id)}
+              disabled={isSolo && completedRegions.has(region.id)}
               style={{
                 left: `${region.x}%`,
                 top: `${region.y}%`,
@@ -265,7 +268,7 @@ export const TownMap: React.FC<TownMapProps> = ({
                   </span>
                 )}
 
-                {isVoting && votes > 0 && (
+                {isVoting && !isSolo && votes > 0 && (
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-500 text-white shadow-sm animate-pulse">
                     {votes} {votes === 1 ? 'voto' : 'votos'}
                   </span>
@@ -296,7 +299,7 @@ export const TownMap: React.FC<TownMapProps> = ({
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
                     }`}
                   >
-                    {hasVotedForThis ? 'Seu Voto ✓' : 'Votar Aqui'}
+                    {hasVotedForThis ? 'Selecionada ✓' : isSolo ? 'Explorar região' : 'Votar Aqui'}
                   </span>
                 </div>
               )}
@@ -307,7 +310,7 @@ export const TownMap: React.FC<TownMapProps> = ({
 
       <div className="grid grid-cols-2 gap-3 sm:hidden" aria-label="Regiões da Vila dos Encontros">
         {REGION_LIST.map(region => {
-          const missions = MISSIONS.filter(m => m.regionId === region.id);
+          const missions = isSolo ? MISSIONS.filter(m => m.regionId === region.id).slice(0, 1) : MISSIONS.filter(m => m.regionId === region.id);
           const done = missions.filter(m => state.completedMissionIds.includes(m.id)).length;
           const selected = myVote === region.id;
           return <button key={region.id} type="button" onClick={() => handleVote(region.id)}
