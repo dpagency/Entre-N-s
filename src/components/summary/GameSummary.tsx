@@ -37,8 +37,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   const fortuneOutcomes = Object.values(state.fortuneCards || {});
   const favorableCards = fortuneOutcomes.filter(card => card.outcome !== 'reves').length;
   const reversals = fortuneOutcomes.filter(card => card.outcome === 'reves').length;
+  const revealedCards = Math.min(4, fortuneOutcomes.length);
   const dimensions = [
-    { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, favorableCards)), explanation: 'Avanço e conclusão das etapas da jornada.' },
+    { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, revealedCards)), explanation: 'Avanço nas missões e participação na dinâmica das cartas, independentemente do resultado sorteado.' },
     { label: 'Confiança', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Atenção dedicada às perspectivas e aos vínculos de confiança.' },
     { label: 'Equilíbrio', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(4, h.perspectivesExploredCount) + (h.reconsiderationOccurred ? 2 : 0), 0)), explanation: 'Perspectivas consideradas e disposição para reconsiderar.' },
     { label: 'Participação', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Participação nas etapas de escuta e exploração.' },
@@ -84,14 +85,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
         <div className="h-3 rounded-full bg-slate-700 overflow-hidden"><div className="h-full rounded-full bg-teal-400 transition-all" style={{ width: `${journeyPoints}%` }} /></div>
         <p className="text-sm font-bold text-teal-300">{journeyLevel}</p>
-        <p className="text-xs text-slate-300">Os pontos reconhecem a navegação, a exploração e a colaboração — não avaliam seus valores nem classificam suas escolhas éticas como boas ou ruins. As cartas de sorte não geram punição moral.</p>
+        <p className="text-xs text-slate-300">Os pontos reconhecem a navegação, a exploração e a colaboração — não avaliam seus valores nem classificam suas escolhas éticas como boas ou ruins. O resultado aleatório das cartas não altera a pontuação.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {dimensions.map((d) => <div key={d.label} className="rounded-xl bg-slate-950 p-3 border border-slate-800">
             <div className="flex justify-between gap-2 text-sm font-bold"><span>{d.label}</span><span className="text-amber-300">{d.points}/25</span></div>
             <p className="text-xs text-slate-400 mt-1">{d.explanation}</p>
           </div>)}
         </div>
-        <p className="text-xs text-amber-200">Cartas reveladas: {fortuneOutcomes.length} · Favoráveis ou segunda chance: {favorableCards} · Reveses: {reversals}. Os reveses não retiram pontos.</p>
+        <p className="text-xs text-amber-200">Cartas reveladas: {fortuneOutcomes.length} · Favoráveis ou segunda chance: {favorableCards} · Reveses: {reversals}. Sorte, segunda chance e revés têm o mesmo peso na participação.</p>
         <p className="text-xs text-slate-400">Escala experimental do piloto: inicial (0–39), desenvolvimento (40–69), avançado (70–100). O máximo representa o teto da escala, não uma nota ética.</p>
       </section>
 
