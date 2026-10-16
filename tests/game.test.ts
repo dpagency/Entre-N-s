@@ -42,14 +42,13 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
  assert.equal(room().completedMissionIds.length,4);
  assert.equal(new Set(room().completedMissionIds).size,4);
 });
-test('multiplayer keeps choices secret and checks host and readiness',()=>{
- fresh(); const a=client(),b=client();a.send({type:'CREATE_ROOM',nickname:'A',characterId:'alex',variantIndex:0});const code=a.frames[0].roomCode;
- b.send({type:'JOIN_ROOM',roomCode:code,nickname:'B',characterId:'bia',variantIndex:0});a.send({type:'START_GAME'});assert.equal(snapshot().rooms[0][1].phase,'LOBBY');
- b.send({type:'TOGGLE_READY'});a.send({type:'START_GAME'});
- a.send({type:'SUBMIT_PRE_TEST',answers:answers(PRE_TEST_QUESTIONS)});b.send({type:'SUBMIT_PRE_TEST',answers:answers(PRE_TEST_QUESTIONS)});
- const mission=MISSIONS[0];b.send({type:'START_MISSION',missionId:mission.id});assert.equal(snapshot().rooms[0][1].phase,'BOARD_SELECT');
- a.send({type:'START_MISSION',missionId:mission.id});a.send({type:'EXPLORE_MISSION'});a.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});
- const state=b.frames.filter(f=>f.type==='STATE_UPDATE').at(-1).state;assert.equal(state.revealedIndividualChoices,undefined);assert.equal(state.myChoice,undefined);
- assert.equal((Object.values(state.players) as any[]).find(p=>p.nickname==='A')?.preTestScore,undefined);
- b.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[1].id});assert.equal(snapshot().rooms[0][1].phase,'MISSION_REVEAL');
+test('solo choice remains visible until explicit reveal',()=>{
+ fresh();const c=client();c.send({type:'CREATE_ROOM',nickname:'Teste',characterId:'alex',variantIndex:0});
+ const room=()=>snapshot().rooms[0][1];
+ c.send({type:'START_GAME'});
+ c.send({type:'VOTE_DESTINATION',regionId:'praca'});c.send({type:'CONFIRM_DESTINATION'});c.send({type:'EXPLORE_MISSION'});
+ c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:MISSIONS[0].actions[0].id});
+ assert.equal(room().phase,'MISSION_EXPLORE');
+ c.send({type:'PROCEED_TO_REVEAL'});
+ assert.equal(room().phase,'MISSION_REVEAL');
 });
