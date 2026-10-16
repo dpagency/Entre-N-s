@@ -139,7 +139,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
               <p className="text-sm text-slate-300">{CHARACTERS[myGuardian.characterId].title}</p>
             </div>
           </div>
-          <p className="text-base leading-relaxed text-slate-100">
+          <p data-narration="story" className="text-base leading-relaxed text-slate-100">
             “Eu teria considerado {guardianPreference.title.toLocaleLowerCase('pt-BR')}. {guardianQuestion[myGuardian.characterId]}”
           </p>
           <p className="text-sm text-slate-300">Sua escolha permanece registrada. Esta é apenas outra perspectiva para refletir.</p>
@@ -161,9 +161,9 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                 <p className="text-base font-semibold">{action.title}</p>
                 <p className="text-sm text-slate-300 leading-relaxed">{action.description}</p>
                 {chosenAction && action.id !== chosenAction.id && (
-                  <p className="mt-3 rounded-xl border border-teal-700/50 bg-teal-950/40 p-3 text-sm text-teal-100" aria-label={`Reflexão de ${CHARACTERS[guardian.characterId]?.name}`}>
+                  <p data-narration="story" className="mt-3 rounded-xl border border-teal-700/50 bg-teal-950/40 p-3 text-sm text-teal-100" aria-label={`Reflexão de ${CHARACTERS[guardian.characterId]?.name}`}>
                     “Eu seguiria por este caminho. {guardianQuestion[guardian.characterId]}”
-                    <span className="block mt-2 text-xs text-slate-300">Você pode continuar com sua própria decisão; esta reflexão não altera sua escolha.</span>
+
                   </p>
                 )}
               </div>
