@@ -491,7 +491,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       if (!mission || !selected || !mission.actions.some(a => a.id === selected)) return;
       room.chosenCollectiveActionId = selected;
       room.isNonConsensualResult = false;
-      room.nonConsensualActionIds = [];
+      room.nonConsensualActionIds = undefined;
       room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false});
       if (!room.unlockedDiscoveries.includes(mission.discovery.key)) room.unlockedDiscoveries.push(mission.discovery.key);
       room.phase = mission.tfChallenge ? 'MISSION_TF_CHALLENGE' : 'MISSION_CONSEQUENCE';
