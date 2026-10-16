@@ -36,7 +36,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     const codeFromUrl = params.get('room');
     if (codeFromUrl) {
       setRoomCode(codeFromUrl.toUpperCase());
-      setMode('join');
+      setMode('solo');
     }
   }, []);
 
@@ -49,7 +49,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     localStorage.setItem('guardioes_character', characterId);
     localStorage.setItem('guardioes_variant', String(variantIndex));
 
-    socketService.setSoloMode(mode === 'solo');
+    socketService.setSoloMode(true);
     socketService.send({
       type: 'CREATE_ROOM',
       nickname: cleanNick,
@@ -112,7 +112,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
       {/* Main interaction card */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
-        <button type="button" onClick={() => setMode('solo')} className="w-full py-3 rounded-xl bg-amber-500 text-slate-950 font-bold">Jogar sozinho com companheiros virtuais</button>
+        <button type="button" onClick={() => setMode('solo')} className="w-full py-3 rounded-xl bg-amber-500 text-slate-950 font-bold">Modo individual · três companheiros virtuais</button>
         {mode === 'solo' && <p className="text-xs text-amber-200">Você e três companheiros virtuais. Sua jornada fica neste dispositivo.</p>}
         {/* Multiplayer depende de configuração de infraestrutura e permanece indisponível neste piloto. */}
         {/* Toggle mode: Criar Sala vs Entrar em Sala */}
@@ -265,7 +265,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
           >
             <Play className="w-5 h-5 fill-current" />
-            <span>{starting ? 'Preparando sua jornada…' : mode === 'solo' ? 'Começar com o computador' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
+            <span>{starting ? 'Preparando sua jornada…' : mode === 'solo' ? 'Começar minha jornada' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
           </button>
         </form>
 
