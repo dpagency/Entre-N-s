@@ -34,8 +34,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
     (priorities[myGuardian.characterId]?.indexOf(a.actionType) ?? 9) -
     (priorities[myGuardian.characterId]?.indexOf(b.actionType) ?? 9)
   )[0];
-  const guardianDiffers = solo && chosenAction && guardianPreference &&
-    chosenAction.id !== guardianPreference.id;
+  const showCompanionReflection = Boolean(solo && chosenAction && guardianPreference);
   const guardianQuestion: Record<string, string> = {
     alex: 'Como sua decisão dialoga com os princípios e responsabilidades envolvidos?',
     joana: 'Como as pessoas afetadas poderão ser ouvidas e acolhidas nesse caminho?',
@@ -130,7 +129,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
 
       {solo && chosenAction && <section className="rounded-2xl border border-teal-500/50 bg-teal-950/25 p-5"><h3 className="text-lg font-bold text-teal-200">Sua decisão</h3><p className="font-semibold mt-2">{chosenAction.title}</p><p className="text-sm text-slate-300 mt-1">{chosenAction.description}</p></section>}
 
-      {guardianDiffers && myGuardian && (
+      {showCompanionReflection && myGuardian && guardianPreference && chosenAction && (
         <section className="rounded-3xl border border-teal-500/40 bg-teal-950/30 p-5 sm:p-6 space-y-3" aria-label="Reflexão do seu Guardião">
           <div className="flex items-center gap-3">
             <CharacterAvatar characterId={myGuardian.characterId} variantIndex={myGuardian.variantIndex} size="md" />
@@ -140,7 +139,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
             </div>
           </div>
           <p data-narration="story" className="text-base leading-relaxed text-slate-100">
-            “Eu teria considerado {guardianPreference.title.toLocaleLowerCase('pt-BR')}. {guardianQuestion[myGuardian.characterId]}”
+            {guardianPreference.id === chosenAction.id ? '“Eu também consideraria esse caminho. ' : `“Eu teria considerado ${guardianPreference.title.toLocaleLowerCase('pt-BR')}. `}{guardianQuestion[myGuardian.characterId]}”
           </p>
 
         </section>
@@ -160,9 +159,9 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                 <h4 className="font-bold text-base text-amber-200">{CHARACTERS[guardian.characterId]?.name}</h4>
                 <p className="text-base font-semibold">{action.title}</p>
                 <p className="text-sm text-slate-300 leading-relaxed">{action.description}</p>
-                {chosenAction && action.id !== chosenAction.id && (
+                {chosenAction && (
                   <p data-narration="story" className="mt-3 rounded-xl border border-teal-700/50 bg-teal-950/40 p-3 text-sm text-teal-100" aria-label={`Reflexão de ${CHARACTERS[guardian.characterId]?.name}`}>
-                    “Eu consideraria {action.title.toLocaleLowerCase("pt-BR")}. {guardianQuestion[guardian.characterId]}”
+                    {action.id === chosenAction.id ? '“Eu também consideraria esse caminho. ' : `“Eu consideraria ${action.title.toLocaleLowerCase('pt-BR')}. `}{guardianQuestion[guardian.characterId]}”
                   </p>
                 )}
               </div>
