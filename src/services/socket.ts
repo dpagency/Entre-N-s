@@ -1,4 +1,5 @@
 import { ClientMessage, SanitizedRoomState, ServerMessage } from '../types/game';
+import * as engine from '../game/engine';
 
 type StateListener = (state: SanitizedRoomState) => void;
 type ErrorListener = (message: string) => void;
@@ -40,7 +41,6 @@ class GameSocketService {
   public async connect(): Promise<void> {
     this.intentionallyClosed = false;
     if (this.localMode) {
-      const engine = await import('../game/engine');
       const saved = sessionStorage.getItem('entre-nos-solo');
       if (saved) {try {engine.restore(JSON.parse(saved));} catch {sessionStorage.removeItem('entre-nos-solo');}}
     }
@@ -58,7 +58,6 @@ class GameSocketService {
   public send(msg: ClientMessage) {
     this.queue = this.queue.then(async () => {
       if (this.localMode) {
-        const engine = await import('../game/engine');
         engine.handleClientMessage(this.localConnection,msg);
         sessionStorage.setItem('entre-nos-solo',JSON.stringify(engine.snapshot()));
       } else await this.request(msg);
@@ -142,7 +141,7 @@ class GameSocketService {
 
   public leaveRoom() {
     const credentials = {sessionToken:this.sessionToken,roomCode:this.roomCode};
-    if (this.localMode) import('../game/engine').then(engine => engine.handleClientDisconnect(this.localConnection));
+    if (this.localMode) engine.handleClientDisconnect(this.localConnection);
     else fetch('/api/game',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...credentials,message:{type:'LEAVE_ROOM'}}),keepalive:true}).catch(()=>{});
     this.intentionallyClosed = true;
     if (this.pollTimer) clearTimeout(this.pollTimer);
