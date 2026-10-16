@@ -27,6 +27,17 @@ export default function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [myPlayerId, setMyPlayerId] = useState<string | null>(socketService.myPlayerId);
 
+  // Ao mudar de etapa, o jogador deve ler a nova tela desde o início.
+  useEffect(() => {
+    if (!state?.phase) return;
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [state?.phase, state?.activeMissionId]);
+
   // Modals
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isInstitutionalGuideOpen, setIsInstitutionalGuideOpen] = useState(false);
