@@ -117,10 +117,12 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
       <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 space-y-4">
         <h3 className="text-lg font-black text-amber-200">Escolha uma das três cartas do destino</h3>
         <p className="text-sm text-slate-300">Sorte, revés ou segunda chance: o acaso define o caminho, independentemente de suas decisões éticas.</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3" role="group" aria-label="Escolha uma carta virada">
           {[0, 1, 2].map(index => <button key={index} type="button" disabled={!!fortune || !isHost}
             onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD', cardIndex:index})}
-            className={`min-h-36 rounded-2xl border-2 p-3 flex flex-col items-center justify-center gap-2 transition-transform ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/50 bg-teal-950 hover:-translate-y-1'} disabled:cursor-default`}>
+            aria-label={fortune?.cardIndex === index ? `Carta ${index + 1} revelada: ${fortune.outcome}` : `Virar carta ${index + 1}`}
+            aria-pressed={fortune?.cardIndex === index}
+            className={`min-h-28 sm:min-h-36 rounded-2xl border-2 p-2 sm:p-3 flex flex-col items-center justify-center gap-2 transition-transform ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/50 bg-teal-950 hover:-translate-y-1'} disabled:cursor-default`}>
             <span className="text-4xl" aria-hidden="true">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
             <span className="text-xs font-bold text-amber-100">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index + 1}`}</span>
           </button>)}
@@ -186,10 +188,10 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
 
         <button
           onClick={handleProceed}
-          disabled={!fortune}
+          disabled={!fortune || !discoveryOpened}
           className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
         >
-          <span>{isLastMission ? 'Ver resumo e medalha' : 'Voltar ao Mapa Territorial'}</span>
+          <span>{!fortune ? 'Escolha uma carta para continuar' : !discoveryOpened ? 'Revelando descoberta...' : isLastMission ? 'Ver resumo e medalha' : 'Voltar ao mapa da Vila'}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
