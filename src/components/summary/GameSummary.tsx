@@ -2,6 +2,7 @@ import React from 'react';
 import { RoomState } from '../../types/game';
 import { MISSIONS } from '../../data/missions';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
+import { CHARACTERS } from '../../data/characters';
 import { Award, CheckCircle2, Users, Compass, Sparkles, MessageSquare, RotateCcw, ShieldCheck } from 'lucide-react';
 
 interface GameSummaryProps {
@@ -38,9 +39,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   const reversals = fortuneOutcomes.filter(card => card.outcome === 'reves').length;
   const dimensions = [
     { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, favorableCards)), explanation: 'Avanço e conclusão das etapas da jornada.' },
-    { label: 'Confiança', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + (h.voteType === 'unanimous' ? 5 : h.voteType === 'majority' ? 3 : 2), 0)), explanation: 'Construção de acordos; divergências também geram aprendizagem.' },
+    { label: 'Confiança', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Atenção dedicada às perspectivas e aos vínculos de confiança.' },
     { label: 'Equilíbrio', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(4, h.perspectivesExploredCount) + (h.reconsiderationOccurred ? 2 : 0), 0)), explanation: 'Perspectivas consideradas e disposição para reconsiderar.' },
-    { label: 'Participação', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Compartilhamento de perspectivas ao longo das missões.' },
+    { label: 'Participação', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Participação nas etapas de escuta e exploração.' },
   ];
   const journeyPoints = dimensions.reduce((sum, d) => sum + d.points, 0);
   const journeyLevel = journeyPoints < 40 ? 'Percurso inicial' : journeyPoints < 70 ? 'Percurso em desenvolvimento' : 'Percurso avançado';
@@ -109,7 +110,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             {state.unlockedDiscoveries.length}/4
           </div>
           <div className="text-xs font-semibold text-slate-300 mt-1">
-            Descobertas Coletivas
+            Descobertas da Jornada
           </div>
         </div>
 
@@ -136,7 +137,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-3">
         <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-amber-400" />
-          Pilares e Descobertas Conquistadas pelo Coletivo
+          Pilares e descobertas da jornada
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -204,9 +205,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             >
               <CharacterAvatar characterId={p.characterId} variantIndex={p.variantIndex} size="sm" />
               <div>
-                <div className="font-bold text-xs text-slate-200">{p.nickname}</div>
+                <div className="font-bold text-xs text-slate-200">{p.isBot ? CHARACTERS[p.characterId]?.name : p.nickname}</div>
                 <div className="text-[10px] text-slate-400">
-                  {p.isHost ? 'Anfitrião da Sala' : 'Guardião'}
+                  {p.isHost ? 'Jogador' : 'Guardião'}
                 </div>
               </div>
             </div>
@@ -217,7 +218,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
       {/* Footer controls */}
       <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs text-slate-400 text-center sm:text-left">
-          Avaliem a experiência para apoiar aprimoramentos no programa pedagógico.
+          Sua avaliação é voluntária e ajuda a aprimorar a experiência.
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
