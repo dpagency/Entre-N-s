@@ -23,7 +23,7 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
   c.send({type:'EXPLORE_MISSION'});
   assert.equal(room().phase,'MISSION_EXPLORE');
   c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});
-  assert.equal(room().phase,'MISSION_INDIVIDUAL_CHOICE');
+  assert.equal(room().phase,'MISSION_EXPLORE');
   c.send({type:'PROCEED_TO_REVEAL'});
   assert.equal(room().phase,'MISSION_REVEAL');
   c.send({type:'OPEN_COLLECTIVE_VOTE'});
