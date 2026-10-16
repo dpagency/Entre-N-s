@@ -101,6 +101,33 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         </div>}
       </div>
 
+      {solo && state.isRaviSecondRoundActive && (
+        <section className="rounded-3xl border border-amber-500/50 bg-amber-950/20 p-5 sm:p-6 space-y-3" aria-label="Nova Escuta de Satori">
+          <h3 className="text-lg font-bold text-amber-200">Nova Escuta — Satori</h3>
+          <p className="text-sm text-slate-200 leading-relaxed">Antes de seguir, considere o que ainda não foi ouvido: quais informações poderiam mudar sua compreensão da situação? Quem será afetado pela decisão? Que consequência mereceria uma segunda conversa?</p>
+          <p className="text-sm font-semibold text-teal-200">Sua decisão continua registrada. Esta pausa não exige mudar de resposta: convida a olhar novamente.</p>
+        </section>
+      )}
+      {solo && state.futureLooks.length > 0 && (
+        <section className="rounded-2xl border border-blue-500/40 bg-blue-950/25 p-5 space-y-2" aria-label="Olhar Adiante de Wa">
+          <h3 className="font-bold text-blue-200">Olhar Adiante — Wa</h3>
+          {state.futureLooks.filter(Boolean).map((look, idx) => <p key={idx} className="text-sm text-slate-200">{look}</p>)}
+          <p className="text-xs text-slate-400">Possibilidades para reflexão, não previsões ou respostas corretas.</p>
+        </section>
+      )}
+      {solo && state.unlockedContextIds.length > 0 && (
+        <section className="rounded-2xl border border-teal-500/40 bg-teal-950/25 p-5 space-y-2" aria-label="Mais Contexto de Rin">
+          <h3 className="font-bold text-teal-200">Mais Contexto — Rin</h3>
+          {mission.additionalContexts.filter(ctx => state.unlockedContextIds.includes(ctx.id)).map(ctx => <p key={ctx.id} className="text-sm text-slate-200">{ctx.content}</p>)}
+        </section>
+      )}
+      {solo && state.sharedPerspectiveIds.length > 0 && (
+        <section className="rounded-2xl border border-rose-500/40 bg-rose-950/20 p-5 space-y-2" aria-label="Outro Olhar de Yūki">
+          <h3 className="font-bold text-rose-200">Outro Olhar — Yūki</h3>
+          {mission.perspectives.filter(p => state.sharedPerspectiveIds.includes(p.id)).map(p => <p key={p.id} className="text-sm text-slate-200"><strong>{p.actorName}:</strong> {p.details}</p>)}
+        </section>
+      )}
+
       {solo && chosenAction && <section className="rounded-2xl border border-teal-500/50 bg-teal-950/25 p-5"><h3 className="text-lg font-bold text-teal-200">Sua decisão</h3><p className="font-semibold mt-2">{chosenAction.title}</p><p className="text-sm text-slate-300 mt-1">{chosenAction.description}</p></section>}
 
       {guardianDiffers && myGuardian && (
