@@ -377,6 +377,10 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       }
     }
     room.completedMissionIds = []; room.historyLog = []; room.unlockedDiscoveries = []; room.destinationVotes = {};
+    // A new journey must never inherit drawn cards or decisions from the previous one.
+    room.fortuneCards = {};
+    room.activeMissionId = undefined;
+    room.chosenCollectiveActionId = undefined;
     for (const p of Object.values(room.players)) {
       p.hasUsedPower = false; p.preTestCompleted = !!p.isBot; p.postTestCompleted = !!p.isBot;
       p.preTestScore = undefined; p.postTestScore = undefined;
