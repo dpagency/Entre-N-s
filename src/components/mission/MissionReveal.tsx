@@ -256,6 +256,15 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       </div>
 
       )}
+      {solo && isHost && (
+        <div className="rounded-2xl border border-teal-500/40 bg-slate-900 p-4 sm:p-5 space-y-3">
+          <p className="text-sm text-slate-300">As perspectivas dos Guardiões ampliam a reflexão. Sua decisão permanece a que você escolheu.</p>
+          <button type="button" onClick={handleStartCollectiveVoting}
+            className="w-full rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-6 py-3 font-black text-slate-950 flex items-center justify-center gap-2">
+            Continuar com minha decisão <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       {/* Footer bar to move to Collective Voting */}
       {!solo && <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
