@@ -50,7 +50,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in"
         >
-          <div className="relative w-full max-w-md bg-slate-900 border border-amber-500/50 rounded-3xl p-6 text-slate-100 shadow-2xl">
+          <div className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto bg-slate-900 border border-amber-500/50 rounded-3xl p-5 sm:p-6 text-slate-100 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center">
                 <Zap className="w-6 h-6 fill-current" />
@@ -72,7 +72,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
             <div className="flex items-start gap-2 text-xs text-amber-200/90 bg-amber-950/30 border border-amber-500/30 p-3 rounded-xl mb-6">
               <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>
-                Lembre-se: este poder só poderá ser acionado <strong>uma vez em toda a partida</strong>. Ele amplia o contexto e a reflexão da equipe, sem garantir respostas perfeitas.
+                Lembre-se: este poder só poderá ser acionado <strong>uma vez em toda a partida</strong>. Ele amplia o contexto e oferece novas perspectivas para sua reflexão, sem indicar uma resposta certa.
               </span>
             </div>
 
