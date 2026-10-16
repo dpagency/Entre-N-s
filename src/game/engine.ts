@@ -380,9 +380,10 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       p.hasUsedPower = false; p.preTestCompleted = !!p.isBot; p.postTestCompleted = !!p.isBot;
       p.preTestScore = undefined; p.postTestScore = undefined;
     }
-    // Move to PRE_TEST
-    room.phase = 'PRE_TEST';
-    broadcastRoomState(room, 'A jornada começou! Responda à breve avaliação inicial.');
+    // O piloto começa diretamente na Vila, sem sondagem preliminar.
+    for (const p of Object.values(room.players)) p.preTestCompleted = true;
+    room.phase = 'BOARD_SELECT';
+    broadcastRoomState(room, 'A jornada começou! Escolha a primeira região da Vila dos Encontros.');
     return;
   }
 
