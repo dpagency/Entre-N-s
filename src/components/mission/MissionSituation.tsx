@@ -72,10 +72,6 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
           {mission.title}
         </h1>
 
-        <p className="text-xs sm:text-sm text-teal-300/90 font-medium mb-4">
-          <strong>Objetivo Pedagógico:</strong> {mission.pedagogicalGoal}
-        </p>
-
         {/* Narrative Context & Trigger */}
         <div className="space-y-3 bg-slate-950/70 border border-slate-800 p-4 sm:p-5 rounded-2xl mb-5">
           <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-serif">
