@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MissionDef, RoomState } from '../../types/game';
 import { DiscoveryCard } from '../cards/CardView';
 import { socketService } from '../../services/socket';
-import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, BookOpen } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, BookOpen, Lock, LockOpen } from 'lucide-react';
 
 interface MissionConsequenceProps {
   mission: MissionDef;
@@ -15,7 +15,13 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   state,
   myPlayerId,
 }) => {
-  const [celebrationSeen, setCelebrationSeen] = useState(false);
+  const [discoveryOpened, setDiscoveryOpened] = useState(false);
+  useEffect(() => {
+    setDiscoveryOpened(false);
+    if (!state.fortuneCards?.[mission.id]) return;
+    const timer = window.setTimeout(() => setDiscoveryOpened(true), 900);
+    return () => window.clearTimeout(timer);
+  }, [mission.id, !!state.fortuneCards?.[mission.id]]);
   const isHost = state.hostId === myPlayerId;
   const chosenActionId = state.chosenCollectiveActionId || mission.actions[0].id;
   const chosenAction = mission.actions.find((a) => a.id === chosenActionId) || mission.actions[0];
@@ -107,16 +113,6 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         )}
       </div>
 
-      {!celebrationSeen && (
-        <div role="status" className="relative overflow-hidden rounded-3xl border border-amber-400/50 bg-gradient-to-r from-amber-950/70 via-slate-900 to-teal-950/70 p-5 text-center shadow-xl animate-in zoom-in duration-500">
-          <div className="text-4xl mb-2" aria-hidden="true">✨🏅✨</div>
-          <h3 className="text-xl font-black text-amber-200">Marco de aprendizagem desbloqueado!</h3>
-          <p className="text-sm text-slate-200 mt-2">Missão {completedCount} de 4: você explorou escolhas e suas consequências.</p>
-          <p className="text-xs text-slate-400 mt-2">Celebramos a reflexão, não uma pontuação moral.</p>
-          <button type="button" onClick={() => setCelebrationSeen(true)} className="mt-4 px-5 py-2 rounded-xl bg-amber-400 text-slate-950 font-bold">Continuar reflexão</button>
-        </div>
-      )}
-
       <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 space-y-4">
         <h3 className="text-lg font-black text-amber-200">Escolha uma das três cartas do destino</h3>
         <p className="text-sm text-slate-300">Sorte, revés ou segunda chance: o acaso define o caminho, independentemente de suas decisões éticas.</p>
@@ -134,8 +130,21 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           <p className="text-sm text-slate-200 mt-2">{fortune.outcome === 'reves' ? 'O revés faz parte da sorte, não é punição pela sua escolha. Você pode continuar.' : 'Esta carta acrescenta uma conquista à sua jornada.'}</p>
         </div>}
       </section>
-      {/* Discovery unlocked card */}
-      <DiscoveryCard discovery={mission.discovery} />
+      {/* Descoberta revelada somente no encerramento da missão, após a carta do destino. */}
+      {fortune && (
+        <section aria-live="polite" className="rounded-3xl border border-amber-400/40 bg-slate-900 p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className={`rounded-2xl p-3 bg-amber-500/15 text-amber-300 transition-transform duration-500 motion-reduce:transition-none ${discoveryOpened ? 'scale-110' : 'scale-100'}`}>
+              {discoveryOpened ? <LockOpen size={30} aria-hidden="true" /> : <Lock size={30} aria-hidden="true" />}
+            </div>
+            <div>
+              <h3 className="font-black text-xl text-amber-200">{discoveryOpened ? 'Descoberta desbloqueada!' : 'Revelando sua descoberta...'}</h3>
+              <p className="text-sm text-slate-300">Um aprendizado desta missão, independentemente da alternativa escolhida.</p>
+            </div>
+          </div>
+          {discoveryOpened && <div className="animate-in fade-in duration-500 motion-reduce:animate-none"><DiscoveryCard discovery={mission.discovery} /></div>}
+        </section>
+      )}
 
       {/* Editorial metadata & proposed guidance tag */}
       <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
