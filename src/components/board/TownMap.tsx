@@ -89,33 +89,6 @@ export const TownMap: React.FC<TownMapProps> = ({
           </p>
         </div>
 
-        {/* Discoveries earned token row */}
-        <div className="flex flex-wrap items-center gap-2 bg-slate-900/90 border border-slate-800 p-2 rounded-xl min-w-0">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Descobertas:</span>
-          {(['escuta', 'respeito', 'responsabilidade', 'orientacao'] as const).map((disc) => {
-            const hasDisc = state.unlockedDiscoveries.includes(disc);
-            const discLabels = {
-              escuta: 'Escuta',
-              respeito: 'Respeito',
-              responsabilidade: 'Responsabilidade',
-              orientacao: 'Orientação',
-            };
-            return (
-              <span
-                key={disc}
-                className={`text-xs px-2 py-0.5 rounded-md font-medium flex items-center gap-1 transition-all ${
-                  hasDisc
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
-                    : 'bg-slate-800/60 text-slate-600 border border-slate-800 line-through'
-                }`}
-                title={hasDisc ? `Descoberta conquistada: ${discLabels[disc]}` : `Ainda não conquistada: ${discLabels[disc]}`}
-              >
-                {hasDisc && <CheckCircle2 className="w-3 h-3 text-amber-400" />}
-                {discLabels[disc]}
-              </span>
-            );
-          })}
-        </div>
       </div>
 
       {/* SVG Map Canvas: desktop only; on phones use accessible region grid below. */}
