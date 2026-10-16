@@ -47,7 +47,7 @@ export const PerspectiveCard: React.FC<PerspectiveCardProps> = ({
         </div>
       </div>
 
-      <div className="text-xs sm:text-sm text-slate-300 font-medium mb-3 italic bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+      <div data-narration="story" className="text-xs sm:text-sm text-slate-300 font-medium mb-3 italic bg-slate-950/60 p-3 rounded-xl border border-slate-800">
         {perspective.details}
       </div>
 
