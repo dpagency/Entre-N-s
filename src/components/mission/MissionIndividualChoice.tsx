@@ -102,7 +102,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           <div className="mt-4 p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/40 text-xs text-blue-200 space-y-1">
             <div className="font-bold flex items-center gap-1.5 text-blue-300">
               <Sparkles className="w-4 h-4 text-blue-400" />
-              Olhar Adiante Ativo (Poder da Joana):
+              Olhar Adiante — poder de Wa
             </div>
             {state.futureLooks.map((look, idx) => (
               <p key={idx} className="italic text-slate-300">
@@ -115,7 +115,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         {state.unlockedContextIds.length > 0 && (
           <div className="mt-3 p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/40 text-xs text-teal-200">
             <strong className="text-teal-300 block mb-1">
-              Contexto Adicional Descoberto (Poder de Alex):
+              Mais Contexto — poder de Rin
             </strong>
             {mission.additionalContexts
               .filter((c) => state.unlockedContextIds.includes(c.id))
