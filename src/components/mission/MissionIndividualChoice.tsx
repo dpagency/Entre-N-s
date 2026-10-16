@@ -55,7 +55,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              Fase 2 de 4 • Escolha Individual em Sigilo
+              Sua decisão
             </span>
             <span className="text-xs text-slate-400">
               {mission.title} ({mission.code})
@@ -82,7 +82,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           Como você atuaria diante desta situação?
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
-          Sua resposta ficará guardada em sigilo no servidor e será revelada juntamente com as escolhas dos demais colegas para promover uma reflexão sincera.
+          Escolha como deseja agir. Sua decisão será destacada antes de conhecer as perspectivas dos Guardiões.
         </p>
 
         {state.sharedPerspectiveIds.length > 0 && (
@@ -128,40 +128,6 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         )}
       </div>
 
-      {/* Roster / Status bar of who has chosen */}
-      <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-300">
-            Respostas Submetidas:
-          </span>
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
-            {choicesSubmittedCount} de {totalActive} guardiões
-          </span>
-        </div>
-
-        {/* Players status pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {Object.values(state.players).map((p) => {
-            const hasChosen = !!state.individualChoiceStatus?.[p.id];
-            return (
-              <div
-                key={p.id}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-all ${
-                  hasChosen
-                    ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                    : 'bg-slate-800/60 border-slate-700/50 text-slate-400'
-                } ${!p.isConnected ? 'opacity-50' : ''}`}
-                title={p.isConnected ? (hasChosen ? 'Já escolheu' : 'Pensando...') : 'Desconectado'}
-              >
-                <CharacterAvatar characterId={p.characterId} variantIndex={p.variantIndex} size="sm" showBadge={false} />
-                <span>{p.nickname}</span>
-                <span>{hasChosen ? '✓' : '…'}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Action Options Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {mission.actions.map((action) => {
@@ -182,7 +148,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         <div className="text-xs sm:text-sm text-slate-300">
           {myChoice ? (
             <span className="text-emerald-300 font-medium">
-              Sua escolha foi registrada no servidor! Você pode alterá-la até a revelação coletiva.
+              Sua escolha está registrada. Você pode alterá-la antes de continuar.
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
@@ -200,7 +166,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
             >
               <Eye className="w-4 h-4" />
-              <span>Revelar Escolhas Simultaneamente</span>
+              <span>Conhecer as perspectivas dos Guardiões</span>
             </button>
           )}
 
