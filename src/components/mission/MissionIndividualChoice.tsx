@@ -90,6 +90,14 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           Escolha como deseja agir. Selecione uma alternativa e confirme sua decisão. Depois de confirmada, ela não poderá ser alterada nesta partida.
         </p>
 
+        {state.isRaviSecondRoundActive && (
+          <section className="mt-4 rounded-2xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-2" aria-label="Nova Escuta de Satori">
+            <h3 className="font-bold text-amber-200">Nova Escuta — Satori</h3>
+            <p data-narration="story" className="text-sm text-slate-200">“Que voz ainda não ouvimos? Que consequência merece mais atenção? Podemos reconsiderar nossa compreensão, mesmo quando a decisão já foi tomada.”</p>
+            <p className="text-xs text-teal-200">{myChoice ? 'Sua decisão está confirmada e permanece registrada.' : 'Você ainda pode refletir antes de confirmar sua decisão.'}</p>
+          </section>
+        )}
+
         {state.sharedPerspectiveIds.length > 0 && (
           <section className="mt-4 p-4 rounded-2xl border border-amber-500/40 bg-amber-950/20 space-y-3" aria-label="Perspectivas reveladas">
             <h3 className="font-bold text-lg text-amber-200">Perspectivas reveladas</h3>
