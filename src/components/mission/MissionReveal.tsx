@@ -142,14 +142,14 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
           <p data-narration="story" className="text-base leading-relaxed text-slate-100">
             “Eu teria considerado {guardianPreference.title.toLocaleLowerCase('pt-BR')}. {guardianQuestion[myGuardian.characterId]}”
           </p>
-          <p className="text-sm text-slate-300">Sua escolha permanece registrada. Esta é apenas outra perspectiva para refletir.</p>
+
         </section>
       )}
 
       {solo ? (
         <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Perspectivas dos três Guardiões virtuais">
           <h3 className="text-lg font-bold text-teal-200">Outros olhares para o mesmo dilema</h3>
-          <p className="text-sm text-slate-300">Cada Guardião considera uma possibilidade. Não há votação, maioria nem resposta vencedora.</p>
+          <p className="text-sm text-slate-300">Três perspectivas independentes, sem votação ou resposta vencedora.</p>
           {Object.entries(revealedChoices).filter(([pid]) => pid !== myPlayerId && state.players[pid]?.isBot).map(([pid, actionId]) => {
             const guardian = state.players[pid];
             const action = mission.actions.find(a => a.id === actionId);
@@ -162,8 +162,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                 <p className="text-sm text-slate-300 leading-relaxed">{action.description}</p>
                 {chosenAction && action.id !== chosenAction.id && (
                   <p data-narration="story" className="mt-3 rounded-xl border border-teal-700/50 bg-teal-950/40 p-3 text-sm text-teal-100" aria-label={`Reflexão de ${CHARACTERS[guardian.characterId]?.name}`}>
-                    “Eu seguiria por este caminho. {guardianQuestion[guardian.characterId]}”
-
+                    “Eu consideraria {action.title.toLocaleLowerCase("pt-BR")}. {guardianQuestion[guardian.characterId]}”
                   </p>
                 )}
               </div>
@@ -264,7 +263,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       )}
       {solo && isHost && (
         <div className="rounded-2xl border border-teal-500/40 bg-slate-900 p-4 sm:p-5 space-y-3">
-          <p className="text-sm text-slate-300">As perspectivas dos Guardiões ampliam a reflexão. Sua decisão permanece a que você escolheu.</p>
+          <p className="text-sm text-slate-300">Ouça os outros olhares e prossiga com sua decisão.</p>
           <button type="button" onClick={handleStartCollectiveVoting}
             className="w-full rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-6 py-3 font-black text-slate-950 flex items-center justify-center gap-2">
             Continuar com minha decisão <ArrowRight className="w-4 h-4" />
