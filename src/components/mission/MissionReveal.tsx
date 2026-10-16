@@ -3,6 +3,7 @@ import { MissionDef, SanitizedRoomState } from '../../types/game';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { PerspectiveCard } from '../cards/CardView';
 import { socketService } from '../../services/socket';
+import { CHARACTERS } from '../../data/characters';
 import { Users, MessageSquareQuote, Vote, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
 
 interface MissionRevealProps {
@@ -18,6 +19,28 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
 }) => {
   const isHost = state.hostId === myPlayerId;
   const revealedChoices: Record<string, string> = state.revealedIndividualChoices || {};
+  const myGuardian = state.players[myPlayerId];
+  const solo = Object.values(state.players).some(p => p.isBot);
+  const chosenAction = mission.actions.find(a => a.id === revealedChoices[myPlayerId]);
+  // Preferências dos arquétipos: não representam respostas certas.
+  const priorities: Record<string, string[]> = {
+    alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
+    joana: ['acolhimento', 'dialogo', 'orientacao', 'cautela', 'formalizacao'],
+    ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
+    bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
+  };
+  const guardianPreference = myGuardian && mission.actions.slice().sort((a, b) =>
+    (priorities[myGuardian.characterId]?.indexOf(a.actionType) ?? 9) -
+    (priorities[myGuardian.characterId]?.indexOf(b.actionType) ?? 9)
+  )[0];
+  const guardianDiffers = solo && chosenAction && guardianPreference &&
+    chosenAction.id !== guardianPreference.id;
+  const guardianQuestion: Record<string, string> = {
+    alex: 'Como sua decisão dialoga com os princípios e responsabilidades envolvidos?',
+    joana: 'Como as pessoas afetadas poderão ser ouvidas e acolhidas nesse caminho?',
+    ravi: 'Que informação ou consequência merece atenção antes de seguirmos?',
+    bia: 'Que responsabilidade essa situação nos convida a assumir, mesmo diante do desconforto?',
+  };
 
   // Group players by chosen action
   const choicesByAction: Record<string, string[]> = {};
@@ -76,6 +99,22 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
           </ul>
         </div>
       </div>
+
+      {guardianDiffers && myGuardian && (
+        <section className="rounded-3xl border border-teal-500/40 bg-teal-950/30 p-5 sm:p-6 space-y-3" aria-label="Reflexão do seu Guardião">
+          <div className="flex items-center gap-3">
+            <CharacterAvatar characterId={myGuardian.characterId} variantIndex={myGuardian.variantIndex} size="md" />
+            <div>
+              <h3 className="font-black text-lg text-teal-200">{CHARACTERS[myGuardian.characterId].name} compartilha um pensamento</h3>
+              <p className="text-sm text-slate-300">{CHARACTERS[myGuardian.characterId].title}</p>
+            </div>
+          </div>
+          <p className="text-base leading-relaxed text-slate-100">
+            “Eu teria considerado {guardianPreference.title.toLocaleLowerCase('pt-BR')}. {guardianQuestion[myGuardian.characterId]}”
+          </p>
+          <p className="text-sm text-slate-300">Sua escolha permanece registrada. Esta é apenas outra perspectiva para refletir.</p>
+        </section>
+      )}
 
       {/* Grid of Actions with chosen avatars */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
