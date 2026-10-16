@@ -146,6 +146,11 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         </section>
       )}
 
+      <section className="rounded-2xl border border-teal-500/30 bg-teal-950/20 p-5 space-y-2">
+        <h3 className="text-lg font-bold text-teal-200">O que esta experiência nos convida a refletir?</h3>
+        <p className="text-base leading-relaxed text-slate-200">{mission.pedagogicalGoal}</p>
+      </section>
+
       {/* Editorial metadata & proposed guidance tag */}
       <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
         <div>
