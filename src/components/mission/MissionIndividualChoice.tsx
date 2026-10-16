@@ -25,8 +25,9 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
 
   // Active connected players count
   const activePlayers = Object.values(state.players).filter((p) => p.isConnected);
-  const totalActive = activePlayers.length;
-  const choicesSubmittedCount = Object.values(state.individualChoiceStatus || {}).filter(Boolean).length;
+  const totalActive = activePlayers.filter(p => !p.isBot).length;
+  const choicesSubmittedCount = Object.entries(state.individualChoiceStatus || {}).filter(([id, chosen]) => chosen && !state.players[id]?.isBot).length;
+  const isSolo = activePlayers.some(p => p.isBot);
 
   const handleSelectAction = (actionId: string) => {
     socketService.send({
@@ -148,7 +149,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         <div className="text-xs sm:text-sm text-slate-300">
           {myChoice ? (
             <span className="text-emerald-300 font-medium">
-              Sua escolha está registrada. Você pode alterá-la antes de continuar.
+              Sua escolha está registrada e destacada acima. Você pode alterá-la antes de continuar.
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
@@ -162,7 +163,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           {(isHost || choicesSubmittedCount >= totalActive) && (
             <button
               onClick={handleProceedToReveal}
-              disabled={choicesSubmittedCount === 0}
+              disabled={isSolo ? !myChoice : choicesSubmittedCount === 0}
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
             >
               <Eye className="w-4 h-4" />
@@ -171,7 +172,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           )}
 
           {/* Disconnection fallback */}
-          {choicesSubmittedCount > 0 && choicesSubmittedCount < totalActive && isHost && (
+          {!isSolo && choicesSubmittedCount > 0 && choicesSubmittedCount < totalActive && isHost && (
             <button
               onClick={handleContinueWithoutDisconnected}
               className="px-3 py-2 text-[11px] text-slate-400 hover:text-amber-300 hover:bg-slate-800 rounded-lg transition-colors"
