@@ -7,28 +7,40 @@ import type {ClientMessage} from '../src/types/game';
 function fresh() {restore({rooms:[],tokens:[],evaluations:[],feedback:[]});}
 function client() {const frames:any[]=[];const ws:GameConnection={readyState:1,send:data=>frames.push(JSON.parse(data))}; return {frames,ws,send:(msg:ClientMessage)=>handleClientMessage(ws,msg)};}
 const answers = (questions:typeof PRE_TEST_QUESTIONS) => Object.fromEntries(questions.map(q=>[q.id,q.options[0].id]));
-test('solo completes four missions, tests and feedback, without bot analytics',()=>{
- fresh(); const c=client();c.send({type:'CREATE_ROOM',nickname:'Teste',characterId:'alex',variantIndex:0});
- const joined=c.frames[0]; const room=()=>snapshot().rooms[0][1];
- c.send({type:'START_GAME'});assert.equal(Object.values(room().players).filter(p=>p.isBot).length,3);
- c.send({type:'SUBMIT_PRE_TEST',answers:{}});assert.equal(room().phase,'PRE_TEST');
- c.send({type:'SUBMIT_PRE_TEST',answers:answers(PRE_TEST_QUESTIONS)});assert.equal(room().phase,'BOARD_SELECT');
- for (const mission of MISSIONS.slice(0,4)) {
-  c.send({type:'START_MISSION',missionId:mission.id});assert.equal(room().phase,'MISSION_SITUATION');
-  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});assert.equal(room().phase,'MISSION_SITUATION');
-  c.send({type:'EXPLORE_MISSION'});assert.equal(room().phase,'MISSION_EXPLORE');
-  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:'invalid'});assert.equal(room().phase,'MISSION_EXPLORE');
-  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});assert.equal(room().phase,'MISSION_REVEAL');
-  c.send({type:'OPEN_COLLECTIVE_VOTE'});assert.equal(room().collectiveVotes[joined.playerId],undefined);
-  c.send({type:'SUBMIT_COLLECTIVE_VOTE',actionId:mission.actions[0].id});
-  if (room().phase==='MISSION_COLLECTIVE_VOTE') c.send({type:'SUBMIT_COLLECTIVE_VOTE',actionId:mission.actions[0].id});
-  if (room().phase==='MISSION_TF_CHALLENGE') {c.send({type:'PROCEED_AFTER_CONSEQUENCE'});assert.equal(room().phase,'MISSION_TF_CHALLENGE');c.send({type:'SUBMIT_TF_ANSWER',answer:true});c.send({type:'PROCEED_AFTER_CONSEQUENCE'});}
-  assert.equal(room().phase,'MISSION_CONSEQUENCE');c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
+test('solo pilot completes four distinct regions and reaches medal summary', () => {
+ fresh(); const c=client();
+ c.send({type:'CREATE_ROOM',nickname:'Teste',characterId:'alex',variantIndex:0});
+ const room=()=>snapshot().rooms[0][1];
+ c.send({type:'START_GAME'});
+ assert.equal(room().phase,'BOARD_SELECT');
+ assert.equal(Object.values(room().players).filter(p=>p.isBot).length,3);
+ const firstFour = ['praca','sala','oficina','portal'].map(region => MISSIONS.find(m=>m.regionId===region)!);
+ for (const mission of firstFour) {
+  c.send({type:'VOTE_DESTINATION',regionId:mission.regionId});
+  c.send({type:'CONFIRM_DESTINATION'});
+  assert.equal(room().phase,'MISSION_SITUATION');
+  assert.equal(room().activeMissionId,mission.id);
+  c.send({type:'EXPLORE_MISSION'});
+  assert.equal(room().phase,'MISSION_EXPLORE');
+  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});
+  assert.equal(room().phase,'MISSION_INDIVIDUAL_CHOICE');
+  c.send({type:'PROCEED_TO_REVEAL'});
+  assert.equal(room().phase,'MISSION_REVEAL');
+  c.send({type:'OPEN_COLLECTIVE_VOTE'});
+  if(room().phase==='MISSION_TF_CHALLENGE') {
+   c.send({type:'SUBMIT_TF_ANSWER',answer:true});
+   c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
+  }
+  assert.equal(room().phase,'MISSION_CONSEQUENCE');
+  c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
+  assert.equal(room().phase,'MISSION_CONSEQUENCE');
+  c.send({type:'DRAW_FORTUNE_CARD',cardIndex:0});
+  assert.ok(room().fortuneCards[mission.id]);
+  c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
  }
- assert.equal(room().phase,'POST_TEST');c.send({type:'SUBMIT_POST_TEST',answers:answers(POST_TEST_QUESTIONS)});assert.equal(room().phase,'GAME_SUMMARY');
- c.send({type:'SUBMIT_FEEDBACK',usability:5,clarity:4,interest:5});c.send({type:'SUBMIT_FEEDBACK',usability:5,clarity:4,interest:5});
- assert.equal(snapshot().evaluations.length,1);assert.equal(snapshot().feedback.length,1);
- c.send({type:'START_GAME'});assert.equal(room().completedMissionIds.length,0);assert.equal(room().players[joined.playerId].preTestCompleted,false);
+ assert.equal(room().phase,'GAME_SUMMARY');
+ assert.equal(room().completedMissionIds.length,4);
+ assert.equal(new Set(room().completedMissionIds).size,4);
 });
 test('multiplayer keeps choices secret and checks host and readiness',()=>{
  fresh(); const a=client(),b=client();a.send({type:'CREATE_ROOM',nickname:'A',characterId:'alex',variantIndex:0});const code=a.frames[0].roomCode;
