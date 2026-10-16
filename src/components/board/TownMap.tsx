@@ -314,6 +314,7 @@ export const TownMap: React.FC<TownMapProps> = ({
           const done = missions.filter(m => state.completedMissionIds.includes(m.id)).length;
           const selected = myVote === region.id;
           return <button key={region.id} type="button" onClick={() => handleVote(region.id)}
+            disabled={isSolo && completedRegions.has(region.id)}
             aria-pressed={selected}
             className={`min-w-0 min-h-36 rounded-2xl border-2 p-3 flex flex-col gap-2 text-left ${selected ? 'bg-teal-950 border-teal-400' : 'bg-slate-900 border-slate-700'}`}>
             <span className="text-teal-300">{getIcon(region.iconName)}</span>
