@@ -78,12 +78,12 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
               <strong className="text-teal-400 block mb-1 text-xs uppercase tracking-wider font-sans">
                 Desdobramentos na Vila dos Encontros:
               </strong>
-              {chosenAction.consequenceDetails}
+              <p data-narration="story">{chosenAction.consequenceDetails}</p>
             </div>
 
             <div className="p-4 rounded-2xl bg-teal-950/40 border border-teal-500/40 text-xs sm:text-sm text-teal-200">
               <strong className="text-teal-300 block mb-1">Para refletir sobre sua decisão:</strong>
-              {chosenAction.pedagogicalFeedback}
+              <p>{chosenAction.pedagogicalFeedback}</p>
             </div>
           </div>
         ) : (
@@ -101,7 +101,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
               {nonConsensualActions.map((act) => act && (
                 <div key={act.id} className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
                   <div className="font-bold text-sm text-slate-100">{act.title}</div>
-                  <div className="text-xs text-slate-300 font-serif leading-relaxed">
+                  <div data-narration="story" className="text-xs text-slate-300 font-serif leading-relaxed">
                     {act.consequenceDetails}
                   </div>
                   <div className="text-[11px] text-teal-300 pt-2 border-t border-slate-800">
@@ -181,7 +181,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
             </span>
           ) : (
             <span className="text-slate-300">
-              Volte ao mapa da Vila para escolher a próxima região ({completedCount}/4).
+              Você concluiu {completedCount} de 4 missões. A próxima região espera por você no mapa.
             </span>
           )}
         </div>
