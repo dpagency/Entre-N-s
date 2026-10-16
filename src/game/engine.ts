@@ -488,6 +488,20 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
   }
   if (msg.type === 'OPEN_COLLECTIVE_VOTE') {
     if (room.hostId !== playerId || room.phase !== 'MISSION_REVEAL') return;
+    // No piloto individual, a escolha já foi feita: não repetir a votação.
+    if (Object.values(room.players).some(p => p.isBot)) {
+      const mission = MISSIONS.find(m => m.id === room.activeMissionId);
+      const selected = room.individualChoices[playerId];
+      if (!mission || !selected || !mission.actions.some(a => a.id === selected)) return;
+      room.chosenCollectiveActionId = selected;
+      room.isNonConsensualResult = false;
+      room.nonConsensualActionIds = [];
+      room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false});
+      if (!room.unlockedDiscoveries.includes(mission.discovery.key)) room.unlockedDiscoveries.push(mission.discovery.key);
+      room.phase = mission.tfChallenge ? 'MISSION_TF_CHALLENGE' : 'MISSION_CONSEQUENCE';
+      broadcastRoomState(room, 'Sua escolha foi registrada. Vamos conhecer os desdobramentos.', 'success');
+      return;
+    }
     room.phase = 'MISSION_COLLECTIVE_VOTE'; broadcastRoomState(room); return;
   }
   if (msg.type === 'LEAVE_ROOM') {
