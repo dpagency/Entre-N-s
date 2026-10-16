@@ -92,7 +92,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
             {mission.perspectives.filter(p => state.sharedPerspectiveIds.includes(p.id)).map(p => (
               <div key={p.id} className="rounded-xl bg-slate-950/70 p-3 border border-slate-700">
                 <strong className="text-teal-200">{p.actorName} — {p.actorRole}</strong>
-                <p className="mt-1 text-sm leading-relaxed text-slate-200">{p.content}</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-200">{p.details}</p>
               </div>
             ))}
           </section>
