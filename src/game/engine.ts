@@ -590,7 +590,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     const activeConnectedPlayers = Object.values(room.players).filter((p) => p.isConnected);
     const allSubmitted = activeConnectedPlayers.every((p) => room.individualChoices[p.id]);
 
-    if (allSubmitted && activeConnectedPlayers.length >= 2) {
+    if (allSubmitted && activeConnectedPlayers.length >= 2 && !activeConnectedPlayers.some(p => p.isBot)) {
       room.phase = 'MISSION_REVEAL';
       broadcastRoomState(room, 'Todos responderam em sigilo! As escolhas foram reveladas simultaneamente.', 'success');
     } else {
