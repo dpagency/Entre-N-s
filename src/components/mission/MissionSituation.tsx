@@ -16,7 +16,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
   state,
   myPlayerId,
 }) => {
-  const isHost = state.hostId === myPlayerId;
+  const isSolo = Object.values(state.players).some(player => player.isBot);
   const region = REGIONS[mission.regionId];
 
   // Perspectives visible to me: either shared with group or assigned privately to me
@@ -128,7 +128,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
               Perspectivas dos Atores Envolvidos
             </h3>
             <p className="text-xs text-slate-400">
-              Cada guardião recebe inicialmente uma visão do cenário. Você pode compartilhar a sua com os colegas.
+              {isSolo ? 'Conheça os relatos disponíveis. Outras perspectivas poderão surgir durante a jornada.' : 'Cada Guardião recebe uma visão do cenário e pode compartilhá-la com os colegas.'}
             </p>
           </div>
         </div>
@@ -152,7 +152,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
                     Perspectiva de {persp.actorName}
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Esta perspectiva foi distribuída a outro colega ou pode ser revelada pelo poder de Bia.
+                    {isSolo ? 'Este relato ainda não foi revelado. O poder de Yūki pode ajudar a conhecê-lo.' : 'Esta perspectiva foi distribuída a outro colega ou pode ser revelada pelo poder de Yūki.'}
                   </p>
                 </div>
               );
@@ -164,7 +164,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
                 perspective={persp}
                 isPrivateToMe={isAssignedToMe}
                 isSharedWithGroup={isShared}
-                onShareWithGroup={() => handleShare(persp.id)}
+                onShareWithGroup={isSolo ? undefined : () => handleShare(persp.id)}
               />
             );
           })}
@@ -174,15 +174,14 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
       {/* Action to proceed to individual choice */}
       <div className="bg-slate-900/80 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
-          Quando todos tiverem lido e compartilhado suas impressões, passem para a{' '}
-          <strong className="text-teal-300">escolha individual em sigilo</strong>.
+          {isSolo ? 'Depois de conhecer o cenário, escolha como deseja agir. Você poderá ouvir os Guardiões após confirmar sua decisão.' : <>Quando todos tiverem lido e compartilhado suas impressões, passem para a <strong className="text-teal-300">escolha individual em sigilo</strong>.</>}
         </div>
 
         <button
           onClick={handleProceedToExplore}
           className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
         >
-          <span>Ir para Escolha Individual</span>
+          <span>{isSolo ? 'Escolher como agir' : 'Ir para Escolha Individual'}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
