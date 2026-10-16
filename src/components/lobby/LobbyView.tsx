@@ -22,7 +22,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
   const totalConnected = connectedPlayers.length;
   const allReady = connectedPlayers.length >= 1 && connectedPlayers.every((p) => p.isReady);
 
-  const isSolo = Object.values(state.players).some(p => p.isBot);
+  const isSolo = state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
   const inviteUrl = `${window.location.origin}?room=${state.roomCode}`;
 
   const handleCopyLink = () => {
@@ -56,14 +56,14 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
                 {isSolo ? 'Partida com o computador' : 'Sala de Convivência Aberta'}
               </span>
               <span className="text-xs text-slate-400">
-                1 a 6 participantes • modo solo disponível
+                {isSolo ? 'Jornada individual' : '1 a 6 participantes'}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-100 mt-1">
-              Vila dos Encontros • Sala de Espera
+              {isSolo ? 'Vila dos Encontros • Sua jornada' : 'Vila dos Encontros • Sala de Espera'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-              Compartilhe o código ou o link direto com seus colegas de equipe para iniciarem a jornada ética.
+              {isSolo ? 'Você e seus companheiros virtuais podem começar a jornada.' : 'Compartilhe o código ou o link direto com seus colegas de equipe para iniciarem a jornada ética.'}
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
             <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
               <h2 className="font-bold text-base text-slate-100 flex items-center gap-2">
                 <Users className="w-5 h-5 text-teal-400" />
-                Guardiões na Sala ({totalConnected}/6)
+                {isSolo ? 'Sua equipe de Guardiões' : `Guardiões na Sala (${totalConnected}/6)`}
               </h2>
 
               <span className="text-xs text-slate-400">
@@ -173,7 +173,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
               })}
 
               {/* Empty slot placeholders */}
-              {Array.from({ length: Math.max(0, 6 - totalConnected) }).map((_, i) => (
+              {!isSolo && Array.from({ length: Math.max(0, 6 - totalConnected) }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
                   className="p-3.5 rounded-2xl border border-dashed border-slate-800 text-slate-600 flex items-center justify-center text-xs"
@@ -185,7 +185,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
 
             {/* Controls Bar */}
             <div className="mt-5 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <button
+              {!isSolo && <button
                 onClick={handleToggleReady}
                 className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition-all active:scale-95 ${
                   myPlayer?.isReady
@@ -194,16 +194,16 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
                 }`}
               >
                 {myPlayer?.isReady ? 'Alterar para Aguardando' : 'Marcar como Pronto ✓'}
-              </button>
+              </button>}
 
               {isHost && (
                 <button
                   onClick={handleStartGame}
-                  disabled={!allReady}
+                  disabled={!isSolo && !allReady}
                   className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Play className="w-4 h-4 fill-current" />
-                  <span>{totalConnected === 1 ? 'Jogar com o computador' : 'Iniciar Partida'}</span>
+                  <span>{isSolo ? 'Começar minha jornada' : totalConnected === 1 ? 'Jogar com o computador' : 'Iniciar Partida'}</span>
                 </button>
               )}
 
