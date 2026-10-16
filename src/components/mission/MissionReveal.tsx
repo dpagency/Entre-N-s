@@ -48,7 +48,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
 
   Object.entries(revealedChoices).forEach(([pid, actId]) => {
     const actionKey = String(actId);
-    if (choicesByAction[actionKey]) {
+    if (choicesByAction[actionKey] && (!solo || pid !== myPlayerId)) {
       choicesByAction[actionKey].push(pid);
     }
   });
@@ -74,14 +74,14 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black text-slate-100 mt-1">
-          As Escolhas Individuais do Grupo
+          {solo ? "Sua decisão e as perspectivas dos Guardiões" : "As Escolhas Individuais do Grupo"}
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
-          Vejam como cada guardião se posicionou inicialmente. Divergências revelam nuances diferentes da situação; aproveitem o momento para debater abertamente.
+          {solo ? "Sua decisão permanece registrada. Conheça as preferências dos três Guardiões virtuais; elas não alteram o rumo que você escolheu." : "Vejam como cada guardião se posicionou inicialmente. Divergências revelam nuances diferentes da situação; aproveitem o momento para debater abertamente."}
         </p>
 
         {/* Guided Discussion Box (Structured reflection cues) */}
-        <div className="mt-5 p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-200">
+        {!solo && <div className="mt-5 p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-200">
           <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wide text-indigo-300 mb-2">
             <MessageSquareQuote className="w-4 h-4 text-indigo-400" />
             Roteiro Sugerido para a Conversa da Equipe (Presencial ou Chamada de Áudio):
@@ -97,8 +97,10 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
               Existe algum ponto em que o grupo pode convergir para uma ação coletiva mais justa?
             </li>
           </ul>
-        </div>
+        </div>}
       </div>
+
+      {solo && chosenAction && <section className="rounded-2xl border border-teal-500/50 bg-teal-950/25 p-5"><h3 className="text-lg font-bold text-teal-200">Sua decisão</h3><p className="font-semibold mt-2">{chosenAction.title}</p><p className="text-sm text-slate-300 mt-1">{chosenAction.description}</p></section>}
 
       {guardianDiffers && myGuardian && (
         <section className="rounded-3xl border border-teal-500/40 bg-teal-950/30 p-5 sm:p-6 space-y-3" aria-label="Reflexão do seu Guardião">
@@ -149,12 +151,12 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
               {/* Roster of players who chose this */}
               <div className="mt-auto pt-3 border-t border-slate-800">
                 <div className="text-[11px] font-semibold text-slate-400 mb-2">
-                  Guardiões que escolheram:
+                  {solo ? "Guardiões virtuais que preferiram esta alternativa:" : "Guardiões que escolheram:"}
                 </div>
 
                 {playerIds.length === 0 ? (
                   <div className="text-xs text-slate-500 italic">
-                    Nenhum guardião escolheu esta alternativa.
+                    {solo ? "Nenhum Guardião virtual preferiu esta alternativa." : "Nenhum guardião escolheu esta alternativa."}
                   </div>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
@@ -203,7 +205,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       </div>
 
       {/* Footer bar to move to Collective Voting */}
-      <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      {!solo && <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
           Após a conversa em equipe, realizem a{' '}
           <strong className="text-teal-300">votação da ação coletiva da Vila</strong>.
@@ -217,7 +219,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
           <span>Iniciar Votação Coletiva da Equipe</span>
           <ArrowRight className="w-4 h-4" />
         </button>
-      </div>
+      </div>}
     </div>
   );
 };
