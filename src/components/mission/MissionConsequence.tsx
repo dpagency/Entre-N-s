@@ -23,6 +23,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
     return () => window.clearTimeout(timer);
   }, [mission.id, !!state.fortuneCards?.[mission.id]]);
   const isHost = state.hostId === myPlayerId;
+  const isSolo = Object.values(state.players).some(p => p.isBot);
   const chosenActionId = state.chosenCollectiveActionId || mission.actions[0].id;
   const chosenAction = mission.actions.find((a) => a.id === chosenActionId) || mission.actions[0];
 
@@ -52,7 +53,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              Desfecho Narrativo e Aprendizados
+              Desfecho e aprendizados
             </span>
             <span className="text-xs text-slate-400">
               Missão {mission.code} • {mission.title}
@@ -67,7 +68,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         <h2 className="text-2xl sm:text-3xl font-black text-slate-100 mt-1">
           {isNonConsensual
             ? 'Decisão Não Consensual: Dois Caminhos em Diálogo'
-            : `Ação Coletiva Escolhida: “${chosenAction.title}”`}
+            : `${isSolo ? 'Sua decisão' : 'Ação coletiva escolhida'}: “${chosenAction.title}”`}
         </h2>
 
         {/* Narrative Outcome Description */}
@@ -81,7 +82,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
             </div>
 
             <div className="p-4 rounded-2xl bg-teal-950/40 border border-teal-500/40 text-xs sm:text-sm text-teal-200">
-              <strong className="text-teal-300 block mb-1">Feedback Pedagógico da Decisão:</strong>
+              <strong className="text-teal-300 block mb-1">Para refletir sobre sua decisão:</strong>
               {chosenAction.pedagogicalFeedback}
             </div>
           </div>
@@ -155,7 +156,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
       <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
         <div>
           <span className="text-slate-300 font-bold block mb-0.5">
-            Fonte Editorial & Status Curatorial:
+            Referência e revisão do conteúdo:
           </span>
           <span>{mission.editorialInfo.source}</span>
         </div>
