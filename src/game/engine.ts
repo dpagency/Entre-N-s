@@ -457,16 +457,11 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
     room.currentRegionId = chosenRegion;
 
-    // Select an uncompleted mission for this region
-    const availableForRegion = MISSIONS.filter(
-      (m) => m.regionId === chosenRegion && !room.completedMissionIds.includes(m.id)
-    );
-
-    let nextMission = availableForRegion[0];
-    if (!nextMission) {
-      // If all missions in this region are done, pick any remaining mission from pool
-      const remainingOverall = MISSIONS.filter((m) => !room.completedMissionIds.includes(m.id));
-      nextMission = remainingOverall[0] || MISSIONS[0];
+    // Jornada-piloto: quatro etapas, uma missão por região.
+    const nextMission = MISSIONS.find(m => m.regionId === chosenRegion);
+    if (!nextMission || room.completedMissionIds.includes(nextMission.id)) {
+      broadcastRoomState(room, 'Esta região já foi explorada. Escolha outra região para continuar.', 'warning');
+      return;
     }
 
     // Set mission and advance to MISSION_SITUATION
