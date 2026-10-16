@@ -1,5 +1,6 @@
 import type {CharacterId, RegionId, ClientMessage, RoomState, SanitizedRoomState, ServerMessage} from '../types/game';
 import {MISSIONS} from '../data/missions';
+import {CHARACTERS} from '../data/characters';
 import {PRE_TEST_QUESTIONS, POST_TEST_QUESTIONS} from '../data/evaluations';
 export interface GameConnection {readyState: number; send(data: string): void}
 function randomHex(bytes: number) {return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), b => b.toString(16).padStart(2,'0')).join('');}
@@ -555,8 +556,8 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     } else if (msg.powerType === 'ravi') {
       // Ravi: triggers extra deliberation round
       room.isRaviSecondRoundActive = true;
-      room.individualChoices = {}; room.phase = 'MISSION_INDIVIDUAL_CHOICE';
-      powerDetails = 'Ravi ativou “Nova Escuta”! Uma rodada extra de reconsideração das escolhas está aberta.';
+      if (!Object.values(room.players).some(p => p.isBot)) { room.individualChoices = {}; room.phase = 'MISSION_INDIVIDUAL_CHOICE'; }
+      powerDetails = 'Satori convida a reconsiderar os fatos e as consequências. Sua decisão permanece preservada.';
     } else if (msg.powerType === 'bia') {
       // Bia: reveals third actor perspective
       const unshared = currentMission.perspectives.find((p) => !room.sharedPerspectiveIds.includes(p.id));
@@ -573,11 +574,11 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       type: 'POWER_ACTIVATED',
       characterId: player.characterId,
       playerName: player.nickname,
-      powerName: msg.powerType.toUpperCase(),
+      powerName: CHARACTERS[player.characterId].powerName,
       details: powerDetails,
     });
 
-    broadcastRoomState(room, `${player.nickname} usou o poder de ${player.characterId.toUpperCase()}!`, 'success');
+    broadcastRoomState(room, `${CHARACTERS[player.characterId].name} ativou ${CHARACTERS[player.characterId].powerName}: ${powerDetails}`, 'success');
     return;
   }
 
@@ -869,7 +870,7 @@ function validAnswers(questions: typeof PRE_TEST_QUESTIONS, answers: Record<stri
 function fillBotChoices(room: RoomState, collective: boolean) {
   const mission = MISSIONS.find(m => m.id === room.activeMissionId);
   if (!mission) return;
-  const preferences: Record<CharacterId, string[]> = {alex:['cautela','orientacao'], joana:['orientacao','formalizacao'], ravi:['dialogo','orientacao'], bia:['acolhimento','dialogo']};
+  const preferences: Record<CharacterId, string[]> = {alex:['formalizacao','orientacao','cautela','dialogo','acolhimento'], joana:['acolhimento','dialogo','orientacao','cautela','formalizacao'], ravi:['cautela','orientacao','dialogo','formalizacao','acolhimento'], bia:['orientacao','formalizacao','dialogo','acolhimento','cautela']};
   for (const bot of Object.values(room.players).filter(p => p.isBot)) {
     const preferred = preferences[bot.characterId];
     const action = preferred.map(type => mission.actions.find(a => a.actionType === type)).find(Boolean) || mission.actions[0];
