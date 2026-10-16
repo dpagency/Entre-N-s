@@ -26,11 +26,10 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
       synth.resume(); setStatus('playing'); return;
     }
     synth.cancel();
-    const root = document.querySelector('main');
-    if (!root) return;
-    const copy = root.cloneNode(true) as HTMLElement;
-    copy.querySelectorAll('button, input, select, textarea, nav, svg, [aria-hidden="true"]').forEach(el => el.remove());
-    const text = (copy.innerText || copy.textContent || '').replace(/\s+/g, ' ').trim();
+    // Narrate only passages explicitly identified as story/dialogue.
+    // Never read navigation, instructions, scores or other interface text.
+    const passages = Array.from(document.querySelectorAll<HTMLElement>('main [data-narration="story"]'));
+    const text = passages.map(el => (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join(' ');
     if (!text) return;
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'pt-BR';
