@@ -3,7 +3,7 @@ import { CharacterId } from '../../types/game';
 import { CHARACTER_LIST, AVATAR_VARIANTS, CHARACTERS } from '../../data/characters';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { socketService } from '../../services/socket';
-import { Play, PlusCircle, LogIn, Sparkles, BookOpen, Users, Compass, HelpCircle } from 'lucide-react';
+import { Play, Sparkles, BookOpen, Compass, HelpCircle } from 'lucide-react';
 
 interface WelcomeScreenProps {
   onOpenRules: () => void;
@@ -16,7 +16,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onOpenInstitutionalGuide,
   onOpenOrganizer,
 }) => {
-  const [mode, setMode] = useState<'create' | 'join' | 'solo'>('solo');
   const [starting, setStarting] = useState(false);
   const [nickname, setNickname] = useState(
     localStorage.getItem('guardioes_nickname') || ''
@@ -27,20 +26,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const [variantIndex, setVariantIndex] = useState(
     Number(localStorage.getItem('guardioes_variant')) || 0
   );
-  const [roomCode, setRoomCode] = useState('');
   const [previewCharacter, setPreviewCharacter] = useState<CharacterId | null>(null);
 
-  // Check URL query params for ?room=CODE
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const codeFromUrl = params.get('room');
-    if (codeFromUrl) {
-      setRoomCode(codeFromUrl.toUpperCase());
-      setMode('solo');
-    }
-  }, []);
-
-  const handleCreateRoom = (e: React.FormEvent) => {
+  const handleStartJourney = (e: React.FormEvent) => {
     e.preventDefault();
     setStarting(true);
     window.setTimeout(() => setStarting(false), 4500);
@@ -52,28 +40,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     socketService.setSoloMode(true);
     socketService.send({
       type: 'CREATE_ROOM',
-      nickname: cleanNick,
-      characterId,
-      variantIndex,
-    });
-  };
-
-  const handleJoinRoom = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStarting(true);
-    window.setTimeout(() => setStarting(false), 4500);
-    const cleanNick = nickname.trim() || 'Guardião';
-    socketService.setSoloMode(false);
-    const cleanCode = roomCode.trim().toUpperCase();
-    if (!cleanCode) return;
-
-    localStorage.setItem('guardioes_nickname', cleanNick);
-    localStorage.setItem('guardioes_character', characterId);
-    localStorage.setItem('guardioes_variant', String(variantIndex));
-
-    socketService.send({
-      type: 'JOIN_ROOM',
-      roomCode: cleanCode,
       nickname: cleanNick,
       characterId,
       variantIndex,
@@ -112,56 +78,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
       {/* Main interaction card */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
-        <button type="button" onClick={() => setMode('solo')} className="w-full py-3 rounded-xl bg-amber-500 text-slate-950 font-bold">Modo individual · três companheiros virtuais</button>
-        {mode === 'solo' && <p className="text-xs text-amber-200">Você e três companheiros virtuais. Sua jornada fica neste dispositivo.</p>}
-        {/* Multiplayer depende de configuração de infraestrutura e permanece indisponível neste piloto. */}
-        {/* Toggle mode: Criar Sala vs Entrar em Sala */}
-        <div className="hidden grid-cols-2 p-1.5 bg-slate-950 rounded-2xl border border-slate-800">
-          <button
-            type="button"
-            onClick={() => setMode('create')}
-            className={`py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
-              mode === 'create'
-                ? 'bg-teal-600 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Criar Nova Sala</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMode('join')}
-            className={`py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
-              mode === 'join'
-                ? 'bg-teal-600 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <LogIn className="w-4 h-4" />
-            <span>Entrar em Sala Existente</span>
-          </button>
-        </div>
-
-        <form onSubmit={mode !== 'join' ? handleCreateRoom : handleJoinRoom} className="space-y-2">
-          {/* Room Code input (if joining) */}
-          {mode === 'join' && (
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                Código da Sala (Ex: VILA-7K4):
-              </label>
-              <input
-                type="text"
-                required
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                placeholder="Ex: VILA-XXXX"
-                className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 font-mono font-bold tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-teal-400 uppercase"
-              />
-            </div>
-          )}
-
+        <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Jornada individual: você joga com três companheiros virtuais, no celular ou no computador.</p>
+        <form onSubmit={handleStartJourney} className="space-y-2">
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -265,7 +183,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
           >
             <Play className="w-5 h-5 fill-current" />
-            <span>{starting ? 'Preparando sua jornada…' : mode === 'solo' ? 'Começar minha jornada' : mode === 'create' ? 'Criar e Entrar na Sala' : 'Entrar na Sala'}</span>
+            <span>{starting ? 'Preparando sua jornada…' : 'Começar minha jornada'}</span>
           </button>
         </form>
 
