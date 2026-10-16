@@ -52,3 +52,28 @@ test('solo choice remains visible until explicit reveal',()=>{
  c.send({type:'PROCEED_TO_REVEAL'});
  assert.equal(room().phase,'MISSION_REVEAL');
 });
+
+test('confirmed solo choice cannot be replaced, even after a guardian power',()=>{
+ fresh();const c=client();
+ c.send({type:'CREATE_ROOM',nickname:'Teste',characterId:'ravi',variantIndex:0});
+ const room=()=>snapshot().rooms[0][1];
+ c.send({type:'START_GAME'});
+ c.send({type:'VOTE_DESTINATION',regionId:'praca'});
+ c.send({type:'CONFIRM_DESTINATION'});
+ c.send({type:'EXPLORE_MISSION'});
+ const mission=MISSIONS.find(m=>m.id===room().activeMissionId)!;
+ const first=mission.actions[0].id;
+ const alternative=mission.actions[1].id;
+ c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:first});
+ const humanId=Object.values(room().players).find(p=>!p.isBot)!.id;
+ assert.equal(room().individualChoices[humanId],first);
+ c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:alternative});
+ assert.equal(room().individualChoices[humanId],first);
+ c.send({type:'USE_POWER',powerType:'ravi'});
+ assert.equal(room().individualChoices[humanId],first);
+ c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:alternative});
+ assert.equal(room().individualChoices[humanId],first);
+ c.send({type:'PROCEED_TO_REVEAL'});
+ assert.equal(room().phase,'MISSION_REVEAL');
+ assert.equal(room().individualChoices[humanId],first);
+});
