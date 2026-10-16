@@ -165,7 +165,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                     “Eu seguiria por este caminho. {guardianQuestion[guardian.characterId]}”
                     <span className="block mt-2 text-xs text-slate-300">Você pode continuar com sua própria decisão; esta reflexão não altera sua escolha.</span>
                   </p>
-                )>
+                )}
               </div>
             </div>;
           })}
