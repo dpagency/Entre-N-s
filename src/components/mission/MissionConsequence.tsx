@@ -174,11 +174,11 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         <div className="text-xs sm:text-sm text-slate-300">
           {isLastMission ? (
             <span className="text-amber-300 font-semibold">
-              Parabéns! As 4 missões foram concluídas. A equipe avançará para a avaliação de encerramento.
+              Parabéns! Você concluiu as quatro missões. Seu resumo e sua medalha estão à frente.
             </span>
           ) : (
             <span className="text-slate-300">
-              Retornem ao mapa da Vila para escolher o próximo destino coletivo ({completedCount}/4).
+              Volte ao mapa da Vila para escolher a próxima região ({completedCount}/4).
             </span>
           )}
         </div>
@@ -188,7 +188,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           disabled={!fortune}
           className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
         >
-          <span>{isLastMission ? 'Ir para Avaliação Final' : 'Voltar ao Mapa Territorial'}</span>
+          <span>{isLastMission ? 'Ver resumo e medalha' : 'Voltar ao Mapa Territorial'}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
