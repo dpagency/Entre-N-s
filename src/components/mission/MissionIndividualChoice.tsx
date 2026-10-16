@@ -144,12 +144,24 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         })}
       </div>
 
+      {/* Confirm the human player\u0027s selected action before showing guardian perspectives. */}
+      {myChoice && (() => {
+        const selected = mission.actions.find(action => action.id === myChoice);
+        if (!selected) return null;
+        return <section aria-live="polite" className="rounded-2xl border-2 border-emerald-400 bg-emerald-950/30 p-4 sm:p-5 space-y-2">
+          <h3 className="text-base font-bold text-emerald-200">Sua decisão nesta missão</h3>
+          <p className="font-semibold text-slate-100">{selected.title}</p>
+          <p className="text-sm text-slate-200">{selected.description}</p>
+          <p className="text-xs text-emerald-200">Você ainda pode escolher outra alternativa antes de continuar.</p>
+        </section>;
+      })()}
+
       {/* Bottom status and control */}
       <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
           {myChoice ? (
             <span className="text-emerald-300 font-medium">
-              Sua escolha está registrada e destacada acima. Você pode alterá-la antes de continuar.
+              Sua decisão está registrada. Continue quando desejar conhecer outros olhares.
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
