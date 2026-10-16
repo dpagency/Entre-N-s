@@ -119,7 +119,26 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         </section>
       )}
 
-      {/* Grid of Actions with chosen avatars */}
+      {solo ? (
+        <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Perspectivas dos três Guardiões virtuais">
+          <h3 className="text-lg font-bold text-teal-200">Outros olhares para o mesmo dilema</h3>
+          <p className="text-sm text-slate-300">Cada Guardião considera uma possibilidade. Não há votação, maioria nem resposta vencedora.</p>
+          {Object.entries(revealedChoices).filter(([pid]) => pid !== myPlayerId && state.players[pid]?.isBot).map(([pid, actionId]) => {
+            const guardian = state.players[pid];
+            const action = mission.actions.find(a => a.id === actionId);
+            if (!action) return null;
+            return <div key={pid} className="flex items-start gap-3 rounded-2xl bg-slate-950 border border-slate-800 p-4">
+              <CharacterAvatar characterId={guardian.characterId} size="md" showBadge={false} />
+              <div className="min-w-0 space-y-1">
+                <h4 className="font-bold text-base text-amber-200">{CHARACTERS[guardian.characterId]?.name}</h4>
+                <p className="text-base font-semibold">{action.title}</p>
+                <p className="text-sm text-slate-300 leading-relaxed">{action.description}</p>
+              </div>
+            </div>;
+          })}
+        </section>
+      ) : (
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {mission.actions.map((action) => {
           const playerIds = choicesByAction[action.id] || [];
@@ -187,6 +206,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         })}
       </div>
 
+      )}
       {solo && <button type="button" onClick={() => setShowPerspectives(v => !v)} className="w-full rounded-2xl border border-teal-500/40 bg-slate-900 px-5 py-4 text-left font-bold text-teal-200">
         {showPerspectives ? 'Ocultar perspectivas anteriores' : 'Voltar e consultar perspectivas anteriores'}
       </button>}
