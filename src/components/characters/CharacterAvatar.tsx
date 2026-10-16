@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterId } from '../../types/game';
-import { CHARACTERS, AVATAR_VARIANTS } from '../../data/characters';
+import { CHARACTERS } from '../../data/characters';
 
 interface CharacterAvatarProps {
   characterId: CharacterId;
@@ -24,7 +24,6 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   className = '',
 }) => {
   const char = CHARACTERS[characterId] || CHARACTERS.alex;
-  const variant = AVATAR_VARIANTS[variantIndex % AVATAR_VARIANTS.length];
 
   const sizeDimensions = {
     sm: 'w-10 h-10',
@@ -143,16 +142,6 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
           style={{ backgroundColor: char.color }}
         />
       </div>
-
-      {/* Variant Badge */}
-      {showBadge && (
-        <span
-          className={`absolute -bottom-1 -right-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white shadow-md border border-slate-900 ${variant.badgeColor}`}
-          title={`Variante ${variant.label} (${variant.suffix})`}
-        >
-          {variant.suffix}
-        </span>
-      )}
 
       {/* Online indicator */}
       {isOnline !== undefined && (
