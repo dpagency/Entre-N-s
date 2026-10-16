@@ -587,6 +587,8 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       return;
     }
     if (!MISSIONS.find(m => m.id === room.activeMissionId)?.actions.some(a => a.id === msg.actionId)) return;
+    // A confirmed decision is final for this mission, including after reconnection.
+    if (room.individualChoices[playerId]) return;
     room.individualChoices[playerId] = msg.actionId;
     fillBotChoices(room, false);
 
