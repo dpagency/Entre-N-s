@@ -78,7 +78,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
       {/* Main interaction card */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
-        <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Jornada individual: você joga com três companheiros virtuais, no celular ou no computador.</p>
+        <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Você participa como você mesmo. Escolha um Guardião para acompanhar suas decisões; os outros três oferecerão perspectivas diferentes ao longo da jornada.</p>
         <form onSubmit={handleStartJourney} className="space-y-2">
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
@@ -102,9 +102,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-300">
-                Escolha seu Personagem:
+                Escolha seu Guardião acompanhante:
               </label>
-              <span className="text-[11px] text-teal-400">Permite personagens repetidos</span>
+              <span className="text-[11px] text-teal-400">Quatro caminhos de reflexão</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -130,8 +130,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             </div>
 
             <div role="status" aria-live="polite" className="rounded-xl border border-teal-500/40 bg-teal-950/40 px-4 py-3 text-sm text-teal-200">
-              {characterConfirmed ? '✓ Personagem escolhido: ' : 'Personagem atual: '}
-              <strong>{selectedChar.name}</strong>. {characterConfirmed ? 'Agora você pode começar sua jornada.' : 'Toque em um personagem para conhecer e confirmar sua escolha.'}
+              {characterConfirmed ? '✓ Seu Guardião acompanhante: ' : 'Guardião em destaque: '}
+              <strong>{selectedChar.name}</strong>. {characterConfirmed ? 'Ele acompanhará você, mas as decisões serão sempre suas.' : 'Toque em um Guardião para conhecê-lo e confirmar quem acompanhará você.'}
             </div>
 
             {/* Character power info preview */}
