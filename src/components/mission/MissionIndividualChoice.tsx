@@ -85,6 +85,18 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           Sua resposta ficará guardada em sigilo no servidor e será revelada juntamente com as escolhas dos demais colegas para promover uma reflexão sincera.
         </p>
 
+        {state.sharedPerspectiveIds.length > 0 && (
+          <section className="mt-4 p-4 rounded-2xl border border-amber-500/40 bg-amber-950/20 space-y-3" aria-label="Perspectivas reveladas">
+            <h3 className="font-bold text-lg text-amber-200">Perspectivas reveladas</h3>
+            <p className="text-sm text-slate-300">Estas informações ajudam a refletir; não alteram sua decisão automaticamente.</p>
+            {mission.perspectives.filter(p => state.sharedPerspectiveIds.includes(p.id)).map(p => (
+              <div key={p.id} className="rounded-xl bg-slate-950/70 p-3 border border-slate-700">
+                <strong className="text-teal-200">{p.actorName} — {p.actorRole}</strong>
+                <p className="mt-1 text-sm leading-relaxed text-slate-200">{p.content}</p>
+              </div>
+            ))}
+          </section>
+        )}
         {/* Unlocked contexts or future preview banner if Joana or Alex used power */}
         {state.futureLooks.length > 0 && (
           <div className="mt-4 p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/40 text-xs text-blue-200 space-y-1">
