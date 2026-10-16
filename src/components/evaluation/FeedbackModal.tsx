@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { socketService } from '../../services/socket';
-import { Star, MessageSquare, CheckCircle2, ShieldAlert, Send } from 'lucide-react';
+import { Star, MessageSquare, ShieldAlert, FileDown, Mail } from 'lucide-react';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -12,23 +11,22 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
   const [clarity, setClarity] = useState(5);
   const [interest, setInterest] = useState(5);
   const [comment, setComment] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    socketService.send({
-      type: 'SUBMIT_FEEDBACK',
-      usability,
-      clarity,
-      interest,
-      comment: comment.trim() || undefined,
-    });
-    setSubmitted(true);
-    setTimeout(() => {
-      onClose();
-    }, 1800);
+  const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char] || char));
+  const generatePdf = () => {
+    const printable = window.open('', '_blank');
+    if (!printable) {
+      window.alert('Permita a abertura de uma nova janela para salvar a avaliação como PDF.');
+      return;
+    }
+    const safeComment = escapeHtml(comment.trim() || 'Não informado');
+    printable.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"/><title>Avaliação Entre Nós</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:48px auto;color:#182331;line-height:1.6;padding:0 20px}h1{color:#087b72}li{margin:12px 0}.comment{white-space:pre-wrap;background:#f3f6f8;padding:16px;border-radius:8px}@media print{button{display:none}}</style></head><body><h1>Entre Nós — Avaliação da experiência</h1><p><strong>Jornada:</strong> Caminhos da Escuta</p><ul><li>Facilidade de uso: <strong>${usability}/5</strong></li><li>Clareza dos dilemas: <strong>${clarity}/5</strong></li><li>Interesse em continuar: <strong>${interest}/5</strong></li></ul><h2>Comentário opcional</h2><p class="comment">${safeComment}</p><p>Envio voluntário à Comissão de Ética do INPI: ceinpi@inpi.gov.br</p><p>Não inclua informações pessoais ou casos institucionais identificáveis.</p><button onclick="window.print()">Salvar ou imprimir em PDF</button></body></html>`);
+    printable.document.close();
+    printable.focus();
+  };
+  const openEmail = () => {
+    const subject = encodeURIComponent('Entre Nós — Avaliação da jornada Caminhos da Escuta');
+    const body = encodeURIComponent('Encaminho, em anexo, minha avaliação da experiência Entre Nós.\n\nO PDF pode ser gerado pelo botão “Gerar PDF” no jogo e deve ser anexado manualmente.');
+    window.location.href = `mailto:ceinpi@inpi.gov.br?subject=${subject}&body=${body}`;
   };
 
   const renderStarRating = (value: number, onChange: (val: number) => void, label: string) => (
@@ -63,9 +61,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in"
     >
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col text-slate-100">
-        {!submitted ? (
-          <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="relative w-full max-w-lg max-h-[88dvh] overflow-y-auto overscroll-contain bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-8 shadow-2xl flex flex-col text-slate-100">
+        <div className="space-y-5">
             <div className="border-b border-slate-800 pb-3">
               <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">
                 Avaliação de Experiência
@@ -125,32 +122,13 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-slate-200 transition-colors"
-              >
-                Pular
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-2 transition-all active:scale-95"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Enviar Avaliação</span>
-              </button>
+            <div className="sticky bottom-0 bg-slate-900 border-t border-slate-700 py-3 flex flex-wrap items-center justify-end gap-3">
+              <button type="button" onClick={onClose} className="px-4 py-3 rounded-xl bg-slate-800 text-slate-200 font-semibold">Fechar</button>
+              <button type="button" onClick={generatePdf} className="px-4 py-3 rounded-xl bg-teal-600 text-white font-bold flex items-center gap-2"><FileDown size={18}/> Gerar PDF</button>
+              <button type="button" onClick={openEmail} className="px-4 py-3 rounded-xl bg-amber-500 text-slate-950 font-bold flex items-center gap-2"><Mail size={18}/> Abrir e-mail</button>
             </div>
-          </form>
-        ) : (
-          <div className="py-8 text-center space-y-3">
-            <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-100">Avaliação enviada com sucesso!</h3>
-            <p className="text-xs text-slate-400">Obrigado por ajudar a aprimorar a Vila dos Encontros.</p>
-          </div>
-        )}
+            <p className="text-xs text-slate-400">O PDF é salvo pelo navegador usando “Imprimir / Salvar como PDF”. Anexe-o manualmente ao e-mail. Nenhuma avaliação é enviada automaticamente.</p>
+        </div>
       </div>
     </div>
   );
