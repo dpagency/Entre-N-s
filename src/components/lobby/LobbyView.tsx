@@ -9,9 +9,10 @@ interface LobbyViewProps {
   state: RoomState;
   myPlayerId: string;
   onOpenRules?: () => void;
+  onReturnToSelection?: () => void;
 }
 
-export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenRules }) => {
+export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenRules, onReturnToSelection }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -52,7 +53,17 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
         <section className="w-full max-w-xl mx-auto rounded-3xl border border-teal-500/40 bg-slate-900 p-5 sm:p-8 space-y-5 text-center">
           <h1 className="text-2xl sm:text-3xl font-black">Sua jornada na Vila dos Encontros</h1>
           <p className="text-base text-slate-200">Você viverá quatro missões, acompanhado pelo Guardião que escolheu. Os outros três apresentarão perspectivas próprias. As decisões serão sempre suas.</p>
-          <div className="flex flex-col items-center gap-2"><CharacterAvatar characterId={myPlayer?.characterId || 'alex'} variantIndex={myPlayer?.variantIndex || 0} size="xl"/><p className="font-bold text-lg">{myPlayer?.nickname || 'Guardião'}</p><p className="text-sm text-teal-300">Seu Guardião está pronto para acompanhar você</p></div>
+          <div className="flex flex-col items-center gap-2">
+            <CharacterAvatar characterId={myPlayer?.characterId || 'alex'} variantIndex={myPlayer?.variantIndex || 0} size="xl"/>
+            <p className="font-bold text-lg">{CHARACTERS[myPlayer?.characterId || 'alex'].name} — {CHARACTERS[myPlayer?.characterId || 'alex'].title}</p>
+            <p className="text-sm text-teal-300">{CHARACTERS[myPlayer?.characterId || 'alex'].role}</p>
+            <p className="text-sm text-slate-200">{CHARACTERS[myPlayer?.characterId || 'alex'].description}</p>
+            <div className="w-full rounded-xl border border-amber-500/30 bg-slate-950 p-4 text-left">
+              <p className="font-bold text-amber-300">Habilidade: {CHARACTERS[myPlayer?.characterId || 'alex'].powerName}</p>
+              <p className="text-sm text-slate-300 mt-1">{CHARACTERS[myPlayer?.characterId || 'alex'].powerDescription}</p>
+            </div>
+          </div>
+          {onReturnToSelection && <button type="button" onClick={onReturnToSelection} className="w-full min-h-11 rounded-xl border border-teal-500/50 text-teal-200 font-bold p-3 hover:bg-teal-950/40">← Voltar e escolher outro Guardião</button>}
           <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
           {onOpenRules && <button type="button" onClick={onOpenRules} className="text-sm text-teal-300 underline">Como jogar</button>}
         </section>
