@@ -30,9 +30,13 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
     ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
     bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
   };
+  const preferenceRank = (guardianId: string, actionType: string) => {
+    const index = priorities[guardianId]?.indexOf(actionType) ?? -1;
+    return index < 0 ? 9 : index;
+  };
   const guardianPreference = myGuardian && mission.actions.slice().sort((a, b) =>
-    (priorities[myGuardian.characterId]?.indexOf(a.actionType) ?? 9) -
-    (priorities[myGuardian.characterId]?.indexOf(b.actionType) ?? 9)
+    preferenceRank(myGuardian.characterId, a.actionType) -
+    preferenceRank(myGuardian.characterId, b.actionType)
   )[0];
   const showCompanionReflection = Boolean(solo && chosenAction && guardianPreference);
   const guardianQuestion: Record<string, string> = {
