@@ -32,7 +32,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     e.preventDefault();
     setStarting(true);
     window.setTimeout(() => setStarting(false), 4500);
-    const cleanNick = nickname.trim() || 'Guardião';
+    const cleanNick = nickname.trim() || 'Participante';
     localStorage.setItem('guardioes_nickname', cleanNick);
     localStorage.setItem('guardioes_character', characterId);
     localStorage.setItem('guardioes_variant', String(variantIndex));
@@ -93,7 +93,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               maxLength={16}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="Ex: Guardião, Lua, Sol..."
+              placeholder="Ex.: Lua, Sol, Visitante..."
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
@@ -155,7 +155,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           {/* Visual Variant Selector */}
           <div className="hidden sm:block space-y-2">
             <label className="text-xs font-bold text-slate-300">
-              Variante Visual do Avatar:
+              Aparência do Guardião acompanhante:
             </label>
             <div className="flex flex-wrap gap-2">
               {AVATAR_VARIANTS.map((v) => (
