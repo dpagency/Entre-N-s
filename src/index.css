@@ -5,7 +5,7 @@
 :root { font-family: 'Nunito', system-ui, sans-serif; }
 body, button, input, textarea { font-family: 'Nunito', system-ui, sans-serif; }
 h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-spacing: -.015em; font-weight: 900; }
-.game-welcome { max-width: 1080px; }
+.game-welcome { max-width: 1440px; }
 @media (max-height: 850px) and (min-width: 640px) {
   .game-welcome { padding-top: 0; padding-bottom: 0; }
   .game-welcome > div:first-child { margin-bottom: 8px; }
@@ -16,7 +16,8 @@ h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-s
   .game-welcome { padding: 0 4px; }
   .game-welcome > div:first-child p { display: none; }
   .game-welcome .grid { gap: 5px; }
-  .game-welcome .grid button { padding: 5px 2px; gap: 3px; }
+  .game-welcome .grid button { padding: 12px 5px; gap: 8px; }
+  .game-welcome .grid button > div:first-child { transform: scale(.65); margin: -15px 0; }
   .game-welcome .grid button div { font-size: 12px; }
   .game-welcome input { padding: 8px 10px; }
   .game-welcome .game-title { font-size: 2rem; }
@@ -27,9 +28,9 @@ h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-s
   main .text-\\[10px\\], main .text-\\[11px\\], main .text-xs { font-size: 0.875rem; line-height: 1.5; }
   main .text-sm { font-size: 1rem; line-height: 1.55; }
   main .text-base { font-size: 1.0625rem; line-height: 1.55; }
-  .game-welcome { max-width: 1080px; }
-  .game-welcome .grid button { min-height: 126px; }
-  .game-welcome .grid button > div:first-child { transform: scale(1.2); margin: 5px 0; }
+  .game-welcome { max-width: 1440px; }
+  .game-welcome .grid button { min-height: 190px; }
+  .game-welcome .grid button > div:first-child { margin: 6px 0; }
 }
 
 /* Leitura confortável no celular: prevalece sobre utilitários tipográficos antigos. */
