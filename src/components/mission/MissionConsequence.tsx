@@ -62,7 +62,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           </div>
 
           <div className="text-xs font-bold text-amber-400">
-            {fortune && discoveryOpened ? 'Missões concluídas' : 'Missão em encerramento'}: {fortune && discoveryOpened ? completedCount : state.completedMissionIds.length} de 4
+            Missões concluídas: {state.completedMissionIds.length} de 4 • Missão atual em encerramento
           </div>
         </div>
 
