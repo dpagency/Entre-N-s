@@ -48,6 +48,34 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
  assert.equal(room().completedMissionIds.length,4);
  assert.equal(new Set(room().completedMissionIds).size,4);
 });
+test('solo journey resumes after a saved snapshot without resetting confirmed decisions', () => {
+ fresh();
+ const original = client();
+ original.send({type:'CREATE_ROOM',nickname:'Jogador',characterId:'ravi',variantIndex:0});
+ const joined = original.frames.find(frame => frame.type === 'ROOM_JOINED');
+ assert.ok(joined);
+ original.send({type:'START_GAME'});
+ original.send({type:'VOTE_DESTINATION',regionId:'praca'});
+ original.send({type:'CONFIRM_DESTINATION'});
+ original.send({type:'EXPLORE_MISSION'});
+ const mission = MISSIONS.find(m => m.regionId === 'praca')!;
+ const actionId = mission.actions[1].id;
+ original.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId});
+ const saved = snapshot();
+ assert.equal(saved.rooms[0][1].individualChoices[joined.playerId],actionId);
+ restore(saved);
+ const resumed = client();
+ resumed.send({type:'JOIN_ROOM',roomCode:joined.roomCode,sessionToken:joined.sessionToken,nickname:'Jogador',characterId:'ravi',variantIndex:0});
+ const rejoined = resumed.frames.find(frame => frame.type === 'ROOM_JOINED');
+ assert.ok(rejoined, 'restored session must rejoin');
+ assert.equal(rejoined.playerId,joined.playerId);
+ assert.equal(rejoined.state.phase,'MISSION_EXPLORE');
+ assert.equal(snapshot().rooms[0][1].individualChoices[joined.playerId],actionId);
+ resumed.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});
+ assert.equal(snapshot().rooms[0][1].individualChoices[joined.playerId],actionId,'confirmed choice stays irreversible after reconnection');
+ resumed.send({type:'PROCEED_TO_REVEAL'});
+ assert.equal(snapshot().rooms[0][1].phase,'MISSION_REVEAL');
+});
 test('solo choice remains visible until explicit reveal',()=>{
  fresh();const c=client();c.send({type:'CREATE_ROOM',nickname:'Teste',characterId:'alex',variantIndex:0});
  const room=()=>snapshot().rooms[0][1];
