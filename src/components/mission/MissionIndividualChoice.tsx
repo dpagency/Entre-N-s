@@ -183,9 +183,9 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           )}
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           {!myChoice && pendingChoice && (
-            <button onClick={handleConfirmChoice} className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm">
+            <button onClick={handleConfirmChoice} className="w-full sm:w-auto min-h-11 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm">
               Confirmar decisão definitiva
             </button>
           )}
@@ -194,7 +194,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
             <button
               onClick={handleProceedToReveal}
               disabled={isSolo ? !myChoice : choicesSubmittedCount === 0}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
+              className="w-full sm:w-auto min-h-11 px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
             >
               <Eye className="w-4 h-4" />
               <span>Conhecer as perspectivas dos Guardiões</span>
