@@ -72,7 +72,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'dialogo',
         description: 'Abrir espaço caloroso antes do encerramento: “Lucas, sei que você está se ambientando, mas se tiver alguma impressão inicial do seu olhar fresco, gostaríamos muito de ouvir — agora ou por mensagem depois.”',
         justification: 'Valida a presença do colega sem impor um interrogatório forçado, dando a ele o controle de quando e como opinar.',
-        pedagogicalFeedback: 'Abordagem equilibrada. Demonstra interesse genuíno na equipe e retira a invisibilidade sem criar constrangimento público.',
+        pedagogicalFeedback: 'O convite abre espaço para a contribuição de Lucas sem exigir que ele fale naquele momento. É importante observar se ele realmente se sente livre para escolher quando e como participar.',
         consequenceSummary: 'Lucas agradece e compartilha um ponto sutil sobre triagem digital que a equipe não havia notado, enriquecendo o plano.',
         consequenceDetails: 'A reunião termina com a equipe mais integrada. Lucas sente que sua bagagem anterior é valorizada, e os colegas percebem que o ritmo acelerado às vezes silencia contribuições valiosas.'
       },
@@ -82,7 +82,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'acolhimento',
         description: 'Esperar o término da reunião e procurá-lo num café ou por mensagem direta, perguntando como se sentiu e convidando-o a enviar anotações por e-mail para a ata revisada.',
         justification: 'Respeita a timidez ou prudência inicial de quem ainda mapeia o território funcional e prefere comunicação estruturada.',
-        pedagogicalFeedback: 'Excelente para situações em que a reunião pública já está muito polarizada ou tensa. Garante segurança psicológica e autonomia.',
+        pedagogicalFeedback: 'Uma conversa reservada pode oferecer mais segurança para Lucas se expressar. Convém verificar se haverá tempo e um canal efetivo para incorporar sua contribuição à decisão.',
         consequenceSummary: 'Lucas detalha por escrito um documento comparativo muito útil no dia seguinte, sem ter sido pressionado na plenária.',
         consequenceDetails: 'A coordenadora inclui as observações de Lucas na minuta final. Estabelece-se uma relação de confiança de médio prazo com o novo servidor.'
       },
@@ -184,7 +184,7 @@ export const MISSIONS: MissionDef[] = [
         isPreferableInContext: true,
         description: 'No próprio grupo: corrigir prontamente o erro na planilha para salvar a entrega, e posicionar com firmeza que divergências devem ser tratadas tecnicamente, sem ataques pessoais. Em seguida, acolher Tiago no privado.',
         justification: 'Protege a entrega pública sem validar a humilhação coletiva, restabelecendo os limites de convivência diante de todas as testemunhas.',
-        pedagogicalFeedback: 'Resposta modelar. Mostra que a integridade do trabalho público não requer crueldade, e que a ofensa testemunhada em público requer demarcação de limites no mesmo espaço.',
+        pedagogicalFeedback: 'Essa intervenção combina a correção necessária do trabalho com a proteção da dignidade de Tiago. Também abre espaço para examinar como a equipe pode prevenir novas ofensas.',
         consequenceSummary: 'A planilha é consertada em minutos; o clima é estabilizado com limites éticos claros e Tiago retorna ao projeto amparado.',
         consequenceDetails: 'A postura serena e firme impede a naturalização da grosseria. Roberto é chamado pela chefia para alinhamento de conduta, e Tiago recupera a confiança no suporte da equipe.'
       },
@@ -303,7 +303,7 @@ export const MISSIONS: MissionDef[] = [
         isPreferableInContext: true,
         description: 'Informar imediatamente a chefia e a área técnica sobre a inconsistência identificada, suspender o envio dos dados errados, aplicar o protocolo de retificação justificada e apoiar Helena na conferência dos números.',
         justification: 'Prioriza a veracidade da informação pública, evita que servidores assinem relatórios com dados falsificados e demonstra responsabilidade institucional.',
-        pedagogicalFeedback: 'Decisão ética e juridicamente irretocável. A transparência tempestiva transforma uma falha técnica em demonstração de responsabilidade e integridade coletiva.',
+        pedagogicalFeedback: 'Comunicar o erro prontamente permite corrigir seus efeitos e prestar contas. Vale refletir sobre como agir com transparência sem expor desnecessariamente pessoas envolvidas.',
         consequenceSummary: 'O envio é corrigido com duas horas de atraso mediante nota técnica justificativa, preservando a fidelidade patrimonial e a segurança da equipe.',
         consequenceDetails: 'A auditoria externa elogiou a prontidão na retificação. Helena sentiu-se amparada pelo grupo e uma nova rotina de conferência em pares foi implementada na Oficina.'
       },
@@ -414,7 +414,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'orientacao',
         description: 'Dedicar os 7 minutos finais para olhar com carinho os documentos principais, circular com caneta clara o que está correto e o que falta na lista impressa, e agendar horário prioritário garantido no dia seguinte (ou informar o posto perto da casa dela).',
         justification: 'Entrega valor real à cidadã, poupa-a de viagens inúteis e respeita com clareza o limite de horário da servidora.',
-        pedagogicalFeedback: 'Excelente equilíbrio entre humanização, empatia e sustentabilidade do trabalho público. Trata o cidadão como sujeito de direitos e não abandona os limites funcionais.',
+        pedagogicalFeedback: 'Acolher a pessoa e explicar os limites do atendimento ajuda a conciliar respeito e responsabilidade funcional. A equipe também pode avaliar quais encaminhamentos são realmente viáveis.',
         consequenceSummary: 'Dona Conceição sai aliviada sabendo exatamente o que providenciar; Renata consegue buscar seu filho no horário.',
         consequenceDetails: 'Dona Conceição retornou dois dias depois diretamente com os documentos certos e foi atendida em 10 minutos. O balcão funcionou com dignidade para ambas as partes.'
       },
