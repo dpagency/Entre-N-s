@@ -199,6 +199,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           Quem acompanhou sua jornada
         </h3>
 
+        <p className="text-sm text-slate-300 mb-3">Você é o Jogador. O Guardião escolhido acompanhou suas reflexões; os outros três ofereceram olhares virtuais.</p>
         <div className="flex flex-wrap items-center gap-3">
           {Object.values(state.players).map((p) => (
             <div
@@ -207,7 +208,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             >
               <CharacterAvatar characterId={p.characterId} variantIndex={p.variantIndex} size="sm" />
               <div>
-                <div className="font-bold text-xs text-slate-200">{p.isBot ? CHARACTERS[p.characterId]?.name : CHARACTERS[p.characterId]?.name}</div>
+                <div className="font-bold text-xs text-slate-200">{CHARACTERS[p.characterId]?.name}</div>
                 <div className="text-[10px] text-slate-400">
                   {p.isBot ? 'Outro olhar virtual' : `Guardião acompanhante de ${p.nickname}`}
                 </div>
