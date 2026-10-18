@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pause, Play, Volume2, Square } from 'lucide-react';
 
-interface Props { phase?: string; missionId?: string }
-export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
+interface Props { phase?: string; missionId?: string; contentVersion?: string }
+export const JourneyAudio: React.FC<Props> = ({ phase, missionId, contentVersion }) => {
   const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [rate, setRate] = useState(1);
@@ -18,7 +18,7 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
     window.speechSynthesis.cancel();
     utteranceRef.current = null;
     setStatus('idle');
-  }, [phase, missionId, supported]);
+  }, [phase, missionId, contentVersion, supported]);
   const start = () => {
     if (!supported) return;
     const synth = window.speechSynthesis;
