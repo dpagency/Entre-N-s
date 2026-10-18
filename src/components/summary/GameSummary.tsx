@@ -192,11 +192,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
       </div>
 
-      {/* Roster of participants */}
+      {/* Guardian companions: player identity remains distinct from chosen guide. */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl">
         <h3 className="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
           <Users className="w-5 h-5 text-teal-400" />
-          Guardiões Participantes
+          Quem acompanhou sua jornada
         </h3>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -207,9 +207,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             >
               <CharacterAvatar characterId={p.characterId} variantIndex={p.variantIndex} size="sm" />
               <div>
-                <div className="font-bold text-xs text-slate-200">{p.isBot ? CHARACTERS[p.characterId]?.name : p.nickname}</div>
+                <div className="font-bold text-xs text-slate-200">{p.isBot ? CHARACTERS[p.characterId]?.name : CHARACTERS[p.characterId]?.name}</div>
                 <div className="text-[10px] text-slate-400">
-                  {p.isHost ? 'Jogador' : 'Guardião'}
+                  {p.isBot ? 'Outro olhar virtual' : `Guardião acompanhante de ${p.nickname}`}
                 </div>
               </div>
             </div>
