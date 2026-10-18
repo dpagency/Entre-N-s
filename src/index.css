@@ -22,6 +22,16 @@ h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-s
   .game-welcome .game-title { font-size: 2rem; }
 }
 
+/* Leitura confortável também no notebook e desktop. */
+@media (min-width: 640px) {
+  main .text-\\[10px\\], main .text-\\[11px\\], main .text-xs { font-size: 0.875rem; line-height: 1.5; }
+  main .text-sm { font-size: 1rem; line-height: 1.55; }
+  main .text-base { font-size: 1.0625rem; line-height: 1.55; }
+  .game-welcome { max-width: 1080px; }
+  .game-welcome .grid button { min-height: 126px; }
+  .game-welcome .grid button > div:first-child { transform: scale(1.2); margin: 5px 0; }
+}
+
 /* Leitura confortável no celular: prevalece sobre utilitários tipográficos antigos. */
 @media (max-width: 639px) {
   html { font-size: 17px; }
