@@ -32,8 +32,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
   const renderStarRating = (value: number, onChange: (val: number) => void, label: string) => (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-xs sm:text-sm font-semibold text-slate-200">{label}</label>
-        <span className="text-xs font-bold text-amber-400">{value}/5</span>
+        <label className="text-base font-semibold text-slate-200">{label}</label>
+        <span className="text-sm font-bold text-amber-400">{value}/5</span>
       </div>
       <div className="flex items-center gap-1.5">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -55,22 +55,24 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     </div>
   );
 
+  if (!isOpen) return null;
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in"
     >
-      <div className="relative w-full max-w-lg max-h-[88dvh] overflow-y-auto overscroll-contain bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-8 shadow-2xl flex flex-col text-slate-100">
+      <div className="relative w-full max-w-2xl max-h-[90dvh] overflow-y-auto overscroll-contain bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl flex flex-col text-slate-100">
         <div className="space-y-5">
             <div className="border-b border-slate-800 pb-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">
+              <span className="text-sm font-bold uppercase tracking-wider text-teal-400">
                 Avaliação de Experiência
               </span>
-              <h2 className="text-xl font-black text-slate-100 mt-0.5">
+              <h2 className="text-2xl font-black text-slate-100 mt-0.5">
                 O que você achou do jogo?
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-sm text-slate-400">
                 Sua avaliação apoia o aprimoramento pedagógico da ferramenta.
               </p>
             </div>
@@ -98,7 +100,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
 
             {/* Optional Comment */}
             <div className="space-y-2 pt-2 border-t border-slate-800">
-              <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+              <label className="text-base font-semibold text-slate-200 flex items-center gap-1.5">
                 <MessageSquare className="w-3.5 h-3.5 text-teal-400" />
                 Comentário ou Sugestão Opcional:
               </label>
@@ -118,7 +120,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
                 maxLength={500}
                 rows={3}
                 placeholder="Compartilhe impressões gerais, sem nomes ou dados pessoais..."
-                className="w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
+                className="w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-base text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
               />
             </div>
 
