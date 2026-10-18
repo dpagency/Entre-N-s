@@ -152,7 +152,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
                     Perspectiva de {persp.actorName}
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    {isSolo ? 'Este relato ainda não foi revelado. Um poder de revelação pode ajudar a conhecê-lo.' : 'Esta perspectiva foi distribuída a outro colega. Ela poderá ser revelada por um poder especial.'}
+                    {isSolo ? 'Este relato ainda não foi revelado. Continue a jornada para conhecer outras perspectivas, quando disponíveis.' : 'Esta perspectiva foi distribuída a outro colega. Ela poderá ser revelada por um poder especial.'}
                   </p>
                 </div>
               );
