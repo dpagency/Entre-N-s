@@ -32,7 +32,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     e.preventDefault();
     setStarting(true);
     window.setTimeout(() => setStarting(false), 4500);
-    const cleanNick = nickname.trim() || 'Participante';
+    const cleanNick = nickname.trim() || 'Jogador';
     localStorage.setItem('guardioes_nickname', cleanNick);
     localStorage.setItem('guardioes_character', characterId);
     localStorage.setItem('guardioes_variant', String(variantIndex));
