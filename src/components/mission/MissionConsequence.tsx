@@ -130,7 +130,14 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         {fortune && <div role="status" className="rounded-2xl border border-amber-400/50 bg-amber-950/40 p-4 text-center animate-in zoom-in duration-500">
           <div className="text-3xl" aria-hidden="true">✨ 🏅 ✨</div>
           <p className="font-black text-amber-200 mt-2">{fortune.outcome === 'sorte' ? 'Um caminho favorável!' : fortune.outcome === 'reves' ? 'Um imprevisto no caminho!' : 'Uma nova oportunidade!'}</p>
-          <p className="text-sm text-slate-200 mt-2">{fortune.outcome === 'reves' ? 'O revés faz parte da sorte, não é punição pela sua escolha. Você pode continuar.' : 'Esta carta acrescenta uma conquista à sua jornada.'}</p>
+          <p className="text-sm text-slate-200 mt-2" data-narration="story">
+            {fortune.outcome === 'sorte'
+              ? 'Uma circunstância favorável abre espaço para o diálogo. Como aproveitar essa oportunidade sem deixar de ouvir quem pensa diferente?'
+              : fortune.outcome === 'reves'
+                ? 'Um imprevisto dificulta o caminho. O revés não é punição pela sua escolha: que cuidado ajudaria a enfrentar essa situação?'
+                : 'Uma nova oportunidade permite reparar vínculos ou ampliar a escuta. Sua decisão anterior permanece; o que você faria daqui para a frente?'}
+          </p>
+          <p className="text-xs text-amber-100/80 mt-2">A carta não altera a decisão confirmada nem indica se ela foi certa ou errada.</p>
         </div>}
       </section>
       {/* Descoberta revelada somente no encerramento da missão, após a carta do destino. */}
