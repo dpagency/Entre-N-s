@@ -277,7 +277,9 @@ export default function App() {
                 myPlayerId={myPlayerId}
                 onOpenFeedback={() => setIsFeedbackOpen(true)}
                 onRestartGame={() => {
-                  socketService.send({ type: 'START_GAME' });
+                  if (window.confirm('Começar uma nova jornada? O progresso e as decisões desta partida serão substituídos.')) {
+                    socketService.send({ type: 'START_GAME' });
+                  }
                 }}
               />
             )}
