@@ -77,3 +77,34 @@ test('confirmed solo choice cannot be replaced, even after a guardian power',()=
  assert.equal(room().phase,'MISSION_REVEAL');
  assert.equal(room().individualChoices[humanId],first);
 });
+
+test('each chosen guardian guides the human without replacing their decision', () => {
+ for (const guardian of ['alex', 'joana', 'ravi', 'bia'] as const) {
+  fresh();
+  const c = client();
+  c.send({type:'CREATE_ROOM', nickname:'Pessoa participante', characterId:guardian, variantIndex:0});
+  const room = () => snapshot().rooms[0][1];
+  c.send({type:'START_GAME'});
+  const human = Object.values(room().players).find(p => !p.isBot)!;
+  const bots = Object.values(room().players).filter(p => p.isBot);
+  assert.equal(human.characterId, guardian);
+  assert.equal(bots.length, 3);
+  assert.equal(new Set(bots.map(p => p.characterId)).size, 3);
+  assert.ok(bots.every(p => p.characterId !== guardian));
+  c.send({type:'VOTE_DESTINATION',regionId:'praca'});
+  c.send({type:'CONFIRM_DESTINATION'});
+  c.send({type:'EXPLORE_MISSION'});
+  const mission = MISSIONS.find(m => m.id === room().activeMissionId)!;
+  const chosen = mission.actions[0].id;
+  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:chosen});
+  const differentPower = (['alex','joana','ravi','bia'] as const).find(id => id !== guardian)!;
+  c.send({type:'USE_POWER',powerType:differentPower});
+  assert.equal(room().players[human.id].hasUsedPower, false, 'another guardian power must not be usable');
+  c.send({type:'USE_POWER',powerType:guardian});
+  assert.equal(room().players[human.id].hasUsedPower, true);
+  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[1].id});
+  assert.equal(room().individualChoices[human.id],chosen);
+  c.send({type:'PROCEED_TO_REVEAL'});
+  assert.equal(room().phase,'MISSION_REVEAL');
+ }
+});
