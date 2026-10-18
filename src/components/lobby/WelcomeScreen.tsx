@@ -56,17 +56,17 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-0 py-2 sm:py-4 px-2 text-slate-100 max-w-none mx-auto w-full game-welcome">
+    <div className="flex flex-col items-center justify-center min-h-0 py-2 lg:py-2 px-2 text-slate-100 max-w-none mx-auto w-full game-welcome">
       {/* Hero presentation */}
-      <div className="text-center max-w-4xl mx-auto mb-5 space-y-2">
+      <div className="text-center max-w-4xl mx-auto mb-2 space-y-1">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
           <Compass className="w-3.5 h-3.5" />
           Jogo Sério Cooperativo de Ética Pública
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-100">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-100">
           Entre Nós
-          <span className="block text-xl sm:text-3xl font-bold text-amber-400 mt-1">
+          <span className="block text-xl sm:text-2xl font-bold text-amber-400 mt-1">
             Guardiões da Convivência
           </span>
         </h1>
@@ -77,9 +77,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
 
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-8 shadow-2xl space-y-5">
+      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-2">
         <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Você participa como você mesmo. Escolha um Guardião para acompanhar suas decisões; os outros três oferecerão perspectivas diferentes ao longo da jornada.</p>
-        <form onSubmit={handleStartJourney} className="space-y-2">
+        <form onSubmit={handleStartJourney} className="space-y-1.5">
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <span className="text-[11px] text-teal-400">Quatro caminhos de reflexão</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               {CHARACTER_LIST.map((char) => {
                 const isSelected = characterId === char.id;
                 return (
@@ -115,13 +115,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                     key={char.id}
                     type="button"
                     onClick={() => setPreviewCharacter(char.id)}
-                    className={`p-4 sm:p-6 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
+                    className={`p-3 sm:p-3 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
                       isSelected
                         ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                         : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
                     }`}
                   >
-                    <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="xl" showBadge={false} />
+                    <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="lg" showBadge={false} />
                     <div className="font-bold text-xs sm:text-sm">{char.name}</div>
                     <div className="text-[10px] text-slate-400 leading-tight">{char.title}</div>
                   </button>
@@ -136,7 +136,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
             {/* Character power info preview */}
             {selectedChar && (
-              <div className="hidden sm:flex p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
+              <div className="hidden xl:flex p-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 shrink-0">
                   <Sparkles className="w-4 h-4" />
                 </div>
@@ -153,7 +153,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </div>
 
           {/* Visual Variant Selector */}
-          <div className="hidden sm:block space-y-2">
+          <div className="hidden space-y-2">
             <label className="text-xs font-bold text-slate-300">
               Aparência do Guardião acompanhante:
             </label>
@@ -180,14 +180,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <button
             type="submit"
             disabled={starting}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
+            className="w-full py-3 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
           >
             <Play className="w-5 h-5 fill-current" />
             <span>{starting ? 'Preparando sua jornada…' : 'Começar minha jornada'}</span>
           </button>
         </form>
 
-        <p className="text-xs text-slate-400 leading-relaxed text-center">Seu progresso é preservado ao atualizar esta página na mesma sessão do navegador. Para evitar perder a jornada, não feche a aba antes de concluir as quatro missões. Não há sincronização entre aparelhos.</p>
+        <p className="text-xs text-slate-400 leading-relaxed text-center hidden lg:block">Seu progresso é preservado ao atualizar esta página na mesma sessão do navegador. Para evitar perder a jornada, não feche a aba antes de concluir as quatro missões. Não há sincronização entre aparelhos.</p>
 
         {/* Informational quick links */}
         <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
