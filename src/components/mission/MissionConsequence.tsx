@@ -61,7 +61,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           </div>
 
           <div className="text-xs font-bold text-amber-400">
-            Missões Cumpridas: {completedCount} de 4
+            {fortune && discoveryOpened ? 'Missões concluídas' : 'Missão em encerramento'}: {fortune && discoveryOpened ? completedCount : state.completedMissionIds.length} de 4
           </div>
         </div>
 
@@ -184,11 +184,11 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         <div className="text-xs sm:text-sm text-slate-300">
           {isLastMission ? (
             <span className="text-amber-300 font-semibold">
-              Parabéns! Você concluiu as quatro missões. Seu resumo e sua medalha estão à frente.
+              {fortune && discoveryOpened ? 'Parabéns! Você encerrou as quatro missões. Seu resumo e sua medalha estão à frente.' : 'Revele sua carta e sua descoberta para concluir a quarta missão.'}
             </span>
           ) : (
             <span className="text-slate-300">
-              Você concluiu {completedCount} de 4 missões. A próxima região espera por você no mapa.
+              {fortune && discoveryOpened ? `Você encerrou ${completedCount} de 4 missões. A próxima região espera por você no mapa.` : 'Conheça sua carta e a descoberta desta missão antes de voltar ao mapa.'}
             </span>
           )}
         </div>
