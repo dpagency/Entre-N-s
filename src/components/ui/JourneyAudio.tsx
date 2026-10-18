@@ -52,11 +52,11 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
         </button>
         <button type="button" onClick={stop} disabled={status === 'idle'} className="min-h-11 px-3 rounded-xl bg-slate-800 disabled:opacity-40 flex items-center gap-1"><Square size={15}/> Parar</button>
         <label className="flex items-center gap-1 text-slate-200"><span className="sr-only">Velocidade</span>
-          <select aria-label="Velocidade da narração" value={rate} onChange={e => { setRate(Number(e.target.value)); if (status === 'playing') pause(); }} className="bg-slate-800 text-white rounded-lg min-h-11 px-2">
+          <select aria-label="Velocidade da narração" value={rate} disabled={status !== 'idle'} onChange={e => setRate(Number(e.target.value))} className="bg-slate-800 text-white rounded-lg min-h-11 px-2">
             <option value={0.8}>0,8×</option><option value={1}>1×</option><option value={1.2}>1,2×</option><option value={1.5}>1,5×</option>
           </select>
         </label>
-        {status === 'paused' && <span className="text-xs text-slate-400">Retoma de onde parou</span>}
+        {status === 'paused' && <span className="text-xs text-slate-400">Retoma de onde parou; para mudar a velocidade, pare e inicie novamente.</span>}
       </div>
     </div>
   );
