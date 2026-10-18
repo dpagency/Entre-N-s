@@ -187,6 +187,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </button>
         </form>
 
+        <p className="text-xs text-slate-400 leading-relaxed text-center">Seu progresso é preservado ao atualizar esta página na mesma sessão do navegador. Para evitar perder a jornada, não feche a aba antes de concluir as quatro missões. Não há sincronização entre aparelhos.</p>
+
         {/* Informational quick links */}
         <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
           <button
