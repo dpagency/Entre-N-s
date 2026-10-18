@@ -41,6 +41,8 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
   c.send({type:'DRAW_FORTUNE_CARD',cardIndex:0});
   assert.ok(room().fortuneCards?.[mission.id]);
   c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
+  assert.equal(room().completedMissionIds.length, firstFour.indexOf(mission) + 1);
+  assert.equal(room().phase, firstFour.indexOf(mission) === 3 ? 'GAME_SUMMARY' : 'BOARD_SELECT');
  }
  assert.equal(room().phase,'GAME_SUMMARY');
  assert.equal(room().completedMissionIds.length,4);
