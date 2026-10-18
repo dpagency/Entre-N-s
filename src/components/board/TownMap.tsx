@@ -322,7 +322,7 @@ export const TownMap: React.FC<TownMapProps> = ({
             disabled={isCompleted}
             aria-label={`${region.name}: ${isCompleted ? 'missão concluída' : 'missão disponível'}`}
             aria-pressed={selected}
-            className={`min-w-0 min-h-36 rounded-2xl border-2 p-3 flex flex-col gap-2 text-left ${selected ? 'bg-teal-950 border-teal-400' : 'bg-slate-900 border-slate-700'}`}>
+            className={`min-w-0 min-h-36 rounded-2xl border-2 p-3 flex flex-col gap-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${isCompleted ? 'opacity-65 cursor-not-allowed' : 'active:scale-[0.98]'} ${selected ? 'bg-teal-950 border-teal-400' : 'bg-slate-900 border-slate-700'}`}>
             <span className="text-teal-300">{getIcon(region.iconName)}</span>
             <span className="text-sm font-black leading-tight break-words">{region.name}</span>
             <span className="text-xs text-slate-400 break-words">{region.subtitle}</span>
@@ -341,7 +341,7 @@ export const TownMap: React.FC<TownMapProps> = ({
               </span>
             ) : (
               <span className="text-amber-300">
-                {isSolo ? 'Escolha uma das quatro regiões para continuar sua jornada.' : 'Clique em uma das quatro regiões acima para registrar o seu voto deliberado.'}
+                {isSolo ? 'Escolha uma das regiões ainda disponíveis para continuar sua jornada.' : 'Clique em uma das quatro regiões acima para registrar o seu voto deliberado.'}
               </span>
             )}
           </div>
@@ -351,7 +351,7 @@ export const TownMap: React.FC<TownMapProps> = ({
               <button
                 onClick={handleConfirmDestination}
                 disabled={Object.keys(state.destinationVotes).length === 0}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-slate-950 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="w-full sm:w-auto min-h-11 px-5 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-slate-950 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
                 {isSolo ? 'Explorar esta região →' : 'Confirmar Destino da Equipe →'}
               </button>
