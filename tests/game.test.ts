@@ -35,6 +35,7 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
    c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
   }
   assert.equal(room().phase,'MISSION_CONSEQUENCE');
+  assert.equal(room().unlockedDiscoveries.includes(mission.discovery.key),false,'discovery must stay locked until mission is finished');
   assert.equal(room().chosenCollectiveActionId,selectedAction, 'consequence must reflect the human choice');
   c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
   assert.equal(room().phase,'MISSION_CONSEQUENCE');
@@ -42,6 +43,7 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
   assert.ok(room().fortuneCards?.[mission.id]);
   c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
   assert.equal(room().completedMissionIds.length, firstFour.indexOf(mission) + 1);
+  assert.equal(room().unlockedDiscoveries.includes(mission.discovery.key),true,'discovery unlocks at completion');
   assert.equal(room().phase, firstFour.indexOf(mission) === 3 ? 'GAME_SUMMARY' : 'BOARD_SELECT');
  }
  assert.equal(room().phase,'GAME_SUMMARY');
