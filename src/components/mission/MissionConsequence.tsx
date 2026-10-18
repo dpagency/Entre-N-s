@@ -24,7 +24,8 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   }, [mission.id, !!state.fortuneCards?.[mission.id]]);
   const isHost = state.hostId === myPlayerId;
   const isSolo = Object.values(state.players).some(p => p.isBot);
-  const chosenActionId = state.chosenCollectiveActionId || mission.actions[0].id;
+  // Solo consequences follow the human player's confirmed choice.
+  const chosenActionId = (isSolo ? state.individualChoices?.[myPlayerId] : state.chosenCollectiveActionId) || state.chosenCollectiveActionId || mission.actions[0].id;
   const chosenAction = mission.actions.find((a) => a.id === chosenActionId) || mission.actions[0];
 
   const isNonConsensual = state.isNonConsensualResult && state.nonConsensualActionIds;
@@ -128,7 +129,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           </button>)}
         </div>
         {fortune && <div role="status" className="rounded-2xl border border-amber-400/50 bg-amber-950/40 p-4 text-center animate-in zoom-in duration-500">
-          <div className="text-3xl" aria-hidden="true">✨ 🏅 ✨</div>
+          <div className="text-3xl" aria-hidden="true">{fortune.outcome === "sorte" ? "✨" : fortune.outcome === "reves" ? "🌧️" : "🌱"}</div>
           <p className="font-black text-amber-200 mt-2">{fortune.outcome === 'sorte' ? 'Um caminho favorável!' : fortune.outcome === 'reves' ? 'Um imprevisto no caminho!' : 'Uma nova oportunidade!'}</p>
           <p className="text-sm text-slate-200 mt-2" data-narration="story">
             {fortune.outcome === 'sorte'
