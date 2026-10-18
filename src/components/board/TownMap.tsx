@@ -86,7 +86,7 @@ export const TownMap: React.FC<TownMapProps> = ({
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
             {isVoting
-              ? (isSolo ? 'Escolha a próxima região para explorar.' : 'Deliberação Coletiva: Votem no próximo destino de atuação do grupo.')
+              ? (isSolo ? 'As regiões concluídas ficam marcadas. Escolha uma das regiões disponíveis para a próxima missão.' : 'Deliberação Coletiva: Votem no próximo destino de atuação do grupo.')
               : `Local Atual: ${currentRegion.name} (${currentRegion.subtitle})`}
           </p>
         </div>
@@ -228,6 +228,7 @@ export const TownMap: React.FC<TownMapProps> = ({
         {/* Interactive Region Cards placed over SVG coordinates */}
         {REGION_LIST.map((region) => {
           const isCurrent = state.currentRegionId === region.id;
+          const isCompleted = isSolo && completedRegions.has(region.id);
           const votes = voteCounts[region.id];
           const hasVotedForThis = myVote === region.id;
           const missionsInRegion = isSolo ? MISSIONS.filter((m) => m.regionId === region.id).slice(0, 1) : MISSIONS.filter((m) => m.regionId === region.id);
@@ -239,7 +240,8 @@ export const TownMap: React.FC<TownMapProps> = ({
             <button
               key={region.id}
               onClick={() => handleVote(region.id)}
-              disabled={isSolo && completedRegions.has(region.id)}
+              disabled={isCompleted}
+              aria-label={`${region.name}: ${isCompleted ? 'missão concluída' : 'missão disponível'}`}
               style={{
                 left: `${region.x}%`,
                 top: `${region.y}%`,
@@ -261,7 +263,9 @@ export const TownMap: React.FC<TownMapProps> = ({
                   {getIcon(region.iconName)}
                 </div>
 
-                {isCurrent && (
+                {isCompleted ? (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-700 text-white flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Feita</span>
+                ) : isCurrent && (
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 flex items-center gap-1 shadow">
                     <Navigation className="w-2.5 h-2.5 fill-current" />
                     Aqui
@@ -299,7 +303,7 @@ export const TownMap: React.FC<TownMapProps> = ({
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
                     }`}
                   >
-                    {hasVotedForThis ? 'Selecionada ✓' : isSolo ? 'Explorar região' : 'Votar Aqui'}
+                    {isCompleted ? 'Missão concluída ✓' : hasVotedForThis ? 'Selecionada ✓' : isSolo ? 'Explorar região' : 'Votar Aqui'}
                   </span>
                 </div>
               )}
@@ -313,14 +317,16 @@ export const TownMap: React.FC<TownMapProps> = ({
           const missions = isSolo ? MISSIONS.filter(m => m.regionId === region.id).slice(0, 1) : MISSIONS.filter(m => m.regionId === region.id);
           const done = missions.filter(m => state.completedMissionIds.includes(m.id)).length;
           const selected = myVote === region.id;
+          const isCompleted = isSolo && completedRegions.has(region.id);
           return <button key={region.id} type="button" onClick={() => handleVote(region.id)}
-            disabled={isSolo && completedRegions.has(region.id)}
+            disabled={isCompleted}
+            aria-label={`${region.name}: ${isCompleted ? 'missão concluída' : 'missão disponível'}`}
             aria-pressed={selected}
             className={`min-w-0 min-h-36 rounded-2xl border-2 p-3 flex flex-col gap-2 text-left ${selected ? 'bg-teal-950 border-teal-400' : 'bg-slate-900 border-slate-700'}`}>
             <span className="text-teal-300">{getIcon(region.iconName)}</span>
             <span className="text-sm font-black leading-tight break-words">{region.name}</span>
             <span className="text-xs text-slate-400 break-words">{region.subtitle}</span>
-            <span className="mt-auto text-xs text-amber-300">{done}/{missions.length} missões {selected ? ' · Selecionada ✓' : ''}</span>
+            <span className="mt-auto text-xs text-amber-300">{isCompleted ? '✓ Missão concluída' : `${done}/${missions.length} missões${selected ? ' · Selecionada ✓' : ''}`}</span>
           </button>;
         })}
       </div>
