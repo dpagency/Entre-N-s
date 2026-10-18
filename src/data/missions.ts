@@ -313,7 +313,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'cautela',
         description: 'Seguir a sugestão de Marcos: submeter o documento com o valor incorreto às 16h59 e tentar maquiar os números em relatórios futuros para não prejudicar as metas.',
         justification: 'Evitar o desconforto de perder o prazo no sistema e proteger temporariamente a nota do setor.',
-        pedagogicalFeedback: 'Conduta inaceitável. Ocultar conscientemente erro em documento público compromete a probidade, fere o interesse coletivo e expõe os servidores a graves sanções disciplinares.',
+        pedagogicalFeedback: 'Ocultar deliberadamente um erro em documento público compromete a integridade da informação e pode gerar responsabilização. A pressão por resultados não elimina o dever de comunicar e corrigir falhas.',
         consequenceSummary: 'Três meses depois, o cruzamento automático de notas fiscais apontou a divergência de 120 máquinas inexistentes.',
         consequenceDetails: 'A Corregedoria abriu sindicância investigatória para apurar se houve desvio ou falsidade ideológica. Todos os que assinaram foram chamados a depor com grande desgaste pessoal e institucional.'
       },
@@ -323,7 +323,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'dialogo',
         description: 'Dizer que a falha foi dela e que se ela não conseguir consertar tudo em 35 minutos antes das 17h, o setor terá que enviá-lo como está sob responsabilidade exclusiva dela.',
         justification: 'Transferir a responsabilidade para quem cometeu o erro operacional.',
-        pedagogicalFeedback: 'Desagrega a equipe e ignora que produtos do serviço público são de responsabilidade colegiada e institucional. Estimula o medo e a ocultação de falhas futuras.',
+        pedagogicalFeedback: 'Transferir toda a culpa a uma pessoa não resolve as falhas de revisão do trabalho coletivo. Esse caminho pode aumentar o receio de comunicar erros e dificultar melhorias nos procedimentos.',
         consequenceSummary: 'Helena tenta consertar sob pânico, comete novos erros na correria e o documento é enviado com múltiplas inconsistências.',
         consequenceDetails: 'O estresse adoece a servidora e o setor perde a credibilidade perante os órgãos de controle devido à falta de cooperação mútua.'
       }
@@ -424,7 +424,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'cautela',
         description: 'Apontar para o relógio na parede às 16h55 e recusar qualquer conversa, orientando-a a retornar na fila normal no dia seguinte.',
         justification: 'Cumprimento estrito e impessoal da regra horária sem flexibilidade comunicacional.',
-        pedagogicalFeedback: 'Legalismo desprovido de empatia. Embora o horário precise ser cumprido, a falta de acolhimento e a ausência de orientação básica geram desamparo e ferem a finalidade do serviço público.',
+        pedagogicalFeedback: 'Cumprir o horário é importante, mas encerrar o contato sem orientação pode deixar o cidadão sem saber como proceder. É possível avaliar formas de acolhimento compatíveis com os limites do serviço.',
         consequenceSummary: 'Dona Conceição chora de cansaço e frustração; testemunhas no saguão ficam revoltadas com a frieza do setor.',
         consequenceDetails: 'Uma reclamação foi protocolada na Ouvidoria por descortesia e falta de orientação à pessoa idosa, desgastando a imagem do Portal do Atendimento.'
       },
@@ -434,7 +434,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'acolhimento',
         description: 'Tentar cadastrar todos os formulários correndo, mesmo sabendo que o sistema cairá às 17h15 e que Renata perderá a hora da creche.',
         justification: 'Vontade de resolver todo o problema da cidadã a qualquer custo pessoal.',
-        pedagogicalFeedback: 'Tentativa bem-intencionada, porém imprudente. Gera promessa que não pode ser cumprida pelo sistema, prejudica a vida pessoal da servidora e pode corromper dados por pressa.',
+        pedagogicalFeedback: 'A intenção de ajudar não torna viável prometer um atendimento fora das condições disponíveis. Convém considerar os limites do sistema, os riscos de erro e a sustentabilidade do trabalho.',
         consequenceSummary: 'Às 17h15 o sistema trava no meio do cadastro sem salvar nada; ambas saem frustradas e desgastadas.',
         consequenceDetails: 'Renata precisou pagar multa na creche e Dona Conceição terá que refazer todo o processo porque o protocolo não foi gerado.'
       }
@@ -526,7 +526,7 @@ export const MISSIONS: MissionDef[] = [
         isPreferableInContext: true,
         description: 'No momento: manifestar claramente que estereótipos regionais não são brincadeira e desrespeitam colegas. Em seguida: acolher Sandra com escuta segura e informá-la sobre os canais de Acolhimento e Ouvidoria/Comissão de Ética, respeitando sua decisão de representação formal.',
         justification: 'Não terceiriza o combate ao preconceito para a vítima, interrompe a cumplicidade coletiva e apoia Sandra com recursos institucionais reais.',
-        pedagogicalFeedback: 'Postura ética e cidadã correta. Discriminação não é opinião nem divergência aceitável: deve ser cessada imediatamente com acolhimento à pessoa atingida.',
+        pedagogicalFeedback: 'Interromper a discriminação e acolher a pessoa atingida protege sua dignidade. A situação também exige avaliar os encaminhamentos institucionais adequados, sem tratar a ofensa como mera divergência de opinião.',
         consequenceSummary: 'O comportamento discriminatório é barrado; Sandra sente que não está sozinha e a instituição toma providências educativas e correcionais.',
         consequenceDetails: 'A intervenção serviu de ponto de virada na unidade. A Gestão de Pessoas organizou oficina sobre respeito à diversidade e Valter foi formalmente advertido por sua conduta.'
       },
@@ -536,7 +536,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'dialogo',
         description: 'Organizar um encontro cara a cara forçado entre Sandra e Valter para que "eles se acertem como adultos", tratando a situação como mero desentendimento interpessoal.',
         justification: 'Tentativa de resolver conflitos rapidamente por conversa direta.',
-        pedagogicalFeedback: 'Completamente inadequado. Discriminação e preconceito envolvem assimetria e violência moral. Forçar a vítima a negociar cara a cara com quem a ofendeu gera revitimização e sofrimento.',
+        pedagogicalFeedback: 'Obrigar a pessoa atingida a confrontar quem a ofendeu pode ampliar seu sofrimento e desconsiderar a assimetria da situação. A resposta institucional deve priorizar proteção, escuta e encaminhamentos apropriados.',
         consequenceSummary: 'Sandra é colocada em situação de extremo constrangimento e pressão para desculpar o colega sem qualquer retratação genuína.',
         consequenceDetails: 'Sandra se sente desamparada pela gestão e pede transferência de setor por não suportar o clima forçado.'
       },
@@ -546,7 +546,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'cautela',
         description: 'Dizer a Sandra no privado: “O Valter é sem noção mesmo, não liga não, releva para manter a paz da equipe e não queimar pontes”.',
         justification: 'Preservar a harmonia aparente do setor e evitar desdobramentos administrativos.',
-        pedagogicalFeedback: 'Inadmissível. Silenciar a discriminação em nome de uma "harmonia aparente" perpetua o ambiente tóxico, protege quem comete o ilícito e isola quem foi ofendido.',
+        pedagogicalFeedback: 'Ignorar a discriminação para preservar uma aparência de harmonia deixa a pessoa atingida desprotegida e favorece a repetição da conduta. O dever de respeito exige uma resposta efetiva.',
         consequenceSummary: 'Valter continua fazendo piadas com outros servidores; o ambiente se degrada gradativamente.',
         consequenceDetails: 'Outros colegas também passam a ser alvo de comentários pejorativos, demonstrando que a omissão coletiva encoraja o assédio moral.'
       }
@@ -645,7 +645,7 @@ export const MISSIONS: MissionDef[] = [
         isPreferableInContext: true,
         description: 'Explicar com respeito ao colega que a atestação deve refletir estritamente os fatos comprovados; emitir o relatório técnico apontando a ausência dos veículos com desconto correspondente no faturamento e notificar a contratada para regularização imediata.',
         justification: 'Cumpre com exatidão a função de fiscalização, protege os recursos públicos, garante o direito de defesa da empresa e resguarda juridicamente os servidores.',
-        pedagogicalFeedback: 'Escolha perfeita. Lealdade ao interesse público não significa inimizade pessoal: pauta-se pelo respeito ao dever legal e à realidade dos fatos apurados sem pactos espúrios.',
+        pedagogicalFeedback: 'Recusar a confirmação de serviços não prestados preserva a veracidade dos registros e o interesse público. A relação pessoal não afasta a responsabilidade de agir com base nos fatos e nos deveres funcionais.',
         consequenceSummary: 'O erário é preservado com desconto de R$ 45.000 na fatura; a empresa repõe a frota completa sob pena de multa contratual.',
         consequenceDetails: 'Daniel compreende que assinar o documento falso teria colocado a carreira de ambos em risco. A linha comunitária foi reestabelecida para os cidadãos com fiscalização exemplar.'
       },
@@ -655,7 +655,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'cautela',
         description: 'Ceder ao pedido de Daniel, certificar que 100% dos veículos rodaram normalmente e torcer para que a empresa cumpra a promessa informal de reposição futura.',
         justification: 'Evitar o confronto com o colega amigo e manter o clima pacífico na equipe.',
-        pedagogicalFeedback: 'Violação gravíssima. Atestar falsamente serviços não prestados é conduta ilícita, trai a confiança da sociedade e converte a camaradagem em conivência com o dano ao patrimônio público.',
+        pedagogicalFeedback: 'Atestar deliberadamente serviços não prestados falsifica o registro administrativo e pode gerar responsabilização. A confiança entre colegas não justifica comprometer o patrimônio público.',
         consequenceSummary: 'A empresa não repôs os veículos no mês seguinte e a denúncia de usuários no Ministério Público deflagrou operação de auditoria.',
         consequenceDetails: 'Os dois servidores foram afastados preventivamente da comissão de fiscalização e respondem a processo correcional por prevaricação e atesto ideologicamente falso.'
       },
@@ -665,7 +665,7 @@ export const MISSIONS: MissionDef[] = [
         actionType: 'orientacao',
         description: 'Não conversar com Daniel, tirar fotos dos documentos e vazar em páginas públicas da internet afirmando que o setor inteiro é corrupto.',
         justification: 'Ímpeto justiceiro de expor a conduta sem passar pelos canais institucionais.',
-        pedagogicalFeedback: 'Conduta irresponsável. Denúncias anônimas em redes sociais violam o sigilo funcional, realizam julgamentos sumários sem contraditório e desestabilizam o serviço público sem apuração legítima.',
+        pedagogicalFeedback: 'Expor acusações e informações funcionais em redes sociais, sem os cuidados devidos, pode violar sigilos e prejudicar a apuração. É importante distinguir a comunicação legítima de irregularidades, inclusive anônima pelos canais apropriados, da divulgação pública precipitada.',
         consequenceSummary: 'A postagem gera escândalo sensacionalista, distorce os fatos reais e prejudica servidores inocentes.',
         consequenceDetails: 'A apuração foi contaminada por vazamento indevido, e quem vazou responde a inquérito por quebra de sigilo funcional sem ter solucionado o problema da frota.'
       }
