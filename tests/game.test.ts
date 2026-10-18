@@ -22,7 +22,10 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
   assert.equal(room().activeMissionId,mission.id);
   c.send({type:'EXPLORE_MISSION'});
   assert.equal(room().phase,'MISSION_EXPLORE');
-  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:mission.actions[0].id});
+  const humanId = Object.values(room().players).find(p => !p.isBot)!.id;
+  const selectedAction = mission.actions[room().completedMissionIds.length % mission.actions.length].id;
+  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:selectedAction});
+  assert.equal(room().individualChoices[humanId],selectedAction);
   assert.equal(room().phase,'MISSION_EXPLORE');
   c.send({type:'PROCEED_TO_REVEAL'});
   assert.equal(room().phase,'MISSION_REVEAL');
@@ -32,6 +35,7 @@ test('solo pilot completes four distinct regions and reaches medal summary', () 
    c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
   }
   assert.equal(room().phase,'MISSION_CONSEQUENCE');
+  assert.equal(room().chosenCollectiveActionId,selectedAction, 'consequence must reflect the human choice');
   c.send({type:'PROCEED_AFTER_CONSEQUENCE'});
   assert.equal(room().phase,'MISSION_CONSEQUENCE');
   c.send({type:'DRAW_FORTUNE_CARD',cardIndex:0});
