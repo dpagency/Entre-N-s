@@ -497,7 +497,6 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       room.isNonConsensualResult = false;
       room.nonConsensualActionIds = undefined;
       room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false});
-      if (!room.unlockedDiscoveries.includes(mission.discovery.key)) room.unlockedDiscoveries.push(mission.discovery.key);
       room.phase = mission.tfChallenge ? 'MISSION_TF_CHALLENGE' : 'MISSION_CONSEQUENCE';
       broadcastRoomState(room, 'Sua escolha foi registrada. Vamos conhecer os desdobramentos.', 'success');
       return;
@@ -683,6 +682,10 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
     if (room.phase === 'MISSION_CONSEQUENCE') {
       if (!room.activeMissionId || !room.fortuneCards?.[room.activeMissionId]) return;
+      const finishedMission = MISSIONS.find(m => m.id === room.activeMissionId);
+      if (finishedMission && !room.unlockedDiscoveries.includes(finishedMission.discovery.key)) {
+        room.unlockedDiscoveries.push(finishedMission.discovery.key);
+      }
       // Record completed mission
       if (room.activeMissionId && !room.completedMissionIds.includes(room.activeMissionId)) {
         room.completedMissionIds.push(room.activeMissionId);
