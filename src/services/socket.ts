@@ -32,7 +32,17 @@ class GameSocketService {
       }
       sessionStorage.removeItem(key);
     }
-    this.localMode = localStorage.getItem('entre-nos-mode') === 'solo';
+    // This pilot is solo-only. A previously saved online waiting room must not
+    // override the solo welcome screen after an upgrade. Preserve solo snapshots.
+    const previousMode = localStorage.getItem('entre-nos-mode');
+    const previousRoom = localStorage.getItem('guardioes_room_code');
+    if (previousMode !== 'solo' && previousRoom && !previousRoom.startsWith('SOLO-')) {
+      localStorage.removeItem('guardioes_session_token');
+      localStorage.removeItem('guardioes_room_code');
+      localStorage.removeItem('guardioes_player_id');
+    }
+    this.localMode = true;
+    localStorage.setItem('entre-nos-mode', 'solo');
     // Restore session credentials across reloads and browser restarts on this device
     const savedToken = localStorage.getItem('guardioes_session_token');
     const savedRoom = localStorage.getItem('guardioes_room_code');
