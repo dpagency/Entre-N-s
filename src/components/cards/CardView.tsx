@@ -51,10 +51,6 @@ export const PerspectiveCard: React.FC<PerspectiveCardProps> = ({
         {perspective.details}
       </div>
 
-      <div className="text-xs text-slate-400 mt-auto">
-        <strong className="text-slate-200">Preocupação central:</strong> {perspective.summary}
-      </div>
-
       {isPrivateToMe && !isSharedWithGroup && onShareWithGroup && (
         <button
           onClick={onShareWithGroup}
