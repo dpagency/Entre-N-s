@@ -89,7 +89,8 @@ test('affinity talismans match only independent bots and survive snapshot restor
  const mission=MISSIONS.find(m=>m.id===room().activeMissionId)!;
  const bots=Object.values(room().players).filter(p=>p.isBot);
  assert.equal(bots.length,3);
- const matchedChoice=room().individualChoices[bots[0].id] || mission.actions.find(a=>a.actionType==='acolhimento')?.id || mission.actions[0].id;
+ const botPriority: Record<string,string[]> = {alex:['formalizacao','orientacao','cautela','dialogo','acolhimento'],joana:['acolhimento','dialogo','orientacao','cautela','formalizacao'],ravi:['cautela','orientacao','dialogo','formalizacao','acolhimento'],bia:['orientacao','formalizacao','dialogo','acolhimento','cautela']};
+ const matchedChoice=botPriority[bots[0].characterId].map(type=>mission.actions.find(a=>a.actionType===type)).find(Boolean)!.id;
  c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:matchedChoice});
  c.send({type:'PROCEED_TO_REVEAL'});
  const expected=bots.filter(p=>room().individualChoices[p.id]===matchedChoice).map(p=>p.characterId).sort();
