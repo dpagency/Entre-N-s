@@ -23,6 +23,8 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
   const myPlayer = state.players[myPlayerId];
   const myChoice = state.myChoice;
   const [pendingChoice, setPendingChoice] = useState<string | null>(null);
+  const [showRevealedPerspectives, setShowRevealedPerspectives] = useState(false);
+  const [showSituationReview, setShowSituationReview] = useState(false);
   const selectedChoice = myChoice || pendingChoice;
 
   // Active connected players count
@@ -98,11 +100,25 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           </section>
         )}
 
+        <button type="button" onClick={() => setShowSituationReview(v => !v)} className="mt-3 min-h-11 px-4 py-2 rounded-xl border border-teal-500/40 text-teal-200 text-sm font-bold hover:bg-teal-950/30" aria-expanded={showSituationReview}>
+          {showSituationReview ? 'Ocultar cenário anterior' : '← Rever cenário e informações da missão'}
+        </button>
+        {showSituationReview && (
+          <section className="mt-3 p-4 rounded-2xl bg-slate-950/70 border border-slate-700 space-y-3">
+            <h3 className="font-bold text-teal-200">{mission.title}</h3>
+            <p className="text-sm text-slate-200">{mission.situation.context}</p>
+            <p className="text-sm text-amber-200">{mission.situation.trigger}</p>
+            <details><summary className="cursor-pointer text-sm font-bold">Fatos conhecidos e incertezas</summary>
+              <ul className="list-disc pl-5 text-sm text-slate-300 mt-2">{mission.situation.knownFacts.map((fact,i) => <li key={i}>{fact}</li>)}</ul>
+              <ul className="list-disc pl-5 text-sm text-slate-300 mt-2">{mission.situation.uncertainties.map((fact,i) => <li key={i}>{fact}</li>)}</ul>
+            </details>
+          </section>
+        )}
         {state.sharedPerspectiveIds.length > 0 && (
           <section className="mt-4 p-4 rounded-2xl border border-amber-500/40 bg-amber-950/20 space-y-3" aria-label="Perspectivas reveladas">
-            <h3 className="font-bold text-lg text-amber-200">Perspectivas reveladas</h3>
-            <p className="text-sm text-slate-300">Estas informações ajudam a refletir; não alteram sua decisão automaticamente.</p>
-            {mission.perspectives.filter(p => state.sharedPerspectiveIds.includes(p.id)).map(p => (
+            <button type="button" className="w-full text-left font-bold text-amber-200 min-h-10" onClick={() => setShowRevealedPerspectives(v => !v)} aria-expanded={showRevealedPerspectives}>Perspectivas reveladas ({state.sharedPerspectiveIds.length}) — {showRevealedPerspectives ? 'Ocultar relatos ↑' : 'Ler relatos ↓'}</button>
+            {showRevealedPerspectives && <p className="text-sm text-slate-300">Estas informações ajudam a refletir; não alteram sua decisão automaticamente.</p>}
+            {showRevealedPerspectives && mission.perspectives.filter(p => state.sharedPerspectiveIds.includes(p.id)).map(p => (
               <div key={p.id} className="rounded-xl bg-slate-950/70 p-3 border border-slate-700">
                 <strong className="text-teal-200">{p.actorName} — {p.actorRole}</strong>
                 <p className="mt-1 text-sm leading-relaxed text-slate-200">{p.details}</p>
