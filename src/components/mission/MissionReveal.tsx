@@ -75,10 +75,10 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black text-slate-100 mt-1">
-          {solo ? "Sua decisão e as perspectivas dos Guardiões" : "As Escolhas Individuais do Grupo"}
+          {solo ? "Sua decisão e as escolhas dos Guardiões" : "As Escolhas Individuais do Grupo"}
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
-          {solo ? "Sua decisão permanece registrada. Conheça as preferências dos três Guardiões virtuais; elas não alteram o rumo que você escolheu." : "Vejam como cada guardião se posicionou inicialmente. Divergências revelam nuances diferentes da situação; aproveitem o momento para debater abertamente."}
+          {solo ? "Sua decisão permanece registrada. Veja quais alternativas os três Guardiões robôs escolheram no mesmo dilema. Suas escolhas não alteram sua decisão." : "Vejam como cada guardião se posicionou inicialmente. Divergências revelam nuances diferentes da situação; aproveitem o momento para debater abertamente."}
         </p>
 
         {/* Guided Discussion Box (Structured reflection cues) */}
@@ -157,7 +157,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       )}
       {solo ? (
         <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Perspectivas dos três Guardiões virtuais">
-          <h3 className="text-lg font-bold text-teal-200">Outros olhares para o mesmo dilema</h3>
+          <h3 className="text-lg font-bold text-teal-200">As escolhas dos três Guardiões robôs</h3>
           <p className="text-sm text-slate-300">Cada Guardião fez sua própria escolha.</p>
           {Object.entries(revealedChoices).filter(([pid]) => pid !== myPlayerId && state.players[pid]?.isBot).map(([pid, actionId]) => {
             const guardian = state.players[pid];
