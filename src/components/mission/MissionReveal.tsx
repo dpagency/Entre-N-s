@@ -60,6 +60,43 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
     });
   };
 
+  if (solo) {
+    return (
+      <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto text-slate-100">
+        <section className="rounded-2xl bg-slate-900 border border-slate-700 p-5 space-y-2">
+          <span className="text-xs text-teal-300 font-bold">{mission.title}</span>
+          <h2 className="text-2xl font-black">Cada Guardião fez sua escolha</h2>
+          {chosenAction && <p className="text-sm text-slate-300">Você escolheu: <strong className="text-slate-100">{chosenAction.title}</strong></p>}
+        </section>
+        <section className="space-y-3" aria-label="Decisões dos Guardiões">
+          {Object.entries(revealedChoices).filter(([pid]) => pid !== myPlayerId && state.players[pid]?.isBot).map(([pid, actionId]) => {
+            const guardian = state.players[pid];
+            const action = mission.actions.find(a => a.id === actionId);
+            if (!action) return null;
+            const same = action.id === chosenAction?.id;
+            return <div key={pid} className="rounded-2xl bg-slate-900 border border-slate-700 p-4 flex gap-3 items-start">
+              <CharacterAvatar characterId={guardian.characterId} size="sm" showBadge={false} />
+              <div className="space-y-1 min-w-0">
+                <strong className="text-teal-200">{CHARACTERS[guardian.characterId].name}</strong>
+                <p className="text-sm font-semibold">{action.title}</p>
+                <p data-narration="story" className="text-sm text-slate-300">{same ? '“Eu também seguiria esse caminho.”' : `“Eu seguiria esse caminho. ${guardianQuestion[guardian.characterId]}”`}</p>
+              </div>
+            </div>;
+          })}
+        </section>
+        <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-2">
+          <h3 className="font-bold text-amber-200">💎 Talismãs de Afinidade · {totalTalismans} de 4</h3>
+          <div className="flex flex-wrap gap-2">
+            {companionAffinity && companion && <span className="rounded-lg bg-teal-950 border border-teal-500/40 px-3 py-2 text-sm">💎 {CHARACTERS[companion.characterId].name} · companheiro</span>}
+            {affinityBots.map(bot => <span key={bot.id} className="rounded-lg bg-slate-900 border border-amber-500/30 px-3 py-2 text-sm">💎 {CHARACTERS[bot.characterId].name}</span>)}
+          </div>
+          <p className="text-xs text-slate-400">Afinidade não significa resposta certa.</p>
+        </section>
+        {isHost && <button type="button" onClick={handleStartCollectiveVoting} className="w-full rounded-xl bg-teal-400 text-slate-950 font-black p-4 flex justify-center items-center gap-2">Ver o que aconteceu <ArrowRight className="w-4 h-4" /></button>}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto text-slate-100">
       {/* Top Banner */}
