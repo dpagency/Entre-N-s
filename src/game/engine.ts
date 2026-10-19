@@ -496,7 +496,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       room.chosenCollectiveActionId = selected;
       room.isNonConsensualResult = false;
       room.nonConsensualActionIds = undefined;
-      room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false});
+      room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false, affinityGuardianIds: Object.values(room.players).filter(p => p.isBot && room.individualChoices[p.id] === selected).map(p => p.characterId)});
       if (!room.unlockedDiscoveries.includes(mission.discovery.key)) room.unlockedDiscoveries.push(mission.discovery.key);
       room.phase = mission.tfChallenge ? 'MISSION_TF_CHALLENGE' : 'MISSION_CONSEQUENCE';
       broadcastRoomState(room, 'Sua escolha foi registrada. Vamos conhecer os desdobramentos.', 'success');
