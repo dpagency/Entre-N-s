@@ -218,7 +218,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
       {previewCharacter && (
         <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setPreviewCharacter(null); }}>
-          <section role="dialog" aria-modal="true" aria-labelledby="persona-title" className="w-full max-w-md rounded-3xl border border-teal-500/50 bg-slate-900 p-6 shadow-2xl space-y-4">
+          <section role="dialog" aria-modal="true" aria-labelledby="persona-title" className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-3xl border border-teal-500/50 bg-slate-900 p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4">
             <div className="flex justify-between items-start gap-3">
               <div className="flex items-center gap-4">
                 <CharacterAvatar characterId={previewCharacter} variantIndex={variantIndex} size="lg" showBadge={false} />
