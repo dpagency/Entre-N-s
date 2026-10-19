@@ -77,3 +77,26 @@ test('confirmed solo choice cannot be replaced, even after a guardian power',()=
  assert.equal(room().phase,'MISSION_REVEAL');
  assert.equal(room().individualChoices[humanId],first);
 });
+
+test('affinity talismans match only independent bots and survive snapshot restoration',()=>{
+ fresh(); const c=client();
+ c.send({type:'CREATE_ROOM',nickname:'Teste',characterId:'alex',variantIndex:0});
+ const room=()=>snapshot().rooms[0][1];
+ c.send({type:'START_GAME'});
+ c.send({type:'VOTE_DESTINATION',regionId:'praca'});
+ c.send({type:'CONFIRM_DESTINATION'});
+ c.send({type:'EXPLORE_MISSION'});
+ const mission=MISSIONS.find(m=>m.id===room().activeMissionId)!;
+ const bots=Object.values(room().players).filter(p=>p.isBot);
+ assert.equal(bots.length,3);
+ const matchedChoice=room().individualChoices[bots[0].id] || mission.actions.find(a=>a.actionType==='acolhimento')?.id || mission.actions[0].id;
+ c.send({type:'SUBMIT_INDIVIDUAL_CHOICE',actionId:matchedChoice});
+ c.send({type:'PROCEED_TO_REVEAL'});
+ const expected=bots.filter(p=>room().individualChoices[p.id]===matchedChoice).map(p=>p.characterId).sort();
+ assert.ok(expected.length>=1);
+ c.send({type:'OPEN_COLLECTIVE_VOTE'});
+ assert.deepEqual(room().historyLog[0].affinityGuardianIds?.slice().sort(),expected);
+ const saved=snapshot();
+ restore(saved);
+ assert.deepEqual(snapshot().rooms[0][1].historyLog[0].affinityGuardianIds?.slice().sort(),expected);
+});
