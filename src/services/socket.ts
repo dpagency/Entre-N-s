@@ -22,10 +22,10 @@ class GameSocketService {
   private intentionallyClosed = false;
 
   constructor() {
-    // Restore session credentials from localStorage if present
-    const savedToken = sessionStorage.getItem('guardioes_session_token');
-    const savedRoom = sessionStorage.getItem('guardioes_room_code');
-    const savedPid = sessionStorage.getItem('guardioes_player_id');
+    // Restore session credentials across reloads and browser restarts on this device
+    const savedToken = localStorage.getItem('guardioes_session_token');
+    const savedRoom = localStorage.getItem('guardioes_room_code');
+    const savedPid = localStorage.getItem('guardioes_player_id');
     if (savedToken && savedRoom && savedPid) {
       this.sessionToken = savedToken;
       this.roomCode = savedRoom;
@@ -33,7 +33,7 @@ class GameSocketService {
     }
   }
 
-  private localMode = sessionStorage.getItem('entre-nos-mode') === 'solo';
+  private localMode = localStorage.getItem('entre-nos-mode') === 'solo';
   private pollTimer: ReturnType<typeof setTimeout> | null = null;
   private queue: Promise<void> = Promise.resolve();
   private localConnection = {readyState: 1, send: (data: string) => this.handleServerMessage(JSON.parse(data))};
@@ -41,8 +41,8 @@ class GameSocketService {
   public async connect(): Promise<void> {
     this.intentionallyClosed = false;
     if (this.localMode) {
-      const saved = sessionStorage.getItem('entre-nos-solo');
-      if (saved) {try {engine.restore(JSON.parse(saved));} catch {sessionStorage.removeItem('entre-nos-solo');}}
+      const saved = localStorage.getItem('entre-nos-solo');
+      if (saved) {try {engine.restore(JSON.parse(saved));} catch {localStorage.removeItem('entre-nos-solo');}}
     }
     this.isConnected = true;
     this.notifyConnection(true);
@@ -52,14 +52,14 @@ class GameSocketService {
   public setSoloMode(solo: boolean) {
     this.intentionallyClosed = false;
     this.localMode = solo;
-    sessionStorage.setItem('entre-nos-mode',solo ? 'solo' : 'online');
+    localStorage.setItem('entre-nos-mode',solo ? 'solo' : 'online');
   }
 
   public send(msg: ClientMessage) {
     this.queue = this.queue.then(async () => {
       if (this.localMode) {
         engine.handleClientMessage(this.localConnection,msg);
-        sessionStorage.setItem('entre-nos-solo',JSON.stringify(engine.snapshot()));
+        localStorage.setItem('entre-nos-solo',JSON.stringify(engine.snapshot()));
       } else await this.request(msg);
     }).catch(error => this.errorListeners.forEach(l => l(error.message || 'Falha na conexão')));
   }
@@ -85,9 +85,9 @@ class GameSocketService {
         this.myPlayerId = msg.playerId;
         this.sessionToken = msg.sessionToken;
 
-        sessionStorage.setItem('guardioes_session_token', msg.sessionToken);
-        sessionStorage.setItem('guardioes_room_code', msg.roomCode);
-        sessionStorage.setItem('guardioes_player_id', msg.playerId);
+        localStorage.setItem('guardioes_session_token', msg.sessionToken);
+        localStorage.setItem('guardioes_room_code', msg.roomCode);
+        localStorage.setItem('guardioes_player_id', msg.playerId);
 
         this.stateListeners.forEach((l) => l(msg.state));
         break;
@@ -145,10 +145,10 @@ class GameSocketService {
     else fetch('/api/game',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...credentials,message:{type:'LEAVE_ROOM'}}),keepalive:true}).catch(()=>{});
     this.intentionallyClosed = true;
     if (this.pollTimer) clearTimeout(this.pollTimer);
-    sessionStorage.removeItem('entre-nos-solo');
-    sessionStorage.removeItem('guardioes_session_token');
-    sessionStorage.removeItem('guardioes_room_code');
-    sessionStorage.removeItem('guardioes_player_id');
+    localStorage.removeItem('entre-nos-solo');
+    localStorage.removeItem('guardioes_session_token');
+    localStorage.removeItem('guardioes_room_code');
+    localStorage.removeItem('guardioes_player_id');
     this.roomCode = null;
     this.myPlayerId = null;
     this.sessionToken = null;
