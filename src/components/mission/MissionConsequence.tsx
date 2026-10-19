@@ -16,6 +16,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   myPlayerId,
 }) => {
   const [discoveryOpened, setDiscoveryOpened] = useState(false);
+  const [showReflection, setShowReflection] = useState(false);
   useEffect(() => {
     setDiscoveryOpened(false);
     if (!state.fortuneCards?.[mission.id]) return;
@@ -44,6 +45,31 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
       type: 'PROCEED_AFTER_CONSEQUENCE',
     });
   };
+
+  if (isSolo) {
+    return <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto text-slate-100">
+      <section className="rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-3">
+        <span className="text-xs text-teal-300 font-bold">{mission.title}</span>
+        <h2 className="text-2xl font-black">O que aconteceu?</h2>
+        <p className="text-sm font-semibold text-teal-200">{chosenAction.title}</p>
+        <p data-narration="story" className="text-base leading-relaxed">{chosenAction.consequenceSummary}</p>
+        <button type="button" onClick={() => setShowReflection(v => !v)} className="text-sm text-teal-300 underline underline-offset-4">{showReflection ? 'Ocultar reflexão' : 'Para refletir (opcional)'}</button>
+        {showReflection && <p className="text-sm text-slate-300">{chosenAction.pedagogicalFeedback}</p>}
+      </section>
+      <section className="rounded-2xl border border-amber-500/40 bg-slate-900 p-4 space-y-3">
+        <h3 className="font-bold text-amber-200">Escolha uma carta do destino</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {[0,1,2].map(index => <button key={index} type="button" disabled={!!fortune || !isHost} onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD',cardIndex:index})} className={`min-h-24 rounded-xl border-2 p-2 flex flex-col items-center justify-center gap-2 ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/40 bg-teal-950'}`}>
+            <span className="text-3xl">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
+            <span className="text-xs">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index+1}`}</span>
+          </button>)}
+        </div>
+        {fortune && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
+      </section>
+      {fortune && <section className="rounded-xl bg-slate-900 border border-slate-700 p-4"><p className="text-sm text-amber-200 font-bold">Descoberta: {mission.discovery.title}</p></section>}
+      <button type="button" disabled={!fortune} onClick={handleProceed} className="w-full rounded-xl bg-teal-400 text-slate-950 font-black p-4 disabled:opacity-40">{!fortune ? 'Vire uma carta para continuar' : isLastMission ? 'Ver resumo e medalha' : 'Próxima missão →'}</button>
+    </div>;
+  }
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto text-slate-100 animate-in fade-in">
