@@ -86,7 +86,7 @@ export const TownMap: React.FC<TownMapProps> = ({
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
             {isVoting
-              ? (isSolo ? 'Escolha a próxima região para explorar.' : 'Deliberação Coletiva: Votem no próximo destino de atuação do grupo.')
+              ? (isSolo ? 'As regiões concluídas ficam marcadas. Escolha uma região disponível.' : 'Deliberação Coletiva: Votem no próximo destino de atuação do grupo.')
               : `Local Atual: ${currentRegion.name} (${currentRegion.subtitle})`}
           </p>
         </div>
@@ -228,6 +228,7 @@ export const TownMap: React.FC<TownMapProps> = ({
         {/* Interactive Region Cards placed over SVG coordinates */}
         {REGION_LIST.map((region) => {
           const isCurrent = state.currentRegionId === region.id;
+          const isCompleted = isSolo && completedRegions.has(region.id);
           const votes = voteCounts[region.id];
           const hasVotedForThis = myVote === region.id;
           const missionsInRegion = isSolo ? MISSIONS.filter((m) => m.regionId === region.id).slice(0, 1) : MISSIONS.filter((m) => m.regionId === region.id);
@@ -261,7 +262,9 @@ export const TownMap: React.FC<TownMapProps> = ({
                   {getIcon(region.iconName)}
                 </div>
 
-                {isCurrent && (
+                {isCompleted ? (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-700 text-white flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Feita</span>
+                ) : isCurrent && (
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 flex items-center gap-1 shadow">
                     <Navigation className="w-2.5 h-2.5 fill-current" />
                     Aqui
@@ -299,7 +302,7 @@ export const TownMap: React.FC<TownMapProps> = ({
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
                     }`}
                   >
-                    {hasVotedForThis ? 'Selecionada ✓' : isSolo ? 'Explorar região' : 'Votar Aqui'}
+                    {isCompleted ? 'Missão concluída ✓' : hasVotedForThis ? 'Selecionada ✓' : isSolo ? 'Explorar região' : 'Votar Aqui'}
                   </span>
                 </div>
               )}
