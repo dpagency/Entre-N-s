@@ -52,7 +52,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
         <section className="w-full max-w-xl mx-auto rounded-3xl border border-teal-500/40 bg-slate-900 p-5 sm:p-8 space-y-5 text-center">
           <h1 className="text-2xl sm:text-3xl font-black">Sua jornada na Vila dos Encontros</h1>
           <p className="text-base text-slate-200">Você viverá quatro missões, acompanhado pelo Guardião que escolheu. Os outros três serão jogadores robôs e escolherão suas próprias alternativas. As decisões serão sempre suas.</p>
-          <div className="flex flex-col items-center gap-2"><CharacterAvatar characterId={myPlayer?.characterId || 'alex'} variantIndex={myPlayer?.variantIndex || 0} size="xl"/><p className="font-bold text-lg">{myPlayer?.nickname || 'Jogador'}</p><p className="text-sm text-teal-300">Seu Guardião está pronto para acompanhar você</p></div>
+          <p className="text-sm text-teal-300">Guardião acompanhante: <strong>{CHARACTERS[myPlayer?.characterId || 'alex'].name}</strong>. Você decide os caminhos da jornada.</p>
           <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
           {onOpenRules && <button type="button" onClick={onOpenRules} className="text-sm text-teal-300 underline">Como jogar</button>}
         </section>
