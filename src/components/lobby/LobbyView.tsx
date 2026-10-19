@@ -63,7 +63,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
               <p className="text-sm text-slate-300 mt-1">{CHARACTERS[myPlayer?.characterId || 'alex'].powerDescription}</p>
             </div>
           </div>
-          {onReturnToSelection && <button type="button" onClick={onReturnToSelection} className="w-full min-h-11 rounded-xl border border-teal-500/50 text-teal-200 font-bold p-3 hover:bg-teal-950/40">← Voltar e escolher outro Guardião</button>}
+          {onReturnToSelection && <button type="button" onClick={onReturnToSelection} className="w-full min-h-11 rounded-xl border border-teal-500/50 text-teal-200 font-bold p-3 hover:bg-teal-950/40">← Voltar à apresentação dos Guardiões</button>}
           <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
           {onOpenRules && <button type="button" onClick={onOpenRules} className="text-sm text-teal-300 underline">Como jogar</button>}
         </section>
