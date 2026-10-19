@@ -23,6 +23,19 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
   const solo = Object.values(state.players).some(p => p.isBot);
   const chosenAction = mission.actions.find(a => a.id === revealedChoices[myPlayerId]);
   const affinityBots = Object.values(state.players).filter(p => p.isBot && chosenAction && revealedChoices[p.id] === chosenAction.id);
+  const companion = state.players[myPlayerId];
+  const companionPriorities: Record<string, string[]> = {
+    alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
+    joana: ['acolhimento', 'dialogo', 'orientacao', 'cautela', 'formalizacao'],
+    ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
+    bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
+  };
+  const companionPreference = companion && mission.actions.slice().sort((a, b) =>
+    (companionPriorities[companion.characterId]?.indexOf(a.actionType) ?? 9) -
+    (companionPriorities[companion.characterId]?.indexOf(b.actionType) ?? 9)
+  )[0];
+  const companionAffinity = Boolean(chosenAction && companionPreference?.id === chosenAction.id);
+  const totalTalismans = affinityBots.length + (companionAffinity ? 1 : 0);
   const guardianQuestion: Record<string, string> = {
     alex: 'Como sua decisão dialoga com os princípios e responsabilidades envolvidos?',
     joana: 'Como as pessoas afetadas poderão ser ouvidas e acolhidas nesse caminho?',
@@ -120,9 +133,11 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       {solo && chosenAction && (
         <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-2" aria-label="Talismãs de Afinidade">
           <h3 className="font-bold text-amber-200">Talismãs de Afinidade</h3>
-          {affinityBots.length ? <div className="flex flex-wrap gap-2">
+          <p className="text-sm font-semibold text-amber-100">{totalTalismans} de 4 talismãs possíveis nesta missão</p>
+          {totalTalismans > 0 ? <div className="flex flex-wrap gap-2">
+            {companionAffinity && companion && <span className="rounded-xl bg-teal-950/60 border border-teal-500/50 px-3 py-2 text-sm text-teal-100">💎 {CHARACTERS[companion.characterId].name} · seu companheiro</span>}
             {affinityBots.map(bot => <span key={bot.id} className="rounded-xl bg-slate-900 border border-amber-500/30 px-3 py-2 text-sm text-amber-100">💎 {CHARACTERS[bot.characterId].name}</span>)}
-          </div> : <p className="text-sm text-slate-300">Nesta missão, você seguiu um caminho diferente dos três Guardiões.</p>}
+          </div> : <p className="text-sm text-slate-300">Nesta missão, suas escolhas foram diferentes das dos quatro Guardiões.</p>}
           <p className="text-xs text-slate-300">Afinidade indica uma escolha em comum, não uma resposta certa.</p>
         </section>
       )}
