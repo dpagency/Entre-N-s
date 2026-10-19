@@ -22,8 +22,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
   const isHost = state.hostId === myPlayerId;
   const myPlayer = state.players[myPlayerId];
   const myChoice = state.myChoice;
-  const [pendingChoice, setPendingChoice] = useState<string | null>(null);
-  const selectedChoice = myChoice || pendingChoice;
+  const selectedChoice = myChoice;
 
   // Active connected players count
   const activePlayers = Object.values(state.players).filter((p) => p.isConnected);
@@ -32,12 +31,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
   const isSolo = activePlayers.some(p => p.isBot);
 
   const handleSelectAction = (actionId: string) => {
-    if (!myChoice) setPendingChoice(actionId);
-  };
-
-  const handleConfirmChoice = () => {
-    if (!pendingChoice || myChoice) return;
-    socketService.send({ type: 'SUBMIT_INDIVIDUAL_CHOICE', actionId: pendingChoice });
+    if (!myChoice) socketService.send({ type: 'SUBMIT_INDIVIDUAL_CHOICE', actionId });
   };
 
   const handleProceedToReveal = () => {
@@ -87,7 +81,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           Como você atuaria diante desta situação?
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
-          Escolha como deseja agir. Selecione uma alternativa e confirme sua decisão. Depois de confirmada, ela não poderá ser alterada nesta partida.
+          Toque na alternativa que representa sua decisão. Sua escolha será registrada e você poderá conhecer as escolhas dos Guardiões.
         </p>
 
         {state.isRaviSecondRoundActive && (
@@ -157,18 +151,6 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         })}
       </div>
 
-      {/* Confirm the human player\u0027s selected action before showing guardian perspectives. */}
-      {selectedChoice && (() => {
-        const selected = mission.actions.find(action => action.id === selectedChoice);
-        if (!selected) return null;
-        return <section aria-live="polite" className="rounded-2xl border-2 border-emerald-400 bg-emerald-950/30 p-4 sm:p-5 space-y-2">
-          <h3 className="text-base font-bold text-emerald-200">{myChoice ? 'Decisão confirmada nesta missão' : 'Sua decisão antes da confirmação'}</h3>
-          <p className="font-semibold text-slate-100">{selected.title}</p>
-          <p className="text-sm text-slate-200">{selected.description}</p>
-          <p className="text-xs text-emerald-200">{myChoice ? 'Sua escolha está registrada e não pode ser alterada nesta partida.' : 'Confira sua escolha. Ao confirmar, você seguirá com as consequências dessa decisão.'}</p>
-        </section>;
-      })()}
-
       {/* Bottom status and control */}
       <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
@@ -178,17 +160,12 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
-              {pendingChoice ? 'Confira a alternativa selecionada e confirme sua decisão.' : 'Selecione uma das cartas para considerar seu posicionamento.'}
+              'Toque em uma das alternativas para registrar sua decisão.'
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          {!myChoice && pendingChoice && (
-            <button onClick={handleConfirmChoice} className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm">
-              Confirmar decisão definitiva
-            </button>
-          )}
           {/* Host or team reveal button */}
           {(isHost || choicesSubmittedCount >= totalActive) && (
             <button
