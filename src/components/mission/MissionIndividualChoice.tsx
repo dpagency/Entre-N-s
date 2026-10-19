@@ -4,6 +4,7 @@ import { ActionCard } from '../cards/CardView';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { PowerButton } from '../characters/PowerButton';
 import { socketService } from '../../services/socket';
+import { CHARACTERS } from '../../data/characters';
 import { Lock, Eye, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 
 interface MissionIndividualChoiceProps {
@@ -23,6 +24,23 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
   const myPlayer = state.players[myPlayerId];
   const myChoice = state.myChoice;
   const selectedChoice = myChoice;
+  const companionPriorities: Record<string, string[]> = {
+    alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
+    joana: ['acolhimento', 'dialogo', 'orientacao', 'cautela', 'formalizacao'],
+    ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
+    bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
+  };
+  const companionChoice = myPlayer && mission.actions.slice().sort((a, b) =>
+    (companionPriorities[myPlayer.characterId]?.indexOf(a.actionType) ?? 9) -
+    (companionPriorities[myPlayer.characterId]?.indexOf(b.actionType) ?? 9)
+  )[0];
+  const companionDiffers = Boolean(myChoice && companionChoice && companionChoice.id !== myChoice);
+  const companionPrompts: Record<string, string> = {
+    alex: 'Como esse caminho protege os princípios envolvidos?',
+    joana: 'Quem ainda precisa ser ouvido?',
+    ravi: 'Que consequência merece atenção?',
+    bia: 'O que essa escolha exige de nós?',
+  };
 
   // Active connected players count
   const activePlayers = Object.values(state.players).filter((p) => p.isConnected);
@@ -151,6 +169,23 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         })}
       </div>
 
+      {isSolo && myChoice && myPlayer && companionChoice && (
+        <section className="rounded-2xl border border-teal-500/40 bg-teal-950/20 p-4 space-y-2" aria-label="Seu Guardião companheiro">
+          <div className="flex items-center gap-3">
+            <CharacterAvatar characterId={myPlayer.characterId} variantIndex={myPlayer.variantIndex} size="sm" />
+            <strong className="text-teal-200 text-sm">{CHARACTERS[myPlayer.characterId].name} · seu companheiro</strong>
+          </div>
+          {companionDiffers ? (
+            <p data-narration="story" className="text-sm text-slate-200">
+              “Eu teria seguido outro caminho: {companionChoice.title.toLocaleLowerCase('pt-BR')}. {companionPrompts[myPlayer.characterId]}”
+            </p>
+          ) : (
+            <p className="text-sm text-slate-300">Seu Guardião também seguiria esse caminho.</p>
+          )}
+          <p className="text-xs text-slate-400">Sua decisão permanece registrada. O Guardião oferece outro olhar, não uma correção.</p>
+        </section>
+      )}
+
       {/* Bottom status and control */}
       <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
@@ -160,7 +195,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
-              'Toque em uma das alternativas para registrar sua decisão.'
+              Toque em uma das alternativas para registrar sua decisão.
             </span>
           )}
         </div>
