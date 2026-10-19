@@ -34,9 +34,18 @@ class GameSocketService {
     }
     // This pilot is solo-only. A previously saved online waiting room must not
     // override the solo welcome screen after an upgrade. Preserve solo snapshots.
-    const previousMode = localStorage.getItem('entre-nos-mode');
     const previousRoom = localStorage.getItem('guardioes_room_code');
-    if (previousMode !== 'solo' && previousRoom && !previousRoom.startsWith('SOLO-')) {
+    const previousToken = localStorage.getItem('guardioes_session_token');
+    let savedSoloContainsSession = false;
+    try {
+      const savedSolo = JSON.parse(localStorage.getItem('entre-nos-solo') || 'null');
+      savedSoloContainsSession = !!previousRoom && !!previousToken
+        && Array.isArray(savedSolo?.rooms)
+        && savedSolo.rooms.some(([code]: [string, unknown]) => code === previousRoom)
+        && Array.isArray(savedSolo?.tokens)
+        && savedSolo.tokens.some(([token]: [string, unknown]) => token === previousToken);
+    } catch { /* A malformed snapshot must not retain stale online credentials. */ }
+    if (previousRoom && !savedSoloContainsSession) {
       localStorage.removeItem('guardioes_session_token');
       localStorage.removeItem('guardioes_room_code');
       localStorage.removeItem('guardioes_player_id');
