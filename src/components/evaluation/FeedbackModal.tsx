@@ -55,6 +55,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     </div>
   );
 
+  if (!isOpen) return null;
+
   return (
     <div
       role="dialog"
