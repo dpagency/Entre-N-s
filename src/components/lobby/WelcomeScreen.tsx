@@ -32,7 +32,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     e.preventDefault();
     setStarting(true);
     window.setTimeout(() => setStarting(false), 4500);
-    const cleanNick = nickname.trim() || 'Guardião';
+    const cleanNick = nickname.trim() || 'Jogador';
     localStorage.setItem('guardioes_nickname', cleanNick);
     localStorage.setItem('guardioes_character', characterId);
     localStorage.setItem('guardioes_variant', String(variantIndex));
@@ -78,7 +78,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
       {/* Main interaction card */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
-        <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Você participa como você mesmo. Escolha um Guardião para acompanhar suas decisões; os outros três oferecerão perspectivas diferentes ao longo da jornada.</p>
+        <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Você joga como você mesmo. Escolha um Guardião para aconselhar você; os outros três serão jogadores robôs e farão suas próprias escolhas.</p>
         <form onSubmit={handleStartJourney} className="space-y-2">
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
@@ -93,7 +93,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               maxLength={16}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="Ex: Guardião, Lua, Sol..."
+              placeholder="Ex.: Lua, Sol, Visitante..."
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
