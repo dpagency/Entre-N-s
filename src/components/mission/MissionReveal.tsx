@@ -148,7 +148,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       {solo ? (
         <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Perspectivas dos três Guardiões virtuais">
           <h3 className="text-lg font-bold text-teal-200">Outros olhares para o mesmo dilema</h3>
-          <p className="text-sm text-slate-300">Três perspectivas independentes, sem votação ou resposta vencedora.</p>
+          <p className="text-sm text-slate-300">Cada Guardião fez sua própria escolha.</p>
           {Object.entries(revealedChoices).filter(([pid]) => pid !== myPlayerId && state.players[pid]?.isBot).map(([pid, actionId]) => {
             const guardian = state.players[pid];
             const action = mission.actions.find(a => a.id === actionId);
@@ -158,7 +158,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
               <div className="min-w-0 space-y-1">
                 <h4 className="font-bold text-base text-amber-200">{CHARACTERS[guardian.characterId]?.name}</h4>
                 <p className="text-base font-semibold">{action.title}</p>
-                <p className="text-sm text-slate-300 leading-relaxed">{action.description}</p>
+
                 {chosenAction && (
                   <p data-narration="story" className="mt-3 rounded-xl border border-teal-700/50 bg-teal-950/40 p-3 text-sm text-teal-100" aria-label={`Reflexão de ${CHARACTERS[guardian.characterId]?.name}`}>
                     {action.id === chosenAction.id ? '“Eu também consideraria esse caminho. ' : `“Eu consideraria ${action.title.toLocaleLowerCase('pt-BR')}. `}{guardianQuestion[guardian.characterId]}”
