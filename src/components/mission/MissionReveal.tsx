@@ -20,22 +20,9 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
   const [showPerspectives, setShowPerspectives] = useState(false);
   const isHost = state.hostId === myPlayerId;
   const revealedChoices: Record<string, string> = state.revealedIndividualChoices || {};
-  const myGuardian = state.players[myPlayerId];
   const solo = Object.values(state.players).some(p => p.isBot);
   const chosenAction = mission.actions.find(a => a.id === revealedChoices[myPlayerId]);
   const affinityBots = Object.values(state.players).filter(p => p.isBot && chosenAction && revealedChoices[p.id] === chosenAction.id);
-  // Preferências dos arquétipos: não representam respostas certas.
-  const priorities: Record<string, string[]> = {
-    alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
-    joana: ['acolhimento', 'dialogo', 'orientacao', 'cautela', 'formalizacao'],
-    ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
-    bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
-  };
-  const guardianPreference = myGuardian && mission.actions.slice().sort((a, b) =>
-    (priorities[myGuardian.characterId]?.indexOf(a.actionType) ?? 9) -
-    (priorities[myGuardian.characterId]?.indexOf(b.actionType) ?? 9)
-  )[0];
-  const showCompanionReflection = Boolean(solo && chosenAction && guardianPreference);
   const guardianQuestion: Record<string, string> = {
     alex: 'Como sua decisão dialoga com os princípios e responsabilidades envolvidos?',
     joana: 'Como as pessoas afetadas poderão ser ouvidas e acolhidas nesse caminho?',
@@ -129,22 +116,6 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
       )}
 
       {solo && chosenAction && <section className="rounded-2xl border border-teal-500/50 bg-teal-950/25 p-5"><h3 className="text-lg font-bold text-teal-200">Sua decisão</h3><p className="font-semibold mt-2">{chosenAction.title}</p><p className="text-sm text-slate-300 mt-1">{chosenAction.description}</p></section>}
-
-      {showCompanionReflection && myGuardian && guardianPreference && chosenAction && (
-        <section className="rounded-3xl border border-teal-500/40 bg-teal-950/30 p-5 sm:p-6 space-y-3" aria-label="Reflexão do seu Guardião">
-          <div className="flex items-center gap-3">
-            <CharacterAvatar characterId={myGuardian.characterId} variantIndex={myGuardian.variantIndex} size="md" />
-            <div>
-              <h3 className="font-black text-lg text-teal-200">{CHARACTERS[myGuardian.characterId].name} compartilha um pensamento</h3>
-              <p className="text-sm text-slate-300">{CHARACTERS[myGuardian.characterId].title}</p>
-            </div>
-          </div>
-          <p data-narration="story" className="text-base leading-relaxed text-slate-100">
-            {guardianPreference.id === chosenAction.id ? '“Eu também consideraria esse caminho. ' : `“Eu teria considerado ${guardianPreference.title.toLocaleLowerCase('pt-BR')}. `}{guardianQuestion[myGuardian.characterId]}”
-          </p>
-
-        </section>
-      )}
 
       {solo && chosenAction && (
         <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-2" aria-label="Talismãs de Afinidade">
