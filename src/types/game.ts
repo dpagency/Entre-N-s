@@ -202,6 +202,7 @@ export interface RoomState {
     voteType: 'unanimous' | 'majority' | 'non_consensual';
     perspectivesExploredCount: number;
     reconsiderationOccurred: boolean;
+    affinityGuardianIds?: CharacterId[];
   }[];
 }
 
