@@ -22,6 +22,16 @@ class GameSocketService {
   private intentionallyClosed = false;
 
   constructor() {
+    // Migrate an unfinished journey from the previous tab-scoped storage.
+    // Never overwrite an existing persistent journey with stale session data.
+    const keys = ['entre-nos-mode', 'entre-nos-solo', 'guardioes_session_token', 'guardioes_room_code', 'guardioes_player_id'];
+    for (const key of keys) {
+      const previous = sessionStorage.getItem(key);
+      if (previous !== null && localStorage.getItem(key) === null) {
+        localStorage.setItem(key, previous);
+      }
+      sessionStorage.removeItem(key);
+    }
     // Restore session credentials across reloads and browser restarts on this device
     const savedToken = localStorage.getItem('guardioes_session_token');
     const savedRoom = localStorage.getItem('guardioes_room_code');
