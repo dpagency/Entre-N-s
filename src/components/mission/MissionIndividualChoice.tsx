@@ -173,18 +173,6 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         })}
       </div>
 
-      {/* Confirm the human player\u0027s selected action before showing guardian perspectives. */}
-      {selectedChoice && (() => {
-        const selected = mission.actions.find(action => action.id === selectedChoice);
-        if (!selected) return null;
-        return <section aria-live="polite" className="rounded-2xl border-2 border-emerald-400 bg-emerald-950/30 p-4 sm:p-5 space-y-2">
-          <h3 className="text-base font-bold text-emerald-200">{myChoice ? 'Decisão confirmada nesta missão' : 'Sua decisão antes da confirmação'}</h3>
-          <p className="font-semibold text-slate-100">{selected.title}</p>
-          <p className="text-sm text-slate-200">{selected.description}</p>
-          <p className="text-xs text-emerald-200">{myChoice ? 'Sua escolha está registrada e não pode ser alterada nesta partida.' : 'Confira sua escolha. Ao confirmar, você seguirá com as consequências dessa decisão.'}</p>
-        </section>;
-      })()}
-
       {/* Bottom status and control */}
       <div className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs sm:text-sm text-slate-300">
@@ -194,7 +182,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
-              {pendingChoice ? 'Confira a alternativa selecionada e confirme sua decisão.' : 'Selecione uma das cartas para considerar seu posicionamento.'}
+              {pendingChoice ? 'Alternativa selecionada. Confirme para continuar.' : 'Selecione uma das cartas para considerar seu posicionamento.'}
             </span>
           )}
         </div>
@@ -202,11 +190,11 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           {!myChoice && pendingChoice && (
             <button onClick={handleConfirmChoice} className="w-full sm:w-auto min-h-11 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm">
-              Confirmar decisão definitiva
+              Confirmar minha decisão
             </button>
           )}
           {/* Host or team reveal button */}
-          {(isHost || choicesSubmittedCount >= totalActive) && (
+          {Boolean(myChoice) && (isHost || choicesSubmittedCount >= totalActive) && (
             <button
               onClick={handleProceedToReveal}
               disabled={isSolo ? !myChoice : choicesSubmittedCount === 0}
