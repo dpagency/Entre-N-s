@@ -32,6 +32,7 @@ class GameSocketService {
       }
       sessionStorage.removeItem(key);
     }
+    this.localMode = localStorage.getItem('entre-nos-mode') === 'solo';
     // Restore session credentials across reloads and browser restarts on this device
     const savedToken = localStorage.getItem('guardioes_session_token');
     const savedRoom = localStorage.getItem('guardioes_room_code');
@@ -43,7 +44,7 @@ class GameSocketService {
     }
   }
 
-  private localMode = localStorage.getItem('entre-nos-mode') === 'solo';
+  private localMode = false;
   private pollTimer: ReturnType<typeof setTimeout> | null = null;
   private queue: Promise<void> = Promise.resolve();
   private localConnection = {readyState: 1, send: (data: string) => this.handleServerMessage(JSON.parse(data))};
