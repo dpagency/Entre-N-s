@@ -9,9 +9,10 @@ interface LobbyViewProps {
   state: RoomState;
   myPlayerId: string;
   onOpenRules?: () => void;
+  onBackToGuardianSelection?: () => void;
 }
 
-export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenRules }) => {
+export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenRules, onBackToGuardianSelection }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -54,6 +55,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
           <p className="text-base text-slate-200">Você viverá quatro missões, acompanhado pelo Guardião que escolheu. Os outros três serão jogadores robôs e escolherão suas próprias alternativas. As decisões serão sempre suas.</p>
           <p className="text-sm text-teal-300">Guardião acompanhante: <strong>{CHARACTERS[myPlayer?.characterId || 'alex'].name}</strong>. Você decide os caminhos da jornada.</p>
           <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
+          {onBackToGuardianSelection && <button type="button" onClick={onBackToGuardianSelection} className="w-full min-h-11 rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-slate-100">← Voltar à escolha do Guardião</button>}
           {onOpenRules && <button type="button" onClick={onOpenRules} className="text-sm text-teal-300 underline">Como jogar</button>}
         </section>
       ) : <>
