@@ -193,6 +193,11 @@ export default function App() {
                 state={state as any}
                 myPlayerId={myPlayerId}
                 onOpenRules={() => setIsRulesOpen(true)}
+                onBackToGuardianSelection={() => {
+                  socketService.leaveRoom();
+                  setState(null);
+                  setMyPlayerId(null);
+                }}
               />
             )}
 
