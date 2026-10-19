@@ -197,7 +197,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
             >
               <Eye className="w-4 h-4" />
-              <span>Conhecer as perspectivas dos Guardiões</span>
+              <span>Revelar as escolhas dos três Guardiões</span>
             </button>
           )}
 
