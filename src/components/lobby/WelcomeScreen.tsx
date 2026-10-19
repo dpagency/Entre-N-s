@@ -78,7 +78,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
       {/* Main interaction card */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
-        <p className="rounded-xl bg-teal-950/50 border border-teal-500/30 p-3 text-sm text-teal-200">Você joga como você mesmo. Escolha um Guardião para aconselhar você; os outros três serão jogadores robôs e farão suas próprias escolhas.</p>
+        <div className="rounded-xl bg-teal-950/40 border border-teal-500/30 px-4 py-3 space-y-1"><h2 className="text-base font-bold text-teal-200">Sua jornada começa aqui!</h2><p className="text-sm leading-relaxed text-slate-200">Escolha um Guardião para acompanhar você pelos desafios da Vila dos Encontros. Cada escolha revela novos caminhos e afinidades.</p></div>
         <form onSubmit={handleStartJourney} className="space-y-2">
           {/* Nickname input (no real name required) */}
           <div className="space-y-1.5">
