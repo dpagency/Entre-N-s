@@ -23,6 +23,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
   const myGuardian = state.players[myPlayerId];
   const solo = Object.values(state.players).some(p => p.isBot);
   const chosenAction = mission.actions.find(a => a.id === revealedChoices[myPlayerId]);
+  const affinityBots = Object.values(state.players).filter(p => p.isBot && chosenAction && revealedChoices[p.id] === chosenAction.id);
   // Preferências dos arquétipos: não representam respostas certas.
   const priorities: Record<string, string[]> = {
     alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
@@ -145,6 +146,15 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
         </section>
       )}
 
+      {solo && chosenAction && (
+        <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-2" aria-label="Talismãs de Afinidade">
+          <h3 className="font-bold text-amber-200">Talismãs de Afinidade</h3>
+          {affinityBots.length ? <div className="flex flex-wrap gap-2">
+            {affinityBots.map(bot => <span key={bot.id} className="rounded-xl bg-slate-900 border border-amber-500/30 px-3 py-2 text-sm text-amber-100">💎 {CHARACTERS[bot.characterId].name}</span>)}
+          </div> : <p className="text-sm text-slate-300">Nesta missão, você seguiu um caminho diferente dos três Guardiões.</p>}
+          <p className="text-xs text-slate-300">Afinidade indica uma escolha em comum, não uma resposta certa.</p>
+        </section>
+      )}
       {solo ? (
         <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Perspectivas dos três Guardiões virtuais">
           <h3 className="text-lg font-bold text-teal-200">Outros olhares para o mesmo dilema</h3>
