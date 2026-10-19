@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MissionDef, RoomState } from '../../types/game';
 import { PerspectiveCard } from '../cards/CardView';
 import { REGIONS } from '../../data/regions';
@@ -18,6 +18,8 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
 }) => {
   const isSolo = Object.values(state.players).some(player => player.isBot);
   const region = REGIONS[mission.regionId];
+  const [openActorId, setOpenActorId] = useState<string | null>(null);
+  const [showExtra, setShowExtra] = useState(false);
 
   // Perspectives visible to me: either shared with group or assigned privately to me
   const myPlayer = state.players[myPlayerId];
@@ -42,6 +44,43 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
       type: 'EXPLORE_MISSION'
     });
   };
+
+  // Piloto da reunião: o fato primeiro, vozes sob demanda e decisão imediata.
+  if (isSolo && mission.id === 'missao-1') {
+    return (
+      <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto text-slate-100">
+        <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-7 space-y-4">
+          <span className="text-xs font-bold uppercase tracking-wider text-teal-300">{region.name} · {mission.code}</span>
+          <h1 className="text-2xl font-black">{mission.title}</h1>
+          <div data-narration="story" className="rounded-2xl bg-slate-950/70 border border-slate-800 p-4 text-base leading-relaxed">
+            A reunião está terminando. A equipe discutiu mudanças no atendimento aos cidadãos, mas Lucas, recém-chegado e experiente no assunto, permaneceu em silêncio. A ata ainda não foi finalizada.
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold">O que eles estão pensando?</h2>
+            <p className="text-sm text-slate-400">Toque em quem quiser ouvir. Você também pode decidir agora.</p>
+            {mission.perspectives.map(perspective => (
+              <div key={perspective.id} className="rounded-xl border border-slate-700 bg-slate-950/50 overflow-hidden">
+                <button type="button" aria-expanded={openActorId === perspective.id} onClick={() => setOpenActorId(openActorId === perspective.id ? null : perspective.id)} className="w-full p-3 flex items-center gap-3 text-left hover:bg-slate-800/70">
+                  <span className="text-2xl" aria-hidden="true">{perspective.actorAvatar}</span>
+                  <span className="flex-1"><strong className="block text-sm">{perspective.actorName}</strong><span className="block text-xs text-slate-400">{perspective.actorRole}</span></span>
+                  <span className="text-teal-300 text-xs">{openActorId === perspective.id ? 'Fechar' : 'Ouvir'}</span>
+                </button>
+                {openActorId === perspective.id && <p data-narration="story" className="px-4 pb-4 text-sm italic text-slate-200">{perspective.details}</p>}
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={handleProceedToExplore} className="w-full rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black px-5 py-3 flex justify-center items-center gap-2">
+            O que você faria? <ArrowRight className="w-4 h-4" />
+          </button>
+          <button type="button" aria-expanded={showExtra} onClick={() => setShowExtra(!showExtra)} className="w-full text-sm text-slate-400 underline underline-offset-4">{showExtra ? 'Ocultar informações adicionais' : 'Saber mais (opcional)'}</button>
+          {showExtra && <div className="rounded-xl bg-slate-950/60 p-4 text-sm text-slate-300 space-y-3">
+            <p>{mission.situation.institutionalNote}</p>
+            <ul className="list-disc pl-5 space-y-1">{mission.situation.knownFacts.map((fact,i) => <li key={i}>{fact}</li>)}</ul>
+          </div>}
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto text-slate-100">
