@@ -237,8 +237,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <p className="text-xs text-slate-400">A persona amplia o olhar, mas não determina a resposta ética.</p>
             </div>
             <div className="flex gap-3">
-              <button type="button" onClick={() => setPreviewCharacter(null)} className="flex-1 rounded-xl border border-slate-600 p-3">Voltar</button>
-              <button type="button" autoFocus onClick={() => confirmCharacter(previewCharacter)} className="flex-1 rounded-xl bg-teal-400 text-slate-950 font-bold p-3">Escolher personagem</button>
+              <button type="button" onClick={() => setPreviewCharacter(null)} className="flex-1 rounded-xl border border-slate-600 p-3">Voltar aos Guardiões</button>
+              <button type="button" autoFocus onClick={() => confirmCharacter(previewCharacter)} className="flex-1 rounded-xl bg-teal-400 text-slate-950 font-bold p-3">{characterId === previewCharacter ? `Continuar com ${CHARACTERS[previewCharacter].name}` : `Escolher ${CHARACTERS[previewCharacter].name}`}</button>
             </div>
           </section>
         </div>
