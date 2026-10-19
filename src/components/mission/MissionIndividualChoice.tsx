@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MissionDef, SanitizedRoomState } from '../../types/game';
 import { ActionCard } from '../cards/CardView';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
@@ -96,10 +96,10 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         </div>
 
         <h2 className="text-xl sm:text-2xl font-black text-slate-100 mt-1">
-          Como você atuaria diante desta situação?
+          O que você faria?
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
-          Toque na alternativa que representa sua decisão. Sua escolha será registrada e você poderá conhecer as escolhas dos Guardiões.
+          Escolha como agir. Os outros Guardiões também tomarão suas próprias decisões.
         </p>
 
         {state.isRaviSecondRoundActive && (
@@ -110,18 +110,6 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           </section>
         )}
 
-        {state.sharedPerspectiveIds.length > 0 && (
-          <section className="mt-4 p-4 rounded-2xl border border-amber-500/40 bg-amber-950/20 space-y-3" aria-label="Perspectivas reveladas">
-            <h3 className="font-bold text-lg text-amber-200">Perspectivas reveladas</h3>
-            <p className="text-sm text-slate-300">Estas informações ajudam a refletir; não alteram sua decisão automaticamente.</p>
-            {mission.perspectives.filter(p => state.sharedPerspectiveIds.includes(p.id)).map(p => (
-              <div key={p.id} className="rounded-xl bg-slate-950/70 p-3 border border-slate-700">
-                <strong className="text-teal-200">{p.actorName} — {p.actorRole}</strong>
-                <p className="mt-1 text-sm leading-relaxed text-slate-200">{p.details}</p>
-              </div>
-            ))}
-          </section>
-        )}
         {/* Unlocked contexts or future preview banner if Joana or Alex used power */}
         {state.futureLooks.length > 0 && (
           <div className="mt-4 p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/40 text-xs text-blue-200 space-y-1">
@@ -191,7 +179,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         <div className="text-xs sm:text-sm text-slate-300">
           {myChoice ? (
             <span className="text-emerald-300 font-medium">
-              Sua decisão está confirmada. Agora conheça outros olhares, sem alterar o caminho escolhido.
+              Sua decisão foi registrada.
             </span>
           ) : (
             <span className="text-amber-300 font-medium">
@@ -209,7 +197,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
             >
               <Eye className="w-4 h-4" />
-              <span>Revelar as escolhas dos três Guardiões</span>
+              <span>Ver como os Guardiões decidiram</span>
             </button>
           )}
 
