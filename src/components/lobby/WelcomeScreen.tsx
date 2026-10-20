@@ -17,6 +17,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onOpenOrganizer,
 }) => {
   const [starting, setStarting] = useState(false);
+  const [savedJourney, setSavedJourney] = useState(() => socketService.hasSavedJourney());
   const [nickname, setNickname] = useState(
     localStorage.getItem('guardioes_nickname') || ''
   );
@@ -37,6 +38,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
   const handleStartJourney = (e: React.FormEvent) => {
     e.preventDefault();
+    socketService.discardSavedJourney();
+    setSavedJourney(false);
     setStarting(true);
     window.setTimeout(() => setStarting(false), 4500);
     const cleanNick = nickname.trim() || 'Jogador';
@@ -83,8 +86,16 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </p>
       </div>
 
+      {savedJourney && (
+        <section className="w-full rounded-2xl border border-amber-400/60 bg-amber-950/25 p-4 space-y-3" aria-label="Jornada salva">
+          <h2 className="text-lg font-bold text-amber-200">Você tem uma jornada em andamento</h2>
+          <p className="text-sm text-slate-200">Quer continuar de onde parou ou começar uma nova jornada?</p>
+          <button type="button" onClick={() => socketService.resumeSavedJourney()} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3">Continuar minha jornada</button>
+          <button type="button" onClick={() => { if (window.confirm('Começar uma nova jornada? O progresso salvo neste endereço será substituído.')) { socketService.discardSavedJourney(); setSavedJourney(false); } }} className="w-full rounded-xl border border-slate-500 p-3 text-slate-100">Começar nova jornada</button>
+        </section>
+      )}
       {/* Main interaction card */}
-      <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3">
+      <div className={`w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3 ${savedJourney ? "opacity-50 pointer-events-none" : ""}`}>
         <div className="rounded-xl bg-teal-950/40 border border-teal-500/30 px-4 py-3 space-y-1"><h2 className="text-base font-bold text-teal-200">Sua jornada começa aqui!</h2><p className="text-sm leading-relaxed text-slate-200">Escolha um Guardião para acompanhar você pelos desafios da Vila dos Encontros. Cada escolha revela novos caminhos e afinidades.</p></div>
         <form onSubmit={handleStartJourney} className="space-y-2">
           {/* Nickname input (no real name required) */}
