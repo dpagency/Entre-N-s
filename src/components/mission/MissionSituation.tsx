@@ -46,14 +46,14 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
   };
 
   // Piloto da reunião: o fato primeiro, vozes sob demanda e decisão imediata.
-  if (isSolo && mission.id === 'missao-1') {
+  if (isSolo) {
     return (
       <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto text-slate-100">
         <section className="rounded-3xl border border-slate-700 bg-slate-900 p-5 sm:p-7 space-y-4">
           <span className="text-xs font-bold uppercase tracking-wider text-teal-300">{region.name} · {mission.code}</span>
           <h1 className="text-2xl font-black">{mission.title}</h1>
           <div data-narration="story" className="rounded-2xl bg-slate-950/70 border border-slate-800 p-4 text-base leading-relaxed">
-            A reunião está terminando. A equipe discutiu mudanças no atendimento aos cidadãos, mas Lucas, recém-chegado e experiente no assunto, permaneceu em silêncio. A ata ainda não foi finalizada.
+            {mission.id === 'missao-1' ? 'A reunião está terminando. A equipe discutiu mudanças no atendimento aos cidadãos, mas Lucas, recém-chegado e experiente no assunto, permaneceu em silêncio. A ata ainda não foi finalizada.' : <>{mission.situation.context} {mission.situation.trigger}</>}
           </div>
           <div className="space-y-2">
             <h2 className="text-lg font-bold">O que eles estão pensando?</h2>
@@ -65,7 +65,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
                   <span className="flex-1"><strong className="block text-sm">{perspective.actorName}</strong><span className="block text-xs text-slate-400">{perspective.actorRole}</span></span>
                   <span className="text-teal-300 text-xs">{openActorId === perspective.id ? 'Fechar' : 'Ouvir'}</span>
                 </button>
-                {openActorId === perspective.id && <p data-narration="story" className="px-4 pb-4 text-sm italic text-slate-200">{perspective.details}</p>}
+                {openActorId === perspective.id && <p data-narration="story" className="px-4 pb-4 text-sm italic text-slate-200">{perspective.summary}</p>}
               </div>
             ))}
           </div>
