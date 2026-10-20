@@ -58,7 +58,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   ).length;
 
   // Pontuação exclusiva por consultas e respostas corretas, sem avaliar dilemas.
-  const learning = learningPoints(socketService.roomCode);
+  const learning = learningPoints(socketService.roomCode, state.fortuneCards);
   const journeyPoints = learning.total;
   const journeyLevel = journeyPoints < 40 ? 'Exploração inicial' : journeyPoints < 60 ? 'Conhecimento em construção' : journeyPoints < 80 ? 'Conhecimento em desenvolvimento' : 'Conhecimento em evolução';
 
