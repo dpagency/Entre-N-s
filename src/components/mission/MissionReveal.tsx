@@ -18,6 +18,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
   myPlayerId,
 }) => {
   const [showPerspectives, setShowPerspectives] = useState(false);
+  const [showAlternatives, setShowAlternatives] = useState(false);
   const isHost = state.hostId === myPlayerId;
   const revealedChoices: Record<string, string> = state.revealedIndividualChoices || {};
   const solo = Object.values(state.players).some(p => p.isBot);
@@ -68,21 +69,24 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
           <h2 className="text-2xl font-black">Cada Guardião fez sua escolha</h2>
           {chosenAction && <p className="text-sm text-slate-300">Você escolheu: <strong className="text-slate-100">{chosenAction.title}</strong></p>}
         </section>
-        <section className="space-y-3" aria-label="Decisões dos Guardiões">
-          {Object.entries(revealedChoices).filter(([pid]) => pid !== myPlayerId && state.players[pid]?.isBot).map(([pid, actionId]) => {
-            const guardian = state.players[pid];
-            const action = mission.actions.find(a => a.id === actionId);
-            if (!action) return null;
-            const same = action.id === chosenAction?.id;
-            return <div key={pid} className="rounded-2xl bg-slate-900 border border-slate-700 p-4 flex gap-3 items-start">
-              <CharacterAvatar characterId={guardian.characterId} size="sm" showBadge={false} />
-              <div className="space-y-1 min-w-0">
-                <strong className="text-teal-200">{CHARACTERS[guardian.characterId].name}</strong>
-                <p className="text-sm font-semibold">{action.title}</p>
-                <p data-narration="story" className="text-sm text-slate-300">{same ? '“Eu também seguiria esse caminho.”' : `“Eu seguiria esse caminho. ${guardianQuestion[guardian.characterId]}”`}</p>
-              </div>
-            </div>;
-          })}
+        <section className="rounded-2xl bg-slate-900 border border-slate-700 p-4 space-y-3" aria-label="Decisões dos Guardiões">
+          <h3 className="font-bold text-lg">Como os Guardiões decidiram</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {mission.actions.map((action, index) => {
+              const guardians = Object.entries(revealedChoices).filter(([pid, id]) => pid !== myPlayerId && state.players[pid]?.isBot && id === action.id).map(([pid]) => state.players[pid]);
+              return <div key={action.id} className={`rounded-xl border p-3 text-center space-y-2 ${chosenAction?.id === action.id ? 'border-teal-400 bg-teal-950/40' : 'border-slate-700 bg-slate-950/60'}`}>
+                <strong className="block text-2xl">{index + 1}</strong>
+                {chosenAction?.id === action.id && <span className="block text-[10px] text-teal-300 font-bold">Sua escolha</span>}
+                <div className="flex flex-col gap-1 items-center">
+                  {guardians.length ? guardians.map(g => <span key={g.id} className="text-xs font-semibold text-slate-200">{CHARACTERS[g.characterId].name}</span>) : <span className="text-xs text-slate-500">—</span>}
+                </div>
+              </div>;
+            })}
+          </div>
+          <button type="button" aria-expanded={showAlternatives} onClick={() => setShowAlternatives(v => !v)} className="text-sm text-teal-300 underline underline-offset-4">{showAlternatives ? 'Ocultar alternativas' : 'Rever as alternativas'}</button>
+          {showAlternatives && <ol className="space-y-2 text-sm text-slate-200">
+            {mission.actions.map((action, index) => <li key={action.id} className="rounded-lg border border-slate-700 p-3"><strong>{index + 1}. {action.title}</strong><p className="text-slate-400 mt-1">{action.description}</p></li>)}
+          </ol>}
         </section>
         <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-2">
           <h3 className="font-bold text-amber-200">💎 Talismãs de Afinidade · {totalTalismans} de 4</h3>
