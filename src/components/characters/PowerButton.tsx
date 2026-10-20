@@ -28,7 +28,8 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
 
   return (
     <>
-      <div className="relative">
+      <div className="relative flex flex-wrap gap-2">
+        <button type="button" onClick={() => setShowAdvice(true)} className="px-3 py-2 rounded-xl border border-teal-500/50 bg-teal-950/60 text-teal-200 text-xs font-bold">Consultar {char.name} · +5 pontos</button>
         <button
           onClick={() => hasUsed ? setShowAdvice(true) : !disabled && setShowConfirm(true)}
           disabled={!hasUsed && disabled}
@@ -46,7 +47,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
         </button>
       </div>
 
-      {showAdvice && hasUsed && (
+      {showAdvice && (
         <div role="dialog" aria-modal="true" aria-label="Orientação do Guardião" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85">
           <div className="w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-3xl border border-amber-500/50 bg-slate-900 p-5 space-y-4 text-slate-100">
             <h3 className="text-lg font-black text-amber-200">Orientação de {char.name}</h3>
@@ -55,8 +56,8 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
             {player.characterId === 'joana' && <div className="space-y-2">{state.futureLooks.length ? state.futureLooks.map((look, index) => <p key={index} className="text-sm leading-relaxed">{look}</p>) : <p className="text-sm">Reflita sobre as possíveis consequências de cada caminho.</p>}</div>}
             {player.characterId === 'ravi' && <p className="text-sm leading-relaxed">Que voz ainda não ouvimos? Que consequência merece mais atenção? Sua decisão original permanece preservada.</p>}
             {player.characterId === 'bia' && <p className="text-sm leading-relaxed">Que perspectiva ainda não foi considerada? Releia as vozes dos envolvidos antes de seguir.</p>}
-            <p className="text-xs text-slate-400">Você pode reler esta orientação quantas vezes quiser. O poder continua sendo de uso único.</p>
-            <button type="button" onClick={() => setShowAdvice(false)} className="w-full rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Terminei de ler</button>
+            <p className="text-xs text-slate-400">Consultar a orientação é livre. Você recebe pontos somente pela primeira consulta em cada missão; o poder especial continua sendo de uso único.</p>
+            <button type="button" onClick={() => { recordLearning(socketService.roomCode, state.activeMissionId, 'guardian'); setShowAdvice(false); }} className="w-full rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Terminei de ler</button>
           </div>
         </div>
       )}
