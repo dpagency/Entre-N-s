@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RoomState } from '../../types/game';
 import { MISSIONS } from '../../data/missions';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
@@ -19,6 +19,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onRestartGame,
 }) => {
   const companion = state.players[myPlayerId];
+  const [nextGuardian, setNextGuardian] = useState<string | null>(null);
   const companionPriorities: Record<string, string[]> = {
     alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
     joana: ['acolhimento', 'dialogo', 'orientacao', 'cautela', 'formalizacao'],
@@ -122,12 +123,21 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         <h2 className="text-lg font-black text-amber-200">💎 Seus Talismãs de Afinidade</h2>
         <p className="text-sm text-slate-300">Cada talismã registra uma escolha em comum com um dos quatro Guardiões, incluindo seu companheiro. Zero talismãs também faz parte da jornada.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {affinityCounts.map(({characterId, count}) => <div key={characterId} className="rounded-xl border border-slate-700 bg-slate-950 p-3 flex items-center gap-3">
+          {affinityCounts.map(({characterId, count}) => <div key={characterId} className={`rounded-xl border p-3 flex items-center gap-3 ${characterId === companion?.characterId ? 'border-teal-400 bg-teal-950/40 ring-1 ring-teal-400/40' : 'border-slate-700 bg-slate-950'}`}>
             <CharacterAvatar characterId={characterId} size="sm" />
-            <div><p className="font-bold text-amber-200">{CHARACTERS[characterId].name}{characterId === companion?.characterId && <span className="ml-2 text-xs font-normal text-teal-300">Seu companheiro</span>}</p><p className="text-sm text-slate-300">{count} {count === 1 ? 'talismã' : 'talismãs'}</p></div>
+            <div><p className="font-bold text-amber-200">{CHARACTERS[characterId].name}{characterId === companion?.characterId && <span className="block text-xs font-bold text-teal-300">★ Seu Guardião nesta jornada</span>}</p><p className="text-sm text-slate-300">{count} {count === 1 ? 'talismã' : 'talismãs'}</p></div>
           </div>)}
         </div>
-        <p className="text-sm text-teal-200">Você escolheria o mesmo Guardião para uma nova jornada?</p>
+        <div className="space-y-3 pt-2">
+          <h3 className="text-lg font-bold text-teal-200">Quem será seu próximo Guardião?</h3>
+          <p className="text-xs text-slate-400">Escolha por curiosidade. Sua resposta não altera a jornada concluída.</p>
+          <div className="grid grid-cols-2 gap-2">
+            {guardianIds.map(id => <button key={id} type="button" aria-pressed={nextGuardian === id} onClick={() => setNextGuardian(id)} className={nextGuardian === id ? 'rounded-xl border-2 border-teal-400 bg-teal-950/60 p-3 text-sm font-bold text-teal-100' : 'rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm text-slate-200'}>
+              {nextGuardian === id ? '✓ ' : ''}{CHARACTERS[id].name}{id === companion?.characterId ? ' · atual' : ''}
+            </button>)}
+          </div>
+          {nextGuardian && <p role="status" className="text-sm text-teal-200">Sua escolha: {CHARACTERS[nextGuardian as keyof typeof CHARACTERS].name}. Você poderá escolhê-lo ao iniciar uma nova jornada.</p>}
+        </div>
       </section>}
       {/* Aggregate Collective Indicators (No moral ranking!) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
