@@ -132,9 +132,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   return (
     <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
       <div className={`relative rounded-full overflow-hidden shadow-lg border-2 ${char.borderColor} ${sizeDimensions}`}>
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          {renderCharacterSvg()}
-        </svg>
+        <img src={`/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[characterId] || "rin"}.png`} alt={char.name} className="w-full h-full object-cover" />
 
         {/* Variant color highlight aura */}
         <div
