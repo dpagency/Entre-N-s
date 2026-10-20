@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterId } from '../../types/game';
-import { CHARACTER_LIST, AVATAR_VARIANTS, CHARACTERS } from '../../data/characters';
+import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { socketService } from '../../services/socket';
 import { Play, Sparkles, BookOpen, Compass, HelpCircle } from 'lucide-react';
@@ -27,6 +27,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     Number(localStorage.getItem('guardioes_variant')) || 0
   );
   const [previewCharacter, setPreviewCharacter] = useState<CharacterId | null>(null);
+  const [previewAvatar, setPreviewAvatar] = useState<number | null>(null);
+  const playerAvatars = [
+    { name: 'Exploradora', face: '👩🏾‍🦱', description: 'Curiosidade e abertura para descobrir novos caminhos.' },
+    { name: 'Observador', face: '🧑🏻‍💻', description: 'Atenção aos detalhes e disposição para observar.' },
+    { name: 'Construtora', face: '👩🏻', description: 'Colaboração e criatividade para construir possibilidades.' },
+    { name: 'Estrategista', face: '🧑🏽‍🎤', description: 'Um olhar criativo e independente, sem rótulos de gênero.' },
+  ];
 
   const handleStartJourney = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,15 +122,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                     key={char.id}
                     type="button"
                     onClick={() => setPreviewCharacter(char.id)}
-                    className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
+                    className={`p-2 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
                       isSelected
                         ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                         : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
                     }`}
                   >
-                    <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="sm" showBadge={false} />
+                    <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="lg" showBadge={false} />
                     <div className="font-bold text-xs sm:text-sm">{char.name}</div>
-                    <div className="text-[10px] text-slate-400 leading-tight">{char.title}</div>
+
                   </button>
                 );
               })}
@@ -152,25 +159,16 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             )}
           </div>
 
-          {/* Visual Variant Selector */}
-          <div className="hidden sm:block space-y-2">
-            <label className="text-xs font-bold text-slate-300">
-              Variante Visual do Avatar:
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {AVATAR_VARIANTS.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => setVariantIndex(v.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 ${
-                    variantIndex === v.id
-                      ? 'bg-teal-500 text-slate-950 border-teal-400 shadow-sm'
-                      : 'bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-850'
-                  }`}
-                >
-                  <span className={`w-2.5 h-2.5 rounded-full ${v.badgeColor}`} />
-                  <span>{v.label} ({v.suffix})</span>
+          {/* Player avatar selection: independent from Guardian choice */}
+          <div className="space-y-2">
+            <p className="text-xs font-bold text-slate-300">Escolha seu avatar:</p>
+            <p className="text-[11px] text-slate-400">Toque em um rosto para conhecer o avatar e escolhê-lo.</p>
+            <div className="grid grid-cols-4 gap-2">
+              {playerAvatars.map((avatar, index) => (
+                <button key={avatar.name} type="button" onClick={() => setPreviewAvatar(index)} aria-label={`Conhecer avatar ${avatar.name}`} aria-pressed={variantIndex === index}
+                  className={`flex flex-col items-center gap-1 rounded-2xl border p-2 transition-all ${variantIndex === index ? 'border-teal-400 ring-2 ring-teal-400/40 bg-teal-950/70' : 'border-slate-700 bg-slate-950'}`}>
+                  <span className="flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-slate-800 text-3xl sm:text-4xl" role="img" aria-label={avatar.name}>{avatar.face}</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-200">{avatar.name}</span>
                 </button>
               ))}
             </div>
@@ -216,6 +214,17 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           </button>
         </div>
       </div>
+      {previewAvatar !== null && (
+        <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setPreviewAvatar(null); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="avatar-preview-title" className="w-full max-w-sm rounded-3xl border border-teal-500/50 bg-slate-900 p-6 text-center space-y-4 shadow-2xl">
+            <div className="text-7xl" role="img" aria-label={playerAvatars[previewAvatar].name}>{playerAvatars[previewAvatar].face}</div>
+            <h2 id="avatar-preview-title" className="text-xl font-black">{playerAvatars[previewAvatar].name}</h2>
+            <p className="text-sm text-slate-300">{playerAvatars[previewAvatar].description}</p>
+            <p className="text-xs text-slate-400">Seu avatar representa você, mas não determina suas decisões durante a jornada.</p>
+            <div className="flex gap-3"><button type="button" onClick={() => setPreviewAvatar(null)} className="flex-1 rounded-xl border border-slate-600 p-3">Voltar</button><button type="button" onClick={() => { setVariantIndex(previewAvatar); localStorage.setItem('guardioes_variant', String(previewAvatar)); setPreviewAvatar(null); }} className="flex-1 rounded-xl bg-teal-400 text-slate-950 font-bold p-3">Escolher avatar</button></div>
+          </section>
+        </div>
+      )}
       {previewCharacter && (
         <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setPreviewCharacter(null); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="persona-title" className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-3xl border border-teal-500/50 bg-slate-900 p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4">
