@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RoomState } from '../../types/game';
 import { MISSIONS } from '../../data/missions';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
+import { JourneyShareCard } from './JourneyShareCard';
 import { CHARACTERS } from '../../data/characters';
 import { Award, CheckCircle2, Users, Compass, Sparkles, MessageSquare, RotateCcw, ShieldCheck } from 'lucide-react';
 
@@ -272,6 +273,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           ))}
         </div>
       </div>
+
+      {companion && <JourneyShareCard guardianId={companion.characterId} playerAvatarIndex={companion.variantIndex || 0} />}
 
       {/* Footer controls */}
       <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
