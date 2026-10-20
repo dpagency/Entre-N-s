@@ -3,6 +3,8 @@ import { RoomState } from '../../types/game';
 import { MISSIONS } from '../../data/missions';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { JourneyShareCard } from './JourneyShareCard';
+import { learningPoints } from '../../services/learningScore';
+import { socketService } from '../../services/socket';
 import { CHARACTERS } from '../../data/characters';
 import { Award, CheckCircle2, Users, Compass, Sparkles, MessageSquare, RotateCcw, ShieldCheck } from 'lucide-react';
 
@@ -55,21 +57,10 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     (h) => h.reconsiderationOccurred
   ).length;
 
-  // Pontos de navegação: nunca derivados de qual alternativa ética foi escolhida.
-  // Quatro missões, até 25 pontos por dimensão; critérios auditáveis no histórico.
-  const progress = Math.min(4, completedMissions.length);
-  const fortuneOutcomes = Object.values(state.fortuneCards || {});
-  const favorableCards = fortuneOutcomes.filter(card => card.outcome !== 'reves').length;
-  const reversals = fortuneOutcomes.filter(card => card.outcome === 'reves').length;
-  const revealedCards = Math.min(4, fortuneOutcomes.length);
-  const dimensions = [
-    { label: 'Resultados', points: Math.min(25, progress * 5 + Math.min(5, revealedCards)), explanation: 'Avanço nas missões e participação na dinâmica das cartas, independentemente do resultado sorteado.' },
-    { label: 'Confiança', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Atenção dedicada às perspectivas e aos vínculos de confiança.' },
-    { label: 'Equilíbrio', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(4, h.perspectivesExploredCount) + (h.reconsiderationOccurred ? 2 : 0), 0)), explanation: 'Perspectivas consideradas e disposição para reconsiderar.' },
-    { label: 'Participação', points: Math.min(25, state.historyLog.reduce((sum, h) => sum + Math.min(5, h.perspectivesExploredCount), 0)), explanation: 'Participação nas etapas de escuta e exploração.' },
-  ];
-  const journeyPoints = dimensions.reduce((sum, d) => sum + d.points, 0);
-  const journeyLevel = journeyPoints < 40 ? 'Percurso inicial' : journeyPoints < 70 ? 'Percurso em desenvolvimento' : 'Percurso avançado';
+  // Pontuação exclusiva por consultas e respostas corretas, sem avaliar dilemas.
+  const learning = learningPoints(socketService.roomCode);
+  const journeyPoints = learning.total;
+  const journeyLevel = journeyPoints < 40 ? 'Exploração inicial' : journeyPoints < 60 ? 'Conhecimento em construção' : journeyPoints < 80 ? 'Conhecimento em desenvolvimento' : 'Conhecimento em evolução';
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto text-slate-100 animate-in fade-in">
@@ -102,22 +93,16 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <p className="rounded-xl bg-slate-950 p-3"><strong className="block text-amber-300">O que aprendemos?</strong>O que faríamos diferente diante de um novo dilema?</p>
         </div>
       </section>
-      <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Pontuação da jornada">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-lg font-black text-amber-200">Seu percurso pela Vila</h2>
-          <span className="text-xl font-black text-amber-300">{journeyPoints}/100 pontos</span>
-        </div>
-        <div className="h-3 rounded-full bg-slate-700 overflow-hidden"><div className="h-full rounded-full bg-teal-400 transition-all" style={{ width: `${journeyPoints}%` }} /></div>
+      <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 sm:p-6 space-y-4" aria-label="Percurso de aprendizagem ética">
+        <div className="flex items-center justify-between gap-3 flex-wrap"><h2 className="text-lg font-black text-amber-200">Seu percurso de aprendizagem ética</h2><span className="text-xl font-black text-amber-300">{journeyPoints}/100 pontos</span></div>
+        <div className="h-3 rounded-full bg-slate-700 overflow-hidden"><div className="h-full rounded-full bg-teal-400" style={{width: journeyPoints + '%'}} /></div>
         <p className="text-sm font-bold text-teal-300">{journeyLevel}</p>
-        <p className="text-xs text-slate-300">Os pontos reconhecem a navegação, a exploração e a colaboração — não avaliam seus valores nem classificam suas escolhas éticas como boas ou ruins. O resultado aleatório das cartas não altera a pontuação.</p>
+        <p className="text-xs text-slate-300">O indicador reconhece orientações consultadas e conhecimentos demonstrados. Nenhuma escolha nos dilemas éticos recebe pontos.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {dimensions.map((d) => <div key={d.label} className="rounded-xl bg-slate-950 p-3 border border-slate-800">
-            <div className="flex justify-between gap-2 text-sm font-bold"><span>{d.label}</span><span className="text-amber-300">{d.points}/25</span></div>
-            <p className="text-xs text-slate-400 mt-1">{d.explanation}</p>
-          </div>)}
+          <div className="rounded-xl bg-slate-950 p-3 border border-slate-800"><div className="flex justify-between text-sm font-bold"><span>Busca de orientação</span><span className="text-amber-300">{learning.consultation}/40</span></div><p className="text-xs text-slate-400 mt-1">Consulta ao Guardião e à Comissão de Ética, uma vez por tipo e por missão.</p></div>
+          <div className="rounded-xl bg-slate-950 p-3 border border-slate-800"><div className="flex justify-between text-sm font-bold"><span>Conhecimentos demonstrados</span><span className="text-amber-300">{learning.knowledge}/60</span></div><p className="text-xs text-slate-400 mt-1">Questões de verdadeiro ou falso respondidas corretamente.</p></div>
         </div>
-        <p className="text-xs text-amber-200">Cartas reveladas: {fortuneOutcomes.length} · Favoráveis ou segunda chance: {favorableCards} · Reveses: {reversals}. Sorte, segunda chance e revés têm o mesmo peso na participação.</p>
-        <p className="text-xs text-slate-400">Escala experimental do piloto: inicial (0–39), desenvolvimento (40–69), avançado (70–100). O máximo representa o teto da escala, não uma nota ética.</p>
+        <p className="text-xs text-slate-400">Escala experimental: exploração inicial (0–39), construção (40–59), desenvolvimento (60–79) e evolução (80–100). Não é uma nota de conduta ética.</p>
       </section>
 
       {affinityCounts.length > 0 && <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 space-y-3" aria-label="Coleção de Talismãs de Afinidade">
