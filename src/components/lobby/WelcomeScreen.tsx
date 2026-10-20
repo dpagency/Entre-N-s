@@ -29,10 +29,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const [previewCharacter, setPreviewCharacter] = useState<CharacterId | null>(null);
   const [previewAvatar, setPreviewAvatar] = useState<number | null>(null);
   const playerAvatars = [
-    { name: 'Exploradora', face: '👩🏾‍🦱', description: 'Curiosidade e abertura para descobrir novos caminhos.' },
-    { name: 'Observador', face: '🧑🏻‍💻', description: 'Atenção aos detalhes e disposição para observar.' },
-    { name: 'Construtora', face: '👩🏻', description: 'Colaboração e criatividade para construir possibilidades.' },
-    { name: 'Estrategista', face: '🧑🏽‍🎤', description: 'Um olhar criativo e independente, sem rótulos de gênero.' },
+    { name: 'Exploradora', image: '/personagens/avatar_exploradora.png', body: '/personagens/avatar_exploradora_corpo.png', description: 'Curiosidade e abertura para descobrir novos caminhos.' },
+    { name: 'Observador', image: '/personagens/avatar_observador.png', body: '/personagens/avatar_observador_corpo.png', description: 'Atenção aos detalhes e disposição para observar.' },
+    { name: 'Construtora', image: '/personagens/avatar_construtora.png', body: '/personagens/avatar_construtora_corpo.png', description: 'Colaboração e criatividade para construir possibilidades.' },
+    { name: 'Estrategista', image: '/personagens/avatar_estrategista.png', body: '/personagens/avatar_estrategista_corpo.png', description: 'Um olhar criativo e independente, sem rótulos de gênero.' },
   ];
 
   const handleStartJourney = (e: React.FormEvent) => {
@@ -167,7 +167,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               {playerAvatars.map((avatar, index) => (
                 <button key={avatar.name} type="button" onClick={() => setPreviewAvatar(index)} aria-label={`Conhecer avatar ${avatar.name}`} aria-pressed={variantIndex === index}
                   className={`flex flex-col items-center gap-1 rounded-2xl border p-2 transition-all ${variantIndex === index ? 'border-teal-400 ring-2 ring-teal-400/40 bg-teal-950/70' : 'border-slate-700 bg-slate-950'}`}>
-                  <span className="flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-slate-800 text-3xl sm:text-4xl" role="img" aria-label={avatar.name}>{avatar.face}</span>
+                  <img src={avatar.image} alt={avatar.name} className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-teal-300/60" />
                   <span className="text-[10px] sm:text-xs font-bold text-slate-200">{avatar.name}</span>
                 </button>
               ))}
@@ -217,7 +217,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       {previewAvatar !== null && (
         <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setPreviewAvatar(null); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="avatar-preview-title" className="w-full max-w-sm rounded-3xl border border-teal-500/50 bg-slate-900 p-6 text-center space-y-4 shadow-2xl">
-            <div className="text-7xl" role="img" aria-label={playerAvatars[previewAvatar].name}>{playerAvatars[previewAvatar].face}</div>
+            <img src={playerAvatars[previewAvatar].body} alt={playerAvatars[previewAvatar].name} className="mx-auto w-40 h-52 rounded-2xl object-cover" />
             <h2 id="avatar-preview-title" className="text-xl font-black">{playerAvatars[previewAvatar].name}</h2>
             <p className="text-sm text-slate-300">{playerAvatars[previewAvatar].description}</p>
             <p className="text-xs text-slate-400">Seu avatar representa você, mas não determina suas decisões durante a jornada.</p>
@@ -230,7 +230,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <section role="dialog" aria-modal="true" aria-labelledby="persona-title" className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-3xl border border-teal-500/50 bg-slate-900 p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4">
             <div className="flex justify-between items-start gap-3">
               <div className="flex items-center gap-4">
-                <CharacterAvatar characterId={previewCharacter} variantIndex={variantIndex} size="lg" showBadge={false} />
+                <img src={`/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[previewCharacter]}_corpo.png`} alt={CHARACTERS[previewCharacter].name} className="w-24 h-36 rounded-2xl object-cover" />
                 <div><h2 id="persona-title" className="text-2xl font-black">{CHARACTERS[previewCharacter].name}</h2><p className="text-teal-300">{CHARACTERS[previewCharacter].title}</p></div>
               </div>
               <button type="button" aria-label="Fechar apresentação" onClick={() => setPreviewCharacter(null)} className="text-slate-300 hover:text-white text-2xl">×</button>
