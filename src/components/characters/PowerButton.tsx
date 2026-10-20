@@ -12,6 +12,7 @@ interface PowerButtonProps {
 
 export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disabled }) => {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showAdvice, setShowAdvice] = useState(false);
   const char = CHARACTERS[player.characterId] || CHARACTERS.alex;
   const hasUsed = player.hasUsedPower;
 
@@ -27,22 +28,36 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
     <>
       <div className="relative">
         <button
-          onClick={() => !hasUsed && !disabled && setShowConfirm(true)}
-          disabled={hasUsed || disabled}
+          onClick={() => hasUsed ? setShowAdvice(true) : !disabled && setShowConfirm(true)}
+          disabled={!hasUsed && disabled}
           className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md border ${
             hasUsed
               ? 'bg-slate-800 text-slate-500 border-slate-700/60 cursor-not-allowed'
               : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 border-amber-300 active:scale-95'
           }`}
-          title={hasUsed ? 'O poder do seu Guardião já foi utilizado nesta partida' : `Pedir ajuda a ${char.name}: ${char.powerName}`}
+          title={hasUsed ? 'Rever a orientação do Guardião sem gastar outro poder' : `Pedir ajuda a ${char.name}: ${char.powerName}`}
         >
           <Zap className={`w-4 h-4 ${hasUsed ? 'text-slate-500' : 'text-slate-950 fill-current'}`} />
           <span>
-            {hasUsed ? 'Poder Utilizado' : `Ajuda de ${char.name}: ${char.powerName}`}
+            {hasUsed ? `Reler orientação de ${char.name}` : `Ajuda de ${char.name}: ${char.powerName}`}
           </span>
         </button>
       </div>
 
+      {showAdvice && hasUsed && (
+        <div role="dialog" aria-modal="true" aria-label="Orientação do Guardião" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85">
+          <div className="w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-3xl border border-amber-500/50 bg-slate-900 p-5 space-y-4 text-slate-100">
+            <h3 className="text-lg font-black text-amber-200">Orientação de {char.name}</h3>
+            <p className="text-sm leading-relaxed">{char.powerDescription}</p>
+            {player.characterId === 'alex' && <div className="space-y-2">{state.unlockedContextIds.length ? <p className="text-sm">O Guardião ajudou a revelar mais contexto. Consulte também a seção “Mais Contexto” desta missão.</p> : <p className="text-sm">Considere que pode haver informações importantes ainda não exploradas.</p>}</div>}
+            {player.characterId === 'joana' && <div className="space-y-2">{state.futureLooks.length ? state.futureLooks.map((look, index) => <p key={index} className="text-sm leading-relaxed">{look}</p>) : <p className="text-sm">Reflita sobre as possíveis consequências de cada caminho.</p>}</div>}
+            {player.characterId === 'ravi' && <p className="text-sm leading-relaxed">Que voz ainda não ouvimos? Que consequência merece mais atenção? Sua decisão original permanece preservada.</p>}
+            {player.characterId === 'bia' && <p className="text-sm leading-relaxed">Que perspectiva ainda não foi considerada? Releia as vozes dos envolvidos antes de seguir.</p>}
+            <p className="text-xs text-slate-400">Você pode reler esta orientação quantas vezes quiser. O poder continua sendo de uso único.</p>
+            <button type="button" onClick={() => setShowAdvice(false)} className="w-full rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Terminei de ler</button>
+          </div>
+        </div>
+      )}
       {/* Confirmation modal */}
       {showConfirm && (
         <div
