@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CharacterId, PlayerSession, RoomState, SanitizedRoomState } from '../../types/game';
 import { CHARACTERS } from '../../data/characters';
 import { socketService } from '../../services/socket';
+import { recordLearning } from '../../services/learningScore';
 import { Zap, AlertCircle, Check, Info } from 'lucide-react';
 
 interface PowerButtonProps {
@@ -17,6 +18,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
   const hasUsed = player.hasUsedPower;
 
   const handleUsePower = () => {
+    recordLearning(socketService.roomCode, state.activeMissionId, 'guardian');
     socketService.send({
       type: 'USE_POWER',
       powerType: player.characterId,
