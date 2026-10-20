@@ -76,7 +76,28 @@ class GameSocketService {
     }
     this.isConnected = true;
     this.notifyConnection(true);
-    if (this.sessionToken && this.roomCode) this.send({type:'JOIN_ROOM',roomCode:this.roomCode,sessionToken:this.sessionToken,nickname:localStorage.getItem('guardioes_nickname') || 'Guardião',characterId:(localStorage.getItem('guardioes_character') as any) || 'alex',variantIndex:Number(localStorage.getItem('guardioes_variant')) || 0});
+    // Wait for an explicit decision: resume the saved journey or start a new one.
+  }
+
+
+  public hasSavedJourney(): boolean {
+    if (!this.sessionToken || !this.roomCode || !this.myPlayerId) return false;
+    try {
+      const saved = JSON.parse(localStorage.getItem('entre-nos-solo') || 'null');
+      return Array.isArray(saved?.rooms) && saved.rooms.some(([code]: [string, unknown]) => code === this.roomCode);
+    } catch { return false; }
+  }
+
+  public resumeSavedJourney(): void {
+    if (!this.hasSavedJourney() || !this.roomCode || !this.sessionToken) return;
+    this.send({type:'JOIN_ROOM',roomCode:this.roomCode,sessionToken:this.sessionToken,nickname:localStorage.getItem('guardioes_nickname') || 'Jogador',characterId:(localStorage.getItem('guardioes_character') as any) || 'alex',variantIndex:Number(localStorage.getItem('guardioes_variant')) || 0});
+  }
+
+  public discardSavedJourney(): void {
+    this.sessionToken = null;
+    this.roomCode = null;
+    this.myPlayerId = null;
+    for (const key of ['entre-nos-solo','guardioes_session_token','guardioes_room_code','guardioes_player_id']) localStorage.removeItem(key);
   }
 
   public setSoloMode(solo: boolean) {
