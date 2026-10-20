@@ -18,9 +18,26 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onOpenFeedback,
   onRestartGame,
 }) => {
-  const affinityCounts = Object.values(state.players).filter(p => p.isBot).map(bot => ({
-    characterId: bot.characterId,
-    count: state.historyLog.filter(h => h.affinityGuardianIds?.includes(bot.characterId)).length,
+  const companion = state.players[myPlayerId];
+  const companionPriorities: Record<string, string[]> = {
+    alex: ['formalizacao', 'orientacao', 'cautela', 'dialogo', 'acolhimento'],
+    joana: ['acolhimento', 'dialogo', 'orientacao', 'cautela', 'formalizacao'],
+    ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
+    bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
+  };
+  const guardianIds = ['alex', 'joana', 'ravi', 'bia'] as const;
+  const affinityCounts = guardianIds.map(characterId => ({
+    characterId,
+    count: state.historyLog.filter(h => {
+      if (characterId !== companion?.characterId) return h.affinityGuardianIds?.includes(characterId);
+      const mission = MISSIONS.find(m => m.id === h.missionId);
+      if (!mission) return false;
+      const preferred = mission.actions.slice().sort((x, y) =>
+        (companionPriorities[characterId].indexOf(x.actionType)) -
+        (companionPriorities[characterId].indexOf(y.actionType))
+      )[0];
+      return preferred?.id === h.actionChosenId;
+    }).length,
   }));
 
   const completedMissions = MISSIONS.filter((m) =>
@@ -103,11 +120,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
       {affinityCounts.length > 0 && <section className="rounded-3xl border border-amber-500/40 bg-slate-900 p-5 space-y-3" aria-label="Coleção de Talismãs de Afinidade">
         <h2 className="text-lg font-black text-amber-200">💎 Seus Talismãs de Afinidade</h2>
-        <p className="text-sm text-slate-300">Cada talismã registra uma escolha em comum com um Guardião robô. Divergir também faz parte da jornada.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <p className="text-sm text-slate-300">Cada talismã registra uma escolha em comum com um dos quatro Guardiões, incluindo seu companheiro. Zero talismãs também faz parte da jornada.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {affinityCounts.map(({characterId, count}) => <div key={characterId} className="rounded-xl border border-slate-700 bg-slate-950 p-3 flex items-center gap-3">
             <CharacterAvatar characterId={characterId} size="sm" />
-            <div><p className="font-bold text-amber-200">{CHARACTERS[characterId].name}</p><p className="text-sm text-slate-300">{count} {count === 1 ? 'talismã' : 'talismãs'}</p></div>
+            <div><p className="font-bold text-amber-200">{CHARACTERS[characterId].name}{characterId === companion?.characterId && <span className="ml-2 text-xs font-normal text-teal-300">Seu companheiro</span>}</p><p className="text-sm text-slate-300">{count} {count === 1 ? 'talismã' : 'talismãs'}</p></div>
           </div>)}
         </div>
         <p className="text-sm text-teal-200">Você escolheria o mesmo Guardião para uma nova jornada?</p>
