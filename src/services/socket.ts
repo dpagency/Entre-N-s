@@ -17,6 +17,7 @@ class GameSocketService {
   public isConnected = false;
   public myPlayerId: string | null = null;
   public roomCode: string | null = null;
+  public activeMissionId: string | null = null;
   public sessionToken: string | null = null;
 
   private intentionallyClosed = false;
@@ -132,6 +133,7 @@ class GameSocketService {
   private handleServerMessage(msg: ServerMessage) {
     switch (msg.type) {
       case 'ROOM_JOINED':
+        this.activeMissionId = msg.state.activeMissionId;
         this.roomCode = msg.roomCode;
         this.myPlayerId = msg.playerId;
         this.sessionToken = msg.sessionToken;
@@ -144,6 +146,7 @@ class GameSocketService {
         break;
 
       case 'STATE_UPDATE':
+        this.activeMissionId = msg.state.activeMissionId;
         this.stateListeners.forEach((l) => l(msg.state));
         break;
 
