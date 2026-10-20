@@ -32,7 +32,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     { name: 'Exploradora', image: '/personagens/avatar_exploradora.png', body: '/personagens/avatar_exploradora_corpo.png', description: 'Curiosidade e abertura para descobrir novos caminhos.' },
     { name: 'Observador', image: '/personagens/avatar_observador.png', body: '/personagens/avatar_observador_corpo.png', description: 'Atenção aos detalhes e disposição para observar.' },
     { name: 'Construtora', image: '/personagens/avatar_construtora.png', body: '/personagens/avatar_construtora_corpo.png', description: 'Colaboração e criatividade para construir possibilidades.' },
-    { name: 'Estrategista', image: '/personagens/avatar_estrategista.png', body: '/personagens/avatar_estrategista_corpo.png', description: 'Um olhar criativo e independente, sem rótulos de gênero.' },
+    { name: 'Estrategista', image: '/personagens/avatar_estrategista.png', body: '/personagens/avatar_estrategista_corpo.png', description: 'Um olhar criativo e independente para explorar diferentes possibilidades.' },
   ];
 
   const handleStartJourney = (e: React.FormEvent) => {
