@@ -1,6 +1,7 @@
 import React from 'react';
 import { MissionDef, RoomState } from '../../types/game';
 import { socketService } from '../../services/socket';
+import { recordLearning } from '../../services/learningScore';
 import { HelpCircle, CheckCircle2, XCircle, ArrowRight, ShieldAlert, BookOpen } from 'lucide-react';
 
 interface TrueFalseChallengeProps {
@@ -22,6 +23,7 @@ export const TrueFalseChallenge: React.FC<TrueFalseChallengeProps> = ({
   const hasAnswered = myAnswer !== undefined;
 
   const handleAnswer = (answer: boolean) => {
+    if (answer === tf.isTrue) recordLearning(socketService.roomCode, mission.id, 'correct');
     socketService.send({
       type: 'SUBMIT_TF_ANSWER',
       answer,
