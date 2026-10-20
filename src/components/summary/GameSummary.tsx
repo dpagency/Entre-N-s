@@ -136,7 +136,20 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               {nextGuardian === id ? '✓ ' : ''}{CHARACTERS[id].name}{id === companion?.characterId ? ' · atual' : ''}
             </button>)}
           </div>
-          {nextGuardian && <p role="status" className="text-sm text-teal-200">Sua escolha: {CHARACTERS[nextGuardian as keyof typeof CHARACTERS].name}. Você poderá escolhê-lo ao iniciar uma nova jornada.</p>}
+          {nextGuardian && <div role="region" aria-live="polite" aria-label="Características do próximo Guardião" className="rounded-2xl border border-teal-500/50 bg-slate-950 p-4 space-y-3">
+            <div className="flex items-center gap-3">
+              <CharacterAvatar characterId={nextGuardian as keyof typeof CHARACTERS} size="sm" />
+              <div><h4 className="text-lg font-black text-teal-200">{CHARACTERS[nextGuardian as keyof typeof CHARACTERS].name}</h4><p className="text-sm text-slate-200">{CHARACTERS[nextGuardian as keyof typeof CHARACTERS].title}</p></div>
+            </div>
+            <p className="text-xs font-semibold text-amber-200">{CHARACTERS[nextGuardian as keyof typeof CHARACTERS].role}</p>
+            <p className="text-sm leading-relaxed text-slate-200">{CHARACTERS[nextGuardian as keyof typeof CHARACTERS].description}</p>
+            <p className="text-sm italic text-teal-200">{CHARACTERS[nextGuardian as keyof typeof CHARACTERS].quote}</p>
+            <div className="rounded-xl border border-slate-700 bg-slate-900 p-3">
+              <p className="text-sm font-bold text-amber-200">Poder especial: {CHARACTERS[nextGuardian as keyof typeof CHARACTERS].powerName}</p>
+              <p className="text-xs text-slate-300 mt-1">{CHARACTERS[nextGuardian as keyof typeof CHARACTERS].powerDescription}</p>
+            </div>
+            <p className="text-xs text-slate-400">Você poderá escolher este Guardião ao iniciar uma nova jornada.</p>
+          </div>}
         </div>
       </section>}
       {/* Aggregate Collective Indicators (No moral ranking!) */}
