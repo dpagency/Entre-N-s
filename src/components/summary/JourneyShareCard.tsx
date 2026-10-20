@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { CHARACTERS } from '../../data/characters';
 import type { CharacterId } from '../../types/game';
 
 interface Props { guardianId: CharacterId; playerAvatarIndex: number; }
 
 const REFLECTION = 'Nem sempre escolhemos o mesmo caminho. Mas podemos aprender a caminhar juntos.';
-const PLAYER_AVATARS = ['🧑🏽', '🧑🏻‍🦱', '🧑🏾‍🦱', '🧑🏼‍🎨'];
+const PLAYER_AVATARS = ['exploradora', 'observador', 'construtora', 'estrategista'];
+const GUARDIAN_FILES: Record<CharacterId, string> = { alex: 'rin', joana: 'wa', ravi: 'satori', bia: 'yuki' };
+const playerImage = (index: number) => '/personagens/avatar_' + PLAYER_AVATARS[index % PLAYER_AVATARS.length] + '_corpo.png';
+const guardianImage = (id: CharacterId) => '/personagens/' + GUARDIAN_FILES[id] + '_corpo.png';
+async function loadPortrait(src: string): Promise<HTMLImageElement> {
+  const image = new Image();
+  await new Promise<void>((resolve, reject) => { image.onload = () => resolve(); image.onerror = () => reject(new Error('Não foi possível carregar a ilustração.')); image.src = src; });
+  return image;
+}
 
 function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
   const words = text.split(' ');
@@ -20,24 +26,6 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
   }
   if (line) lines.push(line);
   return lines;
-}
-
-async function guardianPortrait(id: CharacterId): Promise<HTMLImageElement> {
-  const html = renderToStaticMarkup(<CharacterAvatar characterId={id} size="xl" />);
-  const svg = html.match(/<svg[^>]*>[\s\S]*?<\/svg>/)?.[0];
-  if (!svg) throw new Error('Retrato do Guardião indisponível.');
-  const normalized = svg.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" ');
-  const blob = new Blob([normalized], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  try {
-    const img = new Image();
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error('Não foi possível carregar o retrato.'));
-      img.src = url;
-    });
-    return img;
-  } finally { URL.revokeObjectURL(url); }
 }
 
 export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarIndex }) => {
@@ -58,9 +46,9 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
     ctx.font = '30px sans-serif'; ctx.fillText('GUARDIÕES DA CONVIVÊNCIA', 540, 210);
     ctx.fillStyle = '#164e49'; ctx.beginPath(); ctx.arc(340, 420, 160, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#e0f2fe'; ctx.beginPath(); ctx.arc(740, 420, 160, 0, Math.PI * 2); ctx.fill();
-    ctx.font = '190px sans-serif'; ctx.fillText(PLAYER_AVATARS[playerAvatarIndex % PLAYER_AVATARS.length] || PLAYER_AVATARS[0], 340, 486);
-    const portrait = await guardianPortrait(guardianId);
-    ctx.drawImage(portrait, 605, 285, 270, 270);
+    const [playerPortrait, guardianPortrait] = await Promise.all([loadPortrait(playerImage(playerAvatarIndex)), loadPortrait(guardianImage(guardianId))]);
+    ctx.drawImage(playerPortrait, 195, 270, 290, 330);
+    ctx.drawImage(guardianPortrait, 595, 270, 290, 330);
     ctx.fillStyle = '#d9f5e8'; ctx.font = 'bold 36px sans-serif'; ctx.fillText('Minha jornada', 340, 625);
     ctx.fillText(guardian.name, 740, 625);
     ctx.font = '27px sans-serif'; ctx.fillText('Meu Guardião', 740, 664);
@@ -108,8 +96,8 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
       <h3 className="text-2xl font-black text-teal-100">Entre Nós</h3>
       <p className="text-xs tracking-wide text-teal-200">GUARDIÕES DA CONVIVÊNCIA</p>
       <div className="flex items-center justify-center gap-8">
-        <div><div className="text-6xl" role="img" aria-label="Avatar do jogador">{PLAYER_AVATARS[playerAvatarIndex % PLAYER_AVATARS.length]}</div><p className="text-xs mt-2">Você</p></div>
-        <div><CharacterAvatar characterId={guardianId} size="xl"/><p className="text-xs mt-2">{guardian.name} · seu Guardião</p></div>
+        <div className="flex-1 min-w-0"><img src={playerImage(playerAvatarIndex)} alt="Seu avatar" className="h-44 sm:h-60 w-full object-contain" /><p className="text-xs mt-2">Você</p></div>
+        <div className="flex-1 min-w-0"><img src={guardianImage(guardianId)} alt={guardian.name} className="h-44 sm:h-60 w-full object-contain" /><p className="text-xs mt-2">{guardian.name} · seu Guardião</p></div>
       </div>
       <p className="font-semibold text-lg text-white">“{REFLECTION}”</p>
       <p className="text-sm text-teal-200">E você, que caminhos escolheria?</p>
