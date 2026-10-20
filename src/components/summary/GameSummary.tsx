@@ -102,6 +102,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <div className="rounded-xl bg-slate-950 p-3 border border-slate-800"><div className="flex justify-between text-sm font-bold"><span>Busca de orientação</span><span className="text-amber-300">{learning.consultation}/40</span></div><p className="text-xs text-slate-400 mt-1">Consulta ao Guardião e à Comissão de Ética, uma vez por tipo e por missão.</p></div>
           <div className="rounded-xl bg-slate-950 p-3 border border-slate-800"><div className="flex justify-between text-sm font-bold"><span>Conhecimentos demonstrados</span><span className="text-amber-300">{learning.knowledge}/60</span></div><p className="text-xs text-slate-400 mt-1">Questões de verdadeiro ou falso respondidas corretamente.</p></div>
         </div>
+        <p className="text-sm text-amber-200">Cartas do destino: {learning.fortune > 0 ? "+" : ""}{learning.fortune} pontos (Sorte +3, Revés -3, Segunda chance +1).</p>
         <p className="text-xs text-slate-400">Escala experimental: exploração inicial (0–39), construção (40–59), desenvolvimento (60–79) e evolução (80–100). Não é uma nota de conduta ética.</p>
       </section>
 
