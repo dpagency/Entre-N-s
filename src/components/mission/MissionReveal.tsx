@@ -74,11 +74,15 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
           <div className="grid grid-cols-3 gap-2">
             {mission.actions.map((action, index) => {
               const guardians = Object.entries(revealedChoices).filter(([pid, id]) => pid !== myPlayerId && state.players[pid]?.isBot && id === action.id).map(([pid]) => state.players[pid]);
-              return <div key={action.id} className={`rounded-xl border p-3 text-center space-y-2 ${chosenAction?.id === action.id ? 'border-teal-400 bg-teal-950/40' : 'border-slate-700 bg-slate-950/60'}`}>
+              const companionHere = companionPreference?.id === action.id && companion;
+              const playerHere = chosenAction?.id === action.id;
+              return <div key={action.id} className={`rounded-xl border p-3 text-center space-y-2 ${playerHere ? 'border-teal-400 bg-teal-950/40' : 'border-slate-700 bg-slate-950/60'}`}>
                 <strong className="block text-2xl">{index + 1}</strong>
-                {chosenAction?.id === action.id && <span className="block text-[10px] text-teal-300 font-bold">Sua escolha</span>}
-                <div className="flex flex-col gap-1 items-center">
-                  {guardians.length ? guardians.map(g => <span key={g.id} className="text-xs font-semibold text-slate-200">{CHARACTERS[g.characterId].name}</span>) : <span className="text-xs text-slate-500">—</span>}
+                <div className="flex flex-col gap-2 items-center">
+                  {playerHere && <span className="rounded-lg bg-teal-500/20 px-2 py-1 text-xs font-bold text-teal-200">Você</span>}
+                  {companionHere && <span className="rounded-lg border border-teal-500/50 px-2 py-1 text-xs text-teal-100">💎 {CHARACTERS[companion.characterId].name} <span className="block text-[10px]">companheiro</span></span>}
+                  {guardians.map(g => <span key={g.id} className="text-xs font-semibold text-slate-200">{CHARACTERS[g.characterId].name}</span>)}
+                  {!playerHere && !companionHere && !guardians.length && <span className="text-xs text-slate-500">—</span>}
                 </div>
               </div>;
             })}
