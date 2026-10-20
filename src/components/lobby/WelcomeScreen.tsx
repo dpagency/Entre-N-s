@@ -216,8 +216,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
       {previewAvatar !== null && (
         <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setPreviewAvatar(null); }}>
-          <section role="dialog" aria-modal="true" aria-labelledby="avatar-preview-title" className="w-full max-w-sm rounded-3xl border border-teal-500/50 bg-slate-900 p-6 text-center space-y-4 shadow-2xl">
-            <img src={playerAvatars[previewAvatar].body} alt={playerAvatars[previewAvatar].name} className="mx-auto w-40 h-52 rounded-2xl object-cover" />
+          <section role="dialog" aria-modal="true" aria-labelledby="avatar-preview-title" className="w-full max-w-sm max-h-[90dvh] overflow-y-auto rounded-3xl border border-teal-500/50 bg-slate-900 p-5 text-center space-y-4 shadow-2xl">
+            <img src={playerAvatars[previewAvatar].body} alt={playerAvatars[previewAvatar].name} className="mx-auto w-full max-w-[230px] h-64 rounded-2xl object-contain bg-slate-950" onError={(event) => { event.currentTarget.src = playerAvatars[previewAvatar].image; }} />
             <h2 id="avatar-preview-title" className="text-xl font-black">{playerAvatars[previewAvatar].name}</h2>
             <p className="text-sm text-slate-300">{playerAvatars[previewAvatar].description}</p>
             <p className="text-xs text-slate-400">Seu avatar representa você, mas não determina suas decisões durante a jornada.</p>
@@ -229,8 +229,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         <div className="fixed inset-0 z-[80] bg-slate-950/85 flex items-center justify-center p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setPreviewCharacter(null); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="persona-title" className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-3xl border border-teal-500/50 bg-slate-900 p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4">
             <div className="flex justify-between items-start gap-3">
-              <div className="flex items-center gap-4">
-                <img src={`/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[previewCharacter]}_corpo.png`} alt={CHARACTERS[previewCharacter].name} className="w-24 h-36 rounded-2xl object-cover" />
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <img src={`/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[previewCharacter]}_corpo.png`} alt={CHARACTERS[previewCharacter].name} className="w-36 h-48 sm:w-44 sm:h-56 shrink-0 rounded-2xl object-contain bg-slate-950" onError={(event) => { event.currentTarget.src = `/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[previewCharacter]}.png`; }} />
                 <div><h2 id="persona-title" className="text-2xl font-black">{CHARACTERS[previewCharacter].name}</h2><p className="text-teal-300">{CHARACTERS[previewCharacter].title}</p></div>
               </div>
               <button type="button" aria-label="Fechar apresentação" onClick={() => setPreviewCharacter(null)} className="text-slate-300 hover:text-white text-2xl">×</button>
