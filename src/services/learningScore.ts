@@ -18,9 +18,10 @@ export function recordLearning(roomCode: string | null, missionId: string | null
   window.dispatchEvent(new Event('entre-nos-learning-update'));
   return true;
 }
-export function learningPoints(roomCode: string | null) {
+export function learningPoints(roomCode: string | null, fortuneCards?: Record<string, { outcome: string }>) {
   const data = roomCode ? getLearning(roomCode) : empty();
   const consultation = Math.min(40, (data.guardian.length + data.commission.length) * 5);
   const knowledge = Math.min(60, data.correct.length * 15);
-  return { consultation, knowledge, total: consultation + knowledge, ...data };
+  const fortune = Object.values(fortuneCards || {}).reduce((sum, card) => sum + (card.outcome === 'sorte' ? 3 : card.outcome === 'reves' ? -3 : card.outcome === 'segunda_chance' ? 1 : 0), 0);
+  return { consultation, knowledge, fortune, total: Math.max(0, Math.min(100, consultation + knowledge + fortune)), ...data };
 }
