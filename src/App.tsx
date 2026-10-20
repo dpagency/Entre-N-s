@@ -42,8 +42,9 @@ export default function App() {
     resetScroll();
     const frame = window.requestAnimationFrame(resetScroll);
     const delayed = window.setTimeout(resetScroll, 100);
-    return () => { window.cancelAnimationFrame(frame); window.clearTimeout(delayed); };
-  }, [state?.phase, state?.activeMissionId]);
+    const late = window.setTimeout(resetScroll, 350);
+    return () => { window.cancelAnimationFrame(frame); window.clearTimeout(delayed); window.clearTimeout(late); };
+  }, [state?.phase, state?.activeMissionId, state?.fortuneCards?.[state?.activeMissionId || '']?.outcome, state?.myChoice]);
 
   // Modals
   const [isRulesOpen, setIsRulesOpen] = useState(false);
