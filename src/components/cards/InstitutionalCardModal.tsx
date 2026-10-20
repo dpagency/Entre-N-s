@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
+import { recordLearning } from '../../services/learningScore';
+import { socketService } from '../../services/socket';
 import { InstitutionalChannelDef } from '../../types/game';
 import { X, Scale, Briefcase, Megaphone, ShieldAlert, HeartHandshake, CheckCircle2, AlertOctagon, Info } from 'lucide-react';
 
@@ -78,7 +80,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
               return (
                 <button
                   key={ch.id}
-                  onClick={() => setSelectedChannel(ch)}
+                  onClick={() => { setSelectedChannel(ch); if (/comiss[aã]o de [eé]tica/i.test(ch.name)) recordLearning(socketService.roomCode, socketService.activeMissionId, 'commission'); }}
                   className={`w-full p-3 rounded-2xl text-left transition-all flex items-start gap-3 border ${
                     isSelected
                       ? 'bg-teal-950/70 border-teal-500/60 ring-1 ring-teal-500/40 text-white'
