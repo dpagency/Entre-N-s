@@ -18,8 +18,11 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   const [discoveryOpened, setDiscoveryOpened] = useState(false);
   const [showReflection, setShowReflection] = useState(false);
   const [cardAnswer, setCardAnswer] = useState<number | null>(null);
+  const [pendingCardAnswer, setPendingCardAnswer] = useState<number | null>(null);
   useEffect(() => {
     setDiscoveryOpened(false);
+    setCardAnswer(null);
+    setPendingCardAnswer(null);
     if (!state.fortuneCards?.[mission.id]) return;
     const timer = window.setTimeout(() => setDiscoveryOpened(true), 900);
     return () => window.clearTimeout(timer);
@@ -72,16 +75,18 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         <h3 className="font-bold text-amber-200">Revés · desafio rápido</h3>
         <p className="text-sm">Uma pessoa afetada pela decisão relata que não conseguiu participar. Qual seria o próximo passo mais cuidadoso?</p>
         {['Encerrar o assunto, pois a decisão já foi tomada.', 'Ouvir o relato e avaliar como considerar sua contribuição.', 'Exigir uma manifestação pública imediata.'].map((option, index) =>
-          <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setCardAnswer(index)} className={cardAnswer === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{index+1}. {option}</button>
+          <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{index+1}. {option}</button>
         )}
+        {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={() => setCardAnswer(pendingCardAnswer)} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
         {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">{cardAnswer === 1 ? 'Boa escolha! ' : 'Vale reconsiderar. '}Escutar e criar condições de participação ajuda a lidar com o imprevisto sem constrangimento.</p>}
       </section>}
       {fortune?.outcome === 'segunda_chance' && <section className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 space-y-3">
         <h3 className="font-bold text-amber-200">Segunda chance · outro olhar</h3>
         <p className="text-sm">Surge uma nova informação. Que caminho você exploraria agora? Sua decisão original permanece.</p>
         {['Conversar com alguém ainda não ouvido.', 'Buscar mais informações antes de agir.'].map((option, index) =>
-          <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setCardAnswer(index)} className={cardAnswer === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{option}</button>
+          <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{option}</button>
         )}
+        {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={() => setCardAnswer(pendingCardAnswer)} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
         {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">Um novo caminho se abre, sem apagar sua primeira escolha.</p>}
       </section>}
       {fortune?.outcome === 'sorte' && <section className="rounded-xl bg-slate-900 border border-teal-500/40 p-4"><p className="text-sm text-teal-200">Sorte! Você encontrou uma pista: {mission.discovery.subtitle}</p></section>}
