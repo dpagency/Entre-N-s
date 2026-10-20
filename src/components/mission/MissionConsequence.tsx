@@ -68,6 +68,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
             <span className="text-xs">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index+1}`}</span>
           </button>)}
         </div>
+        {fortune && <p role="status" className="text-lg font-black text-amber-200">{fortune.outcome === 'sorte' ? '+3 pontos' : fortune.outcome === 'reves' ? '−3 pontos' : '+1 ponto'}</p>}
         {fortune && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
       </section>
 
