@@ -18,7 +18,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
   const hasUsed = player.hasUsedPower;
 
   const handleUsePower = () => {
-    recordLearning(socketService.roomCode, state.activeMissionId, 'guardian');
+    recordLearning(socketService.roomCode, state.activeMissionId ?? null, 'guardian');
     socketService.send({
       type: 'USE_POWER',
       powerType: player.characterId,
@@ -57,7 +57,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state, disable
             {player.characterId === 'ravi' && <p className="text-sm leading-relaxed">Que voz ainda não ouvimos? Que consequência merece mais atenção? Sua decisão original permanece preservada.</p>}
             {player.characterId === 'bia' && <p className="text-sm leading-relaxed">Que perspectiva ainda não foi considerada? Releia as vozes dos envolvidos antes de seguir.</p>}
             <p className="text-xs text-slate-400">Consultar a orientação é livre. Você recebe pontos somente pela primeira consulta em cada missão; o poder especial continua sendo de uso único.</p>
-            <button type="button" onClick={() => { recordLearning(socketService.roomCode, state.activeMissionId, 'guardian'); setShowAdvice(false); }} className="w-full rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Terminei de ler</button>
+            <button type="button" onClick={() => { recordLearning(socketService.roomCode, state.activeMissionId ?? null, 'guardian'); setShowAdvice(false); }} className="w-full rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Terminei de ler</button>
           </div>
         </div>
       )}
