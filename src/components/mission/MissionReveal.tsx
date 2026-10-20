@@ -80,7 +80,7 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
                 <strong className="block text-2xl">{index + 1}</strong>
                 <div className="flex flex-col gap-2 items-center">
                   {playerHere && <span className="rounded-lg bg-teal-500/20 px-2 py-1 text-xs font-bold text-teal-200">Você</span>}
-                  {companionHere && <span className="rounded-lg border border-teal-500/50 px-2 py-1 text-xs text-teal-100">💎 {CHARACTERS[companion.characterId].name} <span className="block text-[10px]">companheiro</span></span>}
+                  {companionHere && <span className="rounded-lg border border-teal-500/50 px-2 py-1 text-xs text-teal-100">🤝 {CHARACTERS[companion.characterId].name} <span className="block text-[10px]">companheiro</span></span>}
                   {guardians.map(g => <span key={g.id} className="text-xs font-semibold text-slate-200">{CHARACTERS[g.characterId].name}</span>)}
                   {!playerHere && !companionHere && !guardians.length && <span className="text-xs text-slate-500">—</span>}
                 </div>
