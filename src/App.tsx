@@ -300,7 +300,7 @@ export default function App() {
             “Entre Nós — Guardiões da Convivência” • Jogo Sério Cooperativo de Ética no Cotidiano do Serviço Público
           </span>
           <span className="text-[11px] text-slate-600">
-            Vila dos Encontros • v1.2.0 • Banco Curatorial com 6 Missões
+            Cidade dos Encontros • v1.2.0 • Banco Curatorial com 6 Missões
           </span>
         </div>
       </footer>
