@@ -19,14 +19,8 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
   const guardianPerspectiveIndex: Record<string, number> = { alex: 0, joana: 1, ravi: 2, bia: 0 };
   const preferredIndex = guardianPerspectiveIndex[player.characterId] ?? 0;
   const perspective = perspectives[preferredIndex % Math.max(perspectives.length, 1)];
-  const reminders: Record<string, string> = {
-    alex: 'O que essa perspectiva revela sobre o contexto que talvez ainda não tenha sido considerado?',
-    joana: 'Como sua decisão pode afetar essa pessoa e as relações de convivência?',
-    ravi: 'Será que essa pessoa teve espaço para ser realmente ouvida?',
-    bia: 'O que muda quando você considera o ponto de vista dessa pessoa?',
-  };
   const guidance = perspective
-    ? `Lembre-se de ${perspective.actorName}: ${perspective.summary} ${reminders[player.characterId] ?? 'Como essa perspectiva influencia sua escolha?'}`
+    ? perspective.details || perspective.summary
     : mission?.situation.uncertainties?.[0] ?? 'Que perspectivas merecem atenção antes da sua decisão?';
 
   const consult = () => {
@@ -43,6 +37,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
         <div role="dialog" aria-modal="true" aria-label="Orientação do Guardião" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85">
           <div className="w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-3xl border border-amber-500/50 bg-slate-900 p-5 space-y-4 text-slate-100">
             <h3 className="text-lg font-black text-amber-200">Uma reflexão de {char.name}</h3>
+            {perspective && <p className="text-sm font-semibold text-teal-200">Lembre-se do que {perspective.actorName} disse:</p>}
             <p className="text-sm leading-relaxed">{guidance}</p>
             <div className="flex justify-end">
               <button type="button" onClick={() => setShowAdvice(false)} className="rounded-xl bg-amber-400 hover:bg-amber-300 px-5 py-2 text-sm font-bold text-slate-950">
