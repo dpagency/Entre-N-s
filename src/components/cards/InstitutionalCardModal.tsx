@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
 import { recordLearning } from '../../services/learningScore';
 import { socketService } from '../../services/socket';
@@ -18,6 +18,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
     INSTITUTIONAL_CHANNELS[0]
   );
 
+  const detailsRef = useRef<HTMLDivElement>(null);
   if (!isOpen) return null;
 
   const getIcon = (name: string) => {
@@ -72,15 +73,15 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
         </div>
 
         {/* Content body */}
-        <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-800">
+        <div className="flex-1 min-h-0 overflow-y-auto md:overflow-hidden grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-800">
           {/* Channel selector list (left) */}
-          <div className="md:col-span-5 p-4 space-y-2 bg-slate-950/40 overflow-y-auto">
+          <div className="md:col-span-5 p-4 space-y-2 bg-slate-950/40 md:overflow-y-auto">
             {INSTITUTIONAL_CHANNELS.map((ch) => {
               const isSelected = selectedChannel.id === ch.id;
               return (
                 <button
                   key={ch.id}
-                  onClick={() => { setSelectedChannel(ch); if (/comiss[aã]o de [eé]tica/i.test(ch.name)) recordLearning(socketService.roomCode, socketService.activeMissionId, 'commission'); }}
+                  onClick={() => { setSelectedChannel(ch); if (window.innerWidth < 768) window.requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })); if (/comiss[aã]o de [eé]tica/i.test(ch.name)) recordLearning(socketService.roomCode, socketService.activeMissionId, 'commission'); }}
                   className={`w-full p-3 rounded-2xl text-left transition-all flex items-start gap-3 border ${
                     isSelected
                       ? 'bg-teal-950/70 border-teal-500/60 ring-1 ring-teal-500/40 text-white'
@@ -106,7 +107,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
           </div>
 
           {/* Channel details (right) */}
-          <div className="md:col-span-7 p-5 sm:p-6 space-y-5 overflow-y-auto bg-slate-900">
+          <div ref={detailsRef} className="md:col-span-7 p-5 sm:p-6 space-y-5 md:overflow-y-auto bg-slate-900 scroll-mt-2">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-2xl bg-teal-500/20 text-teal-300 border border-teal-500/40">
                 {getIcon(selectedChannel.icon)}
