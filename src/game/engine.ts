@@ -388,7 +388,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     // O piloto começa diretamente na Vila, sem sondagem preliminar.
     for (const p of Object.values(room.players)) p.preTestCompleted = true;
     room.phase = 'BOARD_SELECT';
-    broadcastRoomState(room, 'A jornada começou! Escolha a primeira região da Vila dos Encontros.');
+    broadcastRoomState(room, 'A jornada começou! Escolha a primeira região da Cidade dos Encontros.');
     return;
   }
 

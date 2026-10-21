@@ -172,7 +172,6 @@ export default function App() {
         onOpenRules={() => setIsRulesOpen(true)}
         onOpenInstitutionalGuide={() => setIsInstitutionalGuideOpen(true)}
         onOpenAccessibility={() => setIsAccessibilityOpen(true)}
-        onOpenOrganizer={() => setIsOrganizerOpen(true)}
         onReturnHome={handleReturnHome}
       />
 
@@ -182,11 +181,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
         {showWelcome || !state || !myPlayerId ? (
           /* Welcome screen when not in a room */
-          <WelcomeScreen
-            onOpenRules={() => setIsRulesOpen(true)}
-            onOpenInstitutionalGuide={() => setIsInstitutionalGuideOpen(true)}
-            onOpenOrganizer={() => setIsOrganizerOpen(true)}
-          />
+          <WelcomeScreen />
         ) : (
           /* Game Phase Routing */
           <>
@@ -289,18 +284,6 @@ export default function App() {
           </>
         )}
       </main>
-
-      {/* Persistent Footer */}
-      <footer className="w-full border-t border-slate-900 bg-slate-950/90 py-4 px-4 text-center text-xs text-slate-500">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>
-            “Entre Nós — Guardiões da Convivência” • Jogo Sério Cooperativo de Ética no Cotidiano do Serviço Público
-          </span>
-          <span className="text-[11px] text-slate-600">
-            Cidade dos Encontros • v1.2.0 • Banco Curatorial com 6 Missões
-          </span>
-        </div>
-      </footer>
 
       {/* Global Modals */}
       <RulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />

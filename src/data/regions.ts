@@ -6,7 +6,7 @@ export const REGIONS: Record<RegionId, RegionDef> = {
     name: 'Praça do Encontro',
     subtitle: 'Convivência e Inclusão',
     theme: 'Escuta Ativa, Respeito à Diversidade e Diálogo',
-    description: 'O coração comunitário da Vila dos Encontros. Onde servidores e cidadãos circulam livremente, conversam nos intervalos e onde a convivência diária é testada em pequenas atitudes.',
+    description: 'O coração comunitário da Cidade dos Encontros. Onde servidores e cidadãos circulam livremente, conversam nos intervalos e onde a convivência diária é testada em pequenas atitudes.',
     color: '#10b981', // emerald-500
     bgGradient: 'from-emerald-950/80 via-slate-900 to-slate-950',
     iconName: 'Users',

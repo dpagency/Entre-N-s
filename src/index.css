@@ -5,22 +5,11 @@
 :root { font-family: 'Nunito', system-ui, sans-serif; }
 body, button, input, textarea { font-family: 'Nunito', system-ui, sans-serif; }
 h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-spacing: -.015em; font-weight: 900; }
-.game-welcome { max-width: 1080px; }
-@media (max-height: 850px) and (min-width: 640px) {
-  .game-welcome { padding-top: 0; padding-bottom: 0; }
-  .game-welcome > div:first-child { margin-bottom: 8px; }
-  .game-welcome > div:first-child p { display: none; }
-  .game-welcome .grid button { padding-top: 6px; padding-bottom: 6px; }
-}
-@media (max-width: 639px) {
-  .game-welcome { padding: 0 4px; }
-  .game-welcome > div:first-child p { display: none; }
-  .game-welcome .grid { gap: 5px; }
-  .game-welcome .grid button { padding: 5px 2px; gap: 3px; }
-  .game-welcome .grid button div { font-size: 12px; }
-  .game-welcome input { padding: 8px 10px; }
-  .game-welcome .game-title { font-size: 2rem; }
-}
+/* A abertura usa a largura do conteúdo e mantém as escolhas em ordem de leitura. */
+.game-welcome { max-width: 1280px; }
+.font-serif { font-family: 'Nunito', system-ui, sans-serif; }
+.game-welcome button, .game-welcome input { min-height: 44px; }
+.game-welcome p, .game-welcome span { overflow-wrap: anywhere; }
 
 /* Leitura confortável no celular: prevalece sobre utilitários tipográficos antigos. */
 @media (max-width: 639px) {
@@ -28,7 +17,7 @@ h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-s
   body { overflow-x: hidden; }
   #root { width: 100%; min-width: 0; overflow-x: clip; }
   main, main > div { min-width: 0; max-width: 100%; }
-  main .text-\\[10px\\], main .text-\\[11px\\], main .text-xs { font-size: 0.875rem; line-height: 1.45; }
+  main .text-\[10px\], main .text-\[11px\], main .text-xs { font-size: 0.875rem; line-height: 1.45; }
   main .text-sm { font-size: 1rem; line-height: 1.5; }
   main .text-base { font-size: 1.0625rem; line-height: 1.5; }
   main button { min-height: 44px; }

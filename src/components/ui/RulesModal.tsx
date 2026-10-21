@@ -46,7 +46,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
         <div className="space-y-6 text-sm sm:text-base text-slate-300 leading-relaxed">
           <section className="space-y-2">
             <h3 className="font-bold text-lg text-teal-300">Como jogar</h3>
-            <p>Você percorre a Vila dos Encontros em quatro missões. Em cada uma, conhece uma história, considera diferentes perspectivas e escolhe como agir. Não há necessidade de acertar a resposta de um Guardião: a decisão é sua.</p>
+            <p>Você percorre a Cidade dos Encontros em quatro missões. Em cada uma, conhece uma história, considera diferentes perspectivas e escolhe como agir. Não há necessidade de acertar a resposta de um Guardião: a decisão é sua.</p>
             <ol className="list-decimal pl-6 space-y-2">
               <li>Escolha seu Guardião e comece a jornada.</li>
               <li>No mapa, selecione uma região e leia ou ouça o dilema.</li>

@@ -1,6 +1,6 @@
 {
   "name": "Entre Nós — Guardiões da Convivência",
-  "description": "Jogo cooperativo de cartas e tabuleiro sobre ética no cotidiano do serviço público na Vila dos Encontros.",
+  "description": "Jogo cooperativo de cartas e tabuleiro sobre ética no cotidiano do serviço público na Cidade dos Encontros.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

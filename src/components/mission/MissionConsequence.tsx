@@ -141,7 +141,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
           <div className="mt-4 space-y-4">
             <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-slate-800 text-sm sm:text-base text-slate-200 leading-relaxed font-serif shadow-inner">
               <strong className="text-teal-400 block mb-1 text-xs uppercase tracking-wider font-sans">
-                Desdobramentos na Vila dos Encontros:
+                Desdobramentos na Cidade dos Encontros:
               </strong>
               <p data-narration="story">{chosenAction.consequenceDetails}</p>
             </div>

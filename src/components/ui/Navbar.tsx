@@ -1,6 +1,6 @@
 import React from 'react';
 import { RoomState } from '../../types/game';
-import { Shield, BookOpen, Eye, Scale, Home, Wifi, WifiOff } from 'lucide-react';
+import { BookOpen, Eye, Scale, Home, Wifi, WifiOff } from 'lucide-react';
 
 interface NavbarProps {
   state: RoomState | null;
@@ -8,7 +8,6 @@ interface NavbarProps {
   onOpenRules: () => void;
   onOpenInstitutionalGuide: () => void;
   onOpenAccessibility: () => void;
-  onOpenOrganizer: () => void;
   onReturnHome: () => void;
 }
 
@@ -18,12 +17,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenRules,
   onOpenInstitutionalGuide,
   onOpenAccessibility,
-  onOpenOrganizer,
   onReturnHome,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 text-slate-100">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-md select-none">
@@ -32,9 +30,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <span className="font-black text-sm sm:text-base tracking-tight text-slate-100 block leading-tight">
               Entre Nós
-            </span>
-            <span className="text-[10px] sm:text-xs font-medium text-teal-400 block leading-none">
-              Guardiões da Convivência
             </span>
           </div>
         </div>
@@ -69,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Institutional Guide Button */}
           <button
             onClick={onOpenInstitutionalGuide}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
             title="Guia de Canais Institucionais"
           >
             <Scale className="w-4 h-4 text-teal-400" />
@@ -79,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Rules Button */}
           <button
             onClick={onOpenRules}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
             title="Regras do Jogo"
           >
             <BookOpen className="w-4 h-4 text-indigo-400" />
@@ -89,26 +84,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Accessibility Button */}
           <button
             onClick={onOpenAccessibility}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
             title="Acessibilidade Visual"
           >
             <Eye className="w-4 h-4 text-amber-400" />
             <span className="hidden lg:inline">Acessibilidade</span>
           </button>
 
-          {/* Organizer Dashboard */}
-          <button
-            onClick={onOpenOrganizer}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-indigo-300 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-            title="Painel do Organizador"
-          >
-            <Shield className="w-4 h-4 text-rose-400" />
-            <span className="hidden lg:inline">Organizador</span>
-          </button>
-
           {state && (
             <button type="button" onClick={onReturnHome}
-              className="p-2 sm:px-3 rounded-xl bg-slate-900 hover:bg-teal-950 text-teal-300 border border-slate-800 flex items-center gap-1.5 text-xs font-semibold"
+              className="p-2 sm:px-3 rounded-xl bg-slate-900 hover:bg-teal-950 text-teal-300 border border-slate-800 flex items-center gap-1.5 text-sm font-semibold"
               title="Voltar ao início — sua jornada fica salva neste navegador">
               <Home className="w-4 h-4" />
               <span className="hidden lg:inline">Início</span>

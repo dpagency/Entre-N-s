@@ -51,7 +51,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
       {/* Solo sessions do not show the multiplayer waiting room. */}
       {isSolo ? (
         <section className="w-full max-w-xl mx-auto rounded-3xl border border-teal-500/40 bg-slate-900 p-5 sm:p-8 space-y-5 text-center">
-          <h1 className="text-2xl sm:text-3xl font-black">Sua jornada na Vila dos Encontros</h1>
+          <h1 className="text-2xl sm:text-3xl font-black">Sua jornada na Cidade dos Encontros</h1>
           <p className="text-base text-slate-200">Você viverá quatro missões, acompanhado pelo Guardião que escolheu. Os outros três serão jogadores robôs e escolherão suas próprias alternativas. As decisões serão sempre suas.</p>
           <p className="text-sm text-teal-300">Guardião acompanhante: <strong>{CHARACTERS[myPlayer?.characterId || 'alex'].name}</strong>. Você decide os caminhos da jornada.</p>
           <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
@@ -72,7 +72,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-100 mt-1">
-              {isSolo ? 'Vila dos Encontros • Sua jornada' : 'Vila dos Encontros • Sala de Espera'}
+              {isSolo ? 'Cidade dos Encontros • Sua jornada' : 'Cidade dos Encontros • Sala de Espera'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
               {isSolo ? 'Você e seus companheiros virtuais podem começar a jornada.' : 'Compartilhe o código ou o link direto com seus colegas de equipe para iniciarem a jornada ética.'}

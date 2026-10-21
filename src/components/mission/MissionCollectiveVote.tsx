@@ -71,7 +71,7 @@ export const MissionCollectiveVote: React.FC<MissionCollectiveVoteProps> = ({
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black text-slate-100 mt-1">
-          Qual decisão coletiva a Vila dos Encontros tomará?
+          Qual decisão coletiva a Cidade dos Encontros tomará?
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
           Vocês podem reconsiderar e alterar seu voto a qualquer momento antes do fechamento. O consenso ou a maioria qualificada constrói o desfecho.

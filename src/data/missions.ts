@@ -12,7 +12,7 @@ export const MISSIONS: MissionDef[] = [
     missionType: 'reflexiva',
     pedagogicalGoal: 'Compreender a diferença entre pressionar por participação e construir condições reais de acolhimento e autonomia para colegas novatos.',
     situation: {
-      context: 'Na sala comunitária da Vila dos Encontros, a equipe debate a reformulação dos fluxos de atendimento aos cidadãos. Entre os presentes está Lucas, servidor recém-empossado há três semanas.',
+      context: 'Na sala comunitária da Cidade dos Encontros, a equipe debate a reformulação dos fluxos de atendimento aos cidadãos. Entre os presentes está Lucas, servidor recém-empossado há três semanas.',
       trigger: 'Durante toda a reunião de 45 minutos, decisões cruciais foram debatidas por colegas mais experientes, enquanto Lucas permaneceu em silêncio contínuo, apenas anotando em seu caderno.',
       knownFacts: [
         'Lucas veio de outro órgão e tem experiência prévia em triagem digital.',
@@ -354,7 +354,7 @@ export const MISSIONS: MissionDef[] = [
     missionType: 'reflexiva',
     pedagogicalGoal: 'Refletir sobre o equilíbrio delicado entre humanização do acolhimento ao cidadão vulnerável, equidade de atendimento e limites legítimos da jornada de trabalho do servidor.',
     situation: {
-      context: 'No balcão presencial do Portal do Atendimento da Vila dos Encontros, o horário de encerramento do expediente é às 17h.',
+      context: 'No balcão presencial do Portal do Atendimento da Cidade dos Encontros, o horário de encerramento do expediente é às 17h.',
       trigger: 'Às 16h53, chega Dona Conceição, senhora idosa que pegou dois ônibus da zona rural, trazendo uma pasta com papéis para tentar solicitar um benefício assistencial essencial.',
       knownFacts: [
         'A lista de exigências é longa e complexa; uma análise completa levaria pelo menos 30 a 40 minutos.',
@@ -584,7 +584,7 @@ export const MISSIONS: MissionDef[] = [
     missionType: 'fundamentada',
     pedagogicalGoal: 'Diferenciar lealdade pessoal ou corporativa de lealdade ao interesse público, atuando com prudência e canais institucionais sem confundir suspeita com condenação sumária nem acobertar irregularidades.',
     situation: {
-      context: 'Na fiscalização de um contrato de prestação de serviços de transporte e manutenção da Vila dos Encontros, a equipe está fechando a medição mensal.',
+      context: 'Na fiscalização de um contrato de prestação de serviços de transporte e manutenção da Cidade dos Encontros, a equipe está fechando a medição mensal.',
       trigger: 'Um colega próximo e querido na equipe pede que você assine a atestação de serviços sem registrar que metade dos veículos terceirizados não prestou o serviço contratado naquele mês: “Se você apontar isso no laudo, a chefia vai cancelar nosso contrato todo, a empresa vai demitir terceirizados e nossa equipe vai ficar mal vista. Faz vista grossa dessa vez pela nossa amizade”.',
       knownFacts: [
         'A ausência dos veículos acarretou prejuízo de atendimento aos cidadãos nos bairros periféricos.',
