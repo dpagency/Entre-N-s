@@ -180,7 +180,7 @@ export default function App() {
         onOpenInstitutionalGuide={() => setIsInstitutionalGuideOpen(true)}
         onOpenAccessibility={() => setIsAccessibilityOpen(true)}
         onOpenOrganizer={() => setIsOrganizerOpen(true)}
-        onLeaveRoom={handleLeaveRoom}
+        onLeaveRoom={handleReturnHome}
         onReturnHome={handleReturnHome}
       />
 
@@ -203,11 +203,7 @@ export default function App() {
                 state={state as any}
                 myPlayerId={myPlayerId}
                 onOpenRules={() => setIsRulesOpen(true)}
-                onBackToGuardianSelection={() => {
-                  socketService.leaveRoom();
-                  setState(null);
-                  setMyPlayerId(null);
-                }}
+                onBackToGuardianSelection={handleReturnHome}
               />
             )}
 
