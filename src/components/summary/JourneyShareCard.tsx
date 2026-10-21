@@ -89,6 +89,30 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
     }
   };
 
+  const invite = async () => {
+    const url = window.location.origin + '/';
+    const text = 'Venha conhecer o Entre Nós — Guardiões da Convivência. Que caminhos você escolheria?';
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Entre Nós — Guardiões da Convivência', text, url });
+        setMessage('Convite pronto para compartilhar.');
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text + '\n' + url);
+        setMessage('Convite copiado. Envie para quem quiser convidar.');
+      } else {
+        setMessage('Compartilhe este endereço: ' + url);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return;
+      try {
+        await navigator.clipboard.writeText(text + '\n' + url);
+        setMessage('Convite copiado. Envie para quem quiser convidar.');
+      } catch {
+        setMessage('Compartilhe este endereço: ' + url);
+      }
+    }
+  };
+
   return <section className="rounded-3xl border border-teal-500/40 bg-slate-900 p-5 space-y-4" aria-label="Compartilhe sua jornada">
     <h2 className="text-xl font-black text-teal-200">Compartilhe sua jornada</h2>
     <p className="text-sm text-slate-300">Uma lembrança com seu avatar e o Guardião que acompanhou você, sem revelar decisões ou pontuações.</p>
@@ -105,7 +129,7 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
     <div className="flex flex-wrap gap-2">
       <button type="button" onClick={share} className="flex-1 rounded-xl bg-teal-500 px-4 py-3 font-bold text-slate-950">Compartilhar imagem</button>
       <button type="button" onClick={download} className="flex-1 rounded-xl border border-teal-500/50 px-4 py-3 font-bold text-teal-100">Salvar imagem</button>
-      <button type="button" onClick={() => { void navigator.clipboard.writeText(REFLECTION + '\nEntre Nós — Guardiões da Convivência\n' + window.location.origin).then(() => setMessage('Convite copiado.')).catch(() => setMessage('Não foi possível copiar.')); }} className="w-full rounded-xl border border-slate-700 px-4 py-3 text-sm">Copiar convite</button>
+      <button type="button" onClick={() => { void invite(); }} className="w-full rounded-xl border border-slate-700 px-4 py-3 text-sm">Convidar alguém para jogar</button>
     </div>
     {message && <p role="status" className="text-xs text-teal-200">{message}</p>}
   </section>;
