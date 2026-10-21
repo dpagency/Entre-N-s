@@ -57,6 +57,18 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
             </ol>
             <p className="text-teal-200">Você pode pausar a narração e ajustar sua velocidade. As cartas trazem elementos de sorte, revés ou segunda chance, sem representar punição moral.</p>
           </section>
+          <section className="space-y-3 border-t border-slate-700 pt-5">
+            <h3 className="font-bold text-lg text-teal-300">Como ganhar pontos de aprendizagem</h3>
+            <p>Os pontos reconhecem a busca de orientação e o conhecimento demonstrado. Não há pontuação por escolher uma ação considerada moralmente certa nos dilemas.</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong className="text-slate-100">Consultar seu Guardião:</strong> +5 pontos por missão, na primeira consulta registrada.</li>
+              <li><strong className="text-slate-100">Consultar a Comissão de Ética:</strong> +5 pontos por missão, na primeira consulta registrada. Buscar orientação não exige acertar uma pergunta.</li>
+              <li><strong className="text-slate-100">Responder corretamente ao desafio de verdadeiro ou falso:</strong> +15 pontos por missão.</li>
+              <li><strong className="text-slate-100">Cartas do destino:</strong> Sorte +3, Revés −3 e Segunda chance +1 ponto, conforme a carta revelada.</li>
+            </ul>
+            <p>As consultas somam até 40 pontos e as respostas corretas, até 60. As cartas ajustam o resultado; a pontuação final permanece entre 0 e 100. Repetir a mesma consulta na missão não gera pontos extras.</p>
+            <p className="text-xs text-slate-400">A pontuação é experimental e serve à aprendizagem, não à avaliação moral ou funcional do jogador.</p>
+          </section>
           <section className="space-y-2 border-t border-slate-700 pt-5">
             <h3 className="font-bold text-lg text-teal-300">Os quatro Guardiões</h3>
             <p>Cada Guardião simboliza uma maneira de observar dilemas. Eles são guias de reflexão, não juízes das suas escolhas.</p>
