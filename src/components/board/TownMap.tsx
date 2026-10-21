@@ -1,4 +1,8 @@
 import React from 'react';
+
+const CITY_IMAGE = '/personagens/cidade-dos-encontros.webp';
+let cityImageReady = false;
+
 import { RegionId, RoomState } from '../../types/game';
 import { REGIONS, REGION_LIST } from '../../data/regions';
 import { MISSIONS } from '../../data/missions';
@@ -16,6 +20,17 @@ export const TownMap: React.FC<TownMapProps> = ({
   myPlayerId,
   onSelectRegionDetails,
 }) => {
+  const [imageReady, setImageReady] = React.useState(cityImageReady);
+  React.useEffect(() => {
+    if (cityImageReady) return;
+    let mounted = true;
+    const image = new Image();
+    image.onload = () => { cityImageReady = true; if (mounted) setImageReady(true); };
+    image.onerror = () => { if (mounted) setImageReady(true); };
+    image.src = CITY_IMAGE;
+    if (image.complete && image.naturalWidth > 0) { cityImageReady = true; setImageReady(true); }
+    return () => { mounted = false; };
+  }, []);
   const isVoting = state.phase === 'BOARD_SELECT';
   const myVote = state.destinationVotes[myPlayerId];
   const isHost = state.hostId === myPlayerId;
@@ -96,12 +111,14 @@ export const TownMap: React.FC<TownMapProps> = ({
       {/* SVG Map Canvas: desktop only; on phones use accessible region grid below. */}
       <div className="hidden sm:block relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[520px] rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
         <img
-          src="/personagens/cidade-dos-encontros.webp"
+          src={CITY_IMAGE}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-center"
           draggable={false}
+          fetchPriority="high"
         />
+        {!imageReady && <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-900 text-sm text-teal-200" role="status">Preparando a Cidade dos Encontros…</div>}
         <div className="absolute inset-0 bg-slate-950/10 pointer-events-none" aria-hidden="true" />
         <svg
           viewBox="0 0 1000 600"
