@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MissionDef, RoomState } from '../../types/game';
 import { DiscoveryCard } from '../cards/CardView';
 import { socketService } from '../../services/socket';
+import { SECOND_CHANCE_SCENARIOS, SETBACK_SCENARIOS } from '../../data/fortuneScenarios';
 import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, BookOpen, Lock, LockOpen } from 'lucide-react';
 
 interface MissionConsequenceProps {
@@ -44,6 +45,27 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   const isLastMission = completedCount >= 4;
   const fortune = state.fortuneCards?.[mission.id];
 
+  const scenarioFor = (kind: 'reves' | 'segunda_chance') => {
+    const pool = kind === 'reves' ? SETBACK_SCENARIOS : SECOND_CHANCE_SCENARIOS;
+    const sessionKey = 'entre-nos-card-scenario-' + (socketService.roomCode || 'solo') + '-' + mission.id + '-' + kind;
+    const lastKey = 'entre-nos-card-last-' + kind;
+    try {
+      const saved = localStorage.getItem(sessionKey);
+      const existing = pool.find(item => item.id === saved);
+      if (existing) return existing;
+      const previous = localStorage.getItem(lastKey);
+      const available = pool.filter(item => item.id !== previous);
+      const chosen = available[Math.floor(Math.random() * available.length)];
+      localStorage.setItem(sessionKey, chosen.id);
+      localStorage.setItem(lastKey, chosen.id);
+      return chosen;
+    } catch { return pool[0]; }
+  };
+  const [scenario, setScenario] = useState<ReturnType<typeof scenarioFor> | null>(null);
+  useEffect(() => {
+    const kind = state.fortuneCards?.[mission.id]?.outcome;
+    setScenario(kind === 'reves' || kind === 'segunda_chance' ? scenarioFor(kind) : null);
+  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome]);
   const handleProceed = () => {
     socketService.send({
       type: 'PROCEED_AFTER_CONSEQUENCE',
@@ -72,23 +94,15 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         {fortune && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
       </section>
 
-      {fortune?.outcome === 'reves' && <section className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 space-y-3">
-        <h3 className="font-bold text-amber-200">Revés · desafio rápido</h3>
-        <p className="text-sm">Uma pessoa afetada pela decisão relata que não conseguiu participar. Qual seria o próximo passo mais cuidadoso?</p>
-        {['Encerrar o assunto, pois a decisão já foi tomada.', 'Ouvir o relato e avaliar como considerar sua contribuição.', 'Exigir uma manifestação pública imediata.'].map((option, index) =>
-          <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{index+1}. {option}</button>
-        )}
-        {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={() => setCardAnswer(pendingCardAnswer)} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
-        {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">{cardAnswer === 1 ? 'Boa escolha! ' : 'Vale reconsiderar. '}Escutar e criar condições de participação ajuda a lidar com o imprevisto sem constrangimento.</p>}
-      </section>}
-      {fortune?.outcome === 'segunda_chance' && <section className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 space-y-3">
-        <h3 className="font-bold text-amber-200">Segunda chance · outro olhar</h3>
-        <p className="text-sm">Surge uma nova informação. Que caminho você exploraria agora? Sua decisão original permanece.</p>
-        {['Conversar com alguém ainda não ouvido.', 'Buscar mais informações antes de agir.'].map((option, index) =>
+      {(fortune?.outcome === 'reves' || fortune?.outcome === 'segunda_chance') && scenario && <section className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 space-y-3">
+        <h3 className="font-bold text-amber-200">{fortune.outcome === 'reves' ? 'Revés · desafio rápido' : 'Segunda chance · outro olhar'}</h3>
+        <p className="text-sm">{scenario.prompt}</p>
+        {fortune.outcome === 'segunda_chance' && <p className="text-xs text-slate-400">Sua decisão original permanece.</p>}
+        {scenario.options.map((option, index) =>
           <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{option}</button>
         )}
         {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={() => setCardAnswer(pendingCardAnswer)} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
-        {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">Um novo caminho se abre, sem apagar sua primeira escolha.</p>}
+        {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">{scenario.feedback[cardAnswer]}</p>}
       </section>}
       {fortune?.outcome === 'sorte' && <section className="rounded-xl bg-slate-900 border border-teal-500/40 p-4"><p className="text-sm text-teal-200">Sorte! Você encontrou uma pista: {mission.discovery.subtitle}</p></section>}
       {fortune && <section className="rounded-xl bg-slate-900 border border-slate-700 p-4"><p className="text-sm text-amber-200 font-bold">Descoberta: {mission.discovery.title}</p></section>}
