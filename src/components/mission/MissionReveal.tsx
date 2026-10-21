@@ -79,7 +79,14 @@ export const MissionReveal: React.FC<MissionRevealProps> = ({
               return <div key={action.id} className={`rounded-xl border p-3 text-center space-y-2 ${playerHere ? 'border-teal-400 bg-teal-950/40' : 'border-slate-700 bg-slate-950/60'}`}>
                 <strong className="block text-2xl">{index + 1}</strong>
                 <div className="flex flex-col gap-2 items-center">
-                  {playerHere && <span className="rounded-lg bg-teal-500/20 px-2 py-1 text-xs font-bold text-teal-200">Você</span>}
+                  {playerHere && <div className="flex flex-col items-center gap-1 rounded-lg bg-teal-500/20 px-2 py-2 text-xs font-bold text-teal-200">
+                    <img
+                      src={['/personagens/avatar_exploradora.png', '/personagens/avatar_observador.png', '/personagens/avatar_construtora.png', '/personagens/avatar_estrategista.png'][((companion?.variantIndex ?? 0) % 4 + 4) % 4]}
+                      alt="Seu avatar"
+                      className="h-10 w-10 rounded-full object-cover border-2 border-teal-300/60"
+                    />
+                    <span>Você</span>
+                  </div>}
                   {companionHere && <div className="flex flex-col items-center gap-1 rounded-lg border border-teal-500/50 px-2 py-2 text-xs text-teal-100"><CharacterAvatar characterId={companion.characterId} size="sm" showBadge={false} /><span>🤝 {CHARACTERS[companion.characterId].name}</span><span className="text-[10px]">companheiro</span></div>}
                   {guardians.map(g => <div key={g.id} className="flex flex-col items-center gap-1"><CharacterAvatar characterId={g.characterId} size="sm" showBadge={false} /><span className="text-xs font-semibold text-slate-200">{CHARACTERS[g.characterId].name}</span></div>)}
                   {!playerHere && !companionHere && !guardians.length && <span className="text-xs text-slate-500">—</span>}
