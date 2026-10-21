@@ -27,6 +27,7 @@ export default function App() {
   const [state, setState] = useState<SanitizedRoomState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [myPlayerId, setMyPlayerId] = useState<string | null>(socketService.myPlayerId);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   // A transição de fase deve reposicionar a leitura antes de pintar a nova tela.
   // Repetimos após a atualização de layout para evitar restauração de scroll no mobile.
@@ -77,6 +78,7 @@ export default function App() {
 
     const unsubState = socketService.onState((newState) => {
       setState(newState);
+      setShowWelcome(false);
       if (socketService.myPlayerId) {
         setMyPlayerId(socketService.myPlayerId);
       }
@@ -107,6 +109,12 @@ export default function App() {
       unsubPower();
     };
   }, []);
+
+  const handleReturnHome = () => {
+    // Pausar apenas a visualização: o snapshot solo permanece salvo no navegador.
+    setShowWelcome(true);
+    window.scrollTo(0, 0);
+  };
 
   const handleLeaveRoom = () => {
     if (window.confirm('Deseja realmente sair da sala atual?')) {
@@ -173,13 +181,14 @@ export default function App() {
         onOpenAccessibility={() => setIsAccessibilityOpen(true)}
         onOpenOrganizer={() => setIsOrganizerOpen(true)}
         onLeaveRoom={handleLeaveRoom}
+        onReturnHome={handleReturnHome}
       />
 
       <JourneyAudio phase={state?.phase} missionId={state?.activeMissionId} />
 
       {/* Main content body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
-        {!state || !myPlayerId ? (
+        {showWelcome || !state || !myPlayerId ? (
           /* Welcome screen when not in a room */
           <WelcomeScreen
             onOpenRules={() => setIsRulesOpen(true)}
