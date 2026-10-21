@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
+import { ADDITIONAL_QUESTIONS } from '../../data/ethicsQuestions';
 import { recordLearning } from '../../services/learningScore';
 import { socketService } from '../../services/socket';
 import { InstitutionalChannelDef } from '../../types/game';
@@ -19,6 +20,33 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   );
 
   const detailsRef = useRef<HTMLDivElement>(null);
+  const [quiz, setQuiz] = useState<{ missionId: string; index: number; answer?: boolean } | null>(null);
+  const missionId = socketService.activeMissionId;
+  const question = quiz && ADDITIONAL_QUESTIONS[quiz.index];
+  const openQuiz = () => {
+    if (!missionId) return;
+    const key = 'entre-nos-channel-quiz-' + (socketService.roomCode || '') + '-' + missionId;
+    try {
+      const saved = window.localStorage.getItem(key);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setQuiz({ missionId, index: parsed.index, answer: parsed.answer });
+        return;
+      }
+      const index = Math.floor(Math.random() * ADDITIONAL_QUESTIONS.length);
+      window.localStorage.setItem(key, JSON.stringify({ index }));
+      setQuiz({ missionId, index });
+    } catch {
+      setQuiz({ missionId, index: 0 });
+    }
+  };
+  const answerQuiz = (answer: boolean) => {
+    if (!quiz || !question || quiz.answer !== undefined) return;
+    if (answer === question.isTrue) recordLearning(socketService.roomCode, quiz.missionId, 'channelCorrect');
+    const next = { ...quiz, answer };
+    setQuiz(next);
+    try { window.localStorage.setItem('entre-nos-channel-quiz-' + (socketService.roomCode || '') + '-' + quiz.missionId, JSON.stringify({ index: quiz.index, answer })); } catch { /* optional persistence */ }
+  };
   if (!isOpen) return null;
 
   const getIcon = (name: string) => {
@@ -150,6 +178,25 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
               </p>
             </div>
 
+            <section className="rounded-2xl border border-teal-500/40 bg-teal-950/20 p-4 space-y-3">
+              <h4 className="font-bold text-teal-200">Para refletir · verdadeiro ou falso</h4>
+              <p className="text-xs text-slate-300">A consulta é livre. Se quiser, responda uma pergunta educativa. Acertar vale +5 pontos de conhecimento por missão, sem substituir o acesso ao canal.</p>
+              {!missionId ? <p className="text-xs text-slate-400">O desafio fica disponível durante as missões.</p> : !quiz || quiz.missionId !== missionId ? (
+                <button type="button" onClick={openQuiz} className="rounded-xl bg-teal-600 px-4 py-2 text-sm font-bold text-slate-950">Responder uma pergunta</button>
+              ) : question && (
+                <>
+                  <p className="text-sm text-slate-100">{question.statement}</p>
+                  {quiz.answer === undefined ? <div className="flex gap-2">
+                    <button type="button" onClick={() => answerQuiz(true)} className="rounded-lg bg-slate-700 px-4 py-2 text-sm">Verdadeiro</button>
+                    <button type="button" onClick={() => answerQuiz(false)} className="rounded-lg bg-slate-700 px-4 py-2 text-sm">Falso</button>
+                  </div> : <div className="space-y-2 text-sm">
+                    <p className="font-bold text-teal-200">{quiz.answer === question.isTrue ? 'Resposta correta! +5 pontos de conhecimento.' : 'Vamos aprender juntos:'}</p>
+                    <p>{question.explanation}</p>
+                    <p className="text-xs text-slate-400">{question.sourceNote}</p>
+                  </div>}
+                </>
+              )}
+            </section>
             {/* Flow clarification */}
             <div className="text-xs text-slate-400 bg-slate-950/50 p-3 rounded-xl border border-slate-800/80">
               <strong className="text-slate-300">Esclarecimento de Fluxo:</strong> {selectedChannel.flowClarification}
