@@ -1,4 +1,5 @@
 import React from 'react';
+import { LearningConfetti } from '../ui/LearningConfetti';
 import { MissionDef, RoomState } from '../../types/game';
 import { socketService } from '../../services/socket';
 import { recordLearning } from '../../services/learningScore';
@@ -65,6 +66,7 @@ export const TrueFalseChallenge: React.FC<TrueFalseChallengeProps> = ({
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto text-slate-100 animate-in fade-in">
       <div className="bg-slate-900 border border-indigo-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        {hasAnswered && myAnswer === tf.isTrue && <LearningConfetti />}
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5" />
