@@ -75,7 +75,7 @@ export const TownMap: React.FC<TownMapProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
-              Vila dos Encontros
+              Cidade dos Encontros
             </span>
             <span className="text-xs text-slate-400">
               Progresso da Jornada: <strong className="text-amber-400">{state.completedMissionIds.length}/4 Missões</strong>
@@ -95,105 +95,25 @@ export const TownMap: React.FC<TownMapProps> = ({
 
       {/* SVG Map Canvas: desktop only; on phones use accessible region grid below. */}
       <div className="hidden sm:block relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[520px] rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
+        <img
+          src="/personagens/cidade-dos-encontros.webp"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          draggable={false}
+        />
+        <div className="absolute inset-0 bg-slate-950/10 pointer-events-none" aria-hidden="true" />
         <svg
           viewBox="0 0 1000 600"
           className="w-full h-full pointer-events-none"
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* Background landscape texture */}
+          {/* Marcador sobre a paisagem ilustrada; os cartões continuam botões HTML acessíveis. */}
           <defs>
-            <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#0d9488" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#020617" stopOpacity="0.8" />
-            </radialGradient>
-            <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0369a1" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#0891b2" stopOpacity="0.6" />
-            </linearGradient>
             <filter id="shadowFilter" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000" floodOpacity="0.6" />
             </filter>
           </defs>
-
-          {/* Land background */}
-          <rect width="1000" height="600" fill="url(#mapGlow)" />
-
-          {/* Gentle stylized river dividing regions */}
-          <path
-            d="M 520 -10 C 490 180 530 320 480 440 C 440 540 470 610 470 610"
-            fill="none"
-            stroke="url(#riverGrad)"
-            strokeWidth="38"
-            strokeLinecap="round"
-          />
-          <path
-            d="M 520 -10 C 490 180 530 320 480 440 C 440 540 470 610 470 610"
-            fill="none"
-            stroke="#38bdf8"
-            strokeWidth="2"
-            strokeDasharray="6 6"
-            opacity="0.4"
-          />
-
-          {/* Cobblestone paths connecting the 4 regions */}
-          {/* Praca (280, 210) to Sala (720, 192) */}
-          <path
-            d="M 280 210 Q 500 130 720 192"
-            fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="5"
-            strokeDasharray="8 8"
-            strokeOpacity="0.25"
-          />
-          {/* Praca (280, 210) to Oficina (320, 450) */}
-          <path
-            d="M 280 210 Q 300 330 320 450"
-            fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="5"
-            strokeDasharray="8 8"
-            strokeOpacity="0.25"
-          />
-          {/* Sala (720, 192) to Portal (750, 432) */}
-          <path
-            d="M 720 192 Q 740 310 750 432"
-            fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="5"
-            strokeDasharray="8 8"
-            strokeOpacity="0.25"
-          />
-          {/* Oficina (320, 450) to Portal (750, 432) via stone bridge over river */}
-          <path
-            d="M 320 450 Q 500 480 750 432"
-            fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="5"
-            strokeDasharray="8 8"
-            strokeOpacity="0.25"
-          />
-          {/* Central bridge overlay over river */}
-          <rect x="475" y="445" width="40" height="20" rx="4" fill="#64748b" stroke="#94a3b8" strokeWidth="2" />
-
-          {/* Decorative town elements (stylized trees, houses, lanterns) */}
-          {/* Grove near Praca */}
-          <circle cx="160" cy="180" r="18" fill="#065f46" opacity="0.6" />
-          <circle cx="185" cy="165" r="14" fill="#047857" opacity="0.6" />
-          <circle cx="150" cy="220" r="16" fill="#059669" opacity="0.6" />
-
-          {/* Civic pillars near Sala */}
-          <rect x="830" y="140" width="8" height="35" rx="2" fill="#475569" opacity="0.7" />
-          <rect x="850" y="140" width="8" height="35" rx="2" fill="#475569" opacity="0.7" />
-          <rect x="870" y="140" width="8" height="35" rx="2" fill="#475569" opacity="0.7" />
-          <polygon points="820,140 860,115 900,140" fill="#334155" opacity="0.8" />
-
-          {/* Workshop gears near Oficina */}
-          <circle cx="180" cy="460" r="22" fill="#78350f" opacity="0.4" stroke="#d97706" strokeWidth="2" strokeDasharray="4 4" />
-          <circle cx="180" cy="460" r="8" fill="#1e293b" />
-
-          {/* Harbor beacon near Portal */}
-          <circle cx="860" cy="450" r="16" fill="#0891b2" opacity="0.4" />
-          <polygon points="860,420 848,460 872,460" fill="#0284c7" opacity="0.7" />
 
           {/* Collective Pawn / Team Marker */}
           {(() => {
@@ -311,7 +231,7 @@ export const TownMap: React.FC<TownMapProps> = ({
         })}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:hidden" aria-label="Regiões da Vila dos Encontros">
+      <div className="grid grid-cols-2 gap-3 sm:hidden" aria-label="Regiões da Cidade dos Encontros">
         {REGION_LIST.map(region => {
           const missions = isSolo ? MISSIONS.filter(m => m.regionId === region.id).slice(0, 1) : MISSIONS.filter(m => m.regionId === region.id);
           const done = missions.filter(m => state.completedMissionIds.includes(m.id)).length;
