@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
 import { ADDITIONAL_QUESTIONS } from '../../data/ethicsQuestions';
-import { recordLearning } from '../../services/learningScore';
+import { recordLearning, learningPoints } from '../../services/learningScore';
 import { socketService } from '../../services/socket';
 import { InstitutionalChannelDef } from '../../types/game';
 import { X, Scale, Briefcase, Megaphone, ShieldAlert, HeartHandshake, CheckCircle2, AlertOctagon, Info } from 'lucide-react';
@@ -20,7 +20,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   );
 
   const detailsRef = useRef<HTMLDivElement>(null);
-  const [quiz, setQuiz] = useState<{ missionId: string; index: number; answer?: boolean } | null>(null);
+  const [quiz, setQuiz] = useState<{ missionId: string; index: number; answer?: boolean; awarded?: boolean } | null>(null);
   const missionId = socketService.activeMissionId;
   const question = quiz && ADDITIONAL_QUESTIONS[quiz.index];
   const openQuiz = () => {
@@ -30,7 +30,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
       const saved = window.localStorage.getItem(key);
       if (saved) {
         const parsed = JSON.parse(saved);
-        setQuiz({ missionId, index: parsed.index, answer: parsed.answer });
+        setQuiz({ missionId, index: parsed.index, answer: parsed.answer, awarded: parsed.awarded });
         return;
       }
       const index = Math.floor(Math.random() * ADDITIONAL_QUESTIONS.length);
@@ -42,10 +42,10 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   };
   const answerQuiz = (answer: boolean) => {
     if (!quiz || !question || quiz.answer !== undefined) return;
-    if (answer === question.isTrue) recordLearning(socketService.roomCode, quiz.missionId, 'channelCorrect');
-    const next = { ...quiz, answer };
+    const awarded = answer === question.isTrue && recordLearning(socketService.roomCode, quiz.missionId, 'channelCorrect');
+    const next = { ...quiz, answer, awarded };
     setQuiz(next);
-    try { window.localStorage.setItem('entre-nos-channel-quiz-' + (socketService.roomCode || '') + '-' + quiz.missionId, JSON.stringify({ index: quiz.index, answer })); } catch { /* optional persistence */ }
+    try { window.localStorage.setItem('entre-nos-channel-quiz-' + (socketService.roomCode || '') + '-' + quiz.missionId, JSON.stringify({ index: quiz.index, answer, awarded })); } catch { /* optional persistence */ }
   };
   if (!isOpen) return null;
 
@@ -190,7 +190,8 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                     <button type="button" onClick={() => answerQuiz(true)} className="rounded-lg bg-slate-700 px-4 py-2 text-sm">Verdadeiro</button>
                     <button type="button" onClick={() => answerQuiz(false)} className="rounded-lg bg-slate-700 px-4 py-2 text-sm">Falso</button>
                   </div> : <div className="space-y-2 text-sm">
-                    <p className="font-bold text-teal-200">{quiz.answer === question.isTrue ? 'Resposta correta! +5 pontos de conhecimento.' : 'Vamos aprender juntos:'}</p>
+                    <p className="font-bold text-teal-200">{quiz.answer !== question.isTrue ? 'Vamos aprender juntos:' : quiz.awarded ? 'Resposta correta! Você ganhou +5 pontos de conhecimento.' : 'Resposta correta! Esta missão já teve seus pontos de conhecimento registrados.'}</p>
+                    {quiz.awarded && <p role="status" className="font-semibold text-teal-100">Pontuação de aprendizagem atual: {learningPoints(socketService.roomCode).knowledge} pontos de conhecimento.</p>}
                     <p>{question.explanation}</p>
                     <p className="text-xs text-slate-400">{question.sourceNote}</p>
                   </div>}
