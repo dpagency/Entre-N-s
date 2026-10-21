@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { LearningConfetti } from '../ui/LearningConfetti';
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
 import { ADDITIONAL_QUESTIONS } from '../../data/ethicsQuestions';
 import { recordLearning, learningPoints } from '../../services/learningScore';
@@ -178,7 +179,8 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
               </p>
             </div>
 
-            <section className="rounded-2xl border border-teal-500/40 bg-teal-950/20 p-4 space-y-3">
+            <section className="relative overflow-hidden rounded-2xl border border-teal-500/40 bg-teal-950/20 p-4 space-y-3">
+              {quiz?.awarded && quiz.missionId === missionId && <LearningConfetti />}
               <h4 className="font-bold text-teal-200">Para refletir · verdadeiro ou falso</h4>
               <p className="text-xs text-slate-300">A consulta é livre. Se quiser, responda uma pergunta educativa. Acertar vale +5 pontos de conhecimento por missão, sem substituir o acesso ao canal.</p>
               {!missionId ? <p className="text-xs text-slate-400">O desafio fica disponível durante as missões.</p> : !quiz || quiz.missionId !== missionId ? (
