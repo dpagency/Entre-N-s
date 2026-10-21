@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PlayerSession, RoomState, SanitizedRoomState } from '../../types/game';
 import { CHARACTERS } from '../../data/characters';
+import { CharacterAvatar } from './CharacterAvatar';
 import { MISSIONS } from '../../data/missions';
 import { socketService } from '../../services/socket';
 import { recordLearning } from '../../services/learningScore';
@@ -37,9 +38,19 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
       {showAdvice && (
         <div role="dialog" aria-modal="true" aria-label="Orientação do Guardião" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85">
           <div className="w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-3xl border border-amber-500/50 bg-slate-900 p-5 space-y-4 text-slate-100">
-            <h3 className="text-lg font-black text-amber-200">Uma reflexão de {char.name}</h3>
-            {perspective && <p className="text-sm font-semibold text-teal-200">Lembre-se do que {perspective.actorName} disse:</p>}
-            <p className="text-sm leading-relaxed">{guidance}</p>
+            <div className="flex items-center gap-3">
+              <CharacterAvatar characterId={player.characterId} size="lg" showBadge={false} />
+              <h3 className="text-lg font-black text-amber-200">Uma reflexão de {char.name}</h3>
+            </div>
+            <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
+              {perspective && (
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-800 text-2xl" role="img" aria-label={perspective.actorName}>{perspective.actorAvatar}</span>
+                  <p className="text-sm font-semibold text-teal-200">Lembre-se do que {perspective.actorName} disse:</p>
+                </div>
+              )}
+              <p className="text-sm leading-relaxed text-slate-100">{guidance}</p>
+            </div>
             <div className="flex justify-end">
               <button type="button" onClick={() => setShowAdvice(false)} className="rounded-xl bg-amber-400 hover:bg-amber-300 px-5 py-2 text-sm font-bold text-slate-950">
                 Voltar à decisão
