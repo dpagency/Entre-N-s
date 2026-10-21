@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { LearningConfetti } from '../ui/LearningConfetti';
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
 import { ADDITIONAL_QUESTIONS } from '../../data/ethicsQuestions';
-import { recordLearning, learningPoints } from '../../services/learningScore';
+import { recordLearning } from '../../services/learningScore';
 import { socketService } from '../../services/socket';
 import { InstitutionalChannelDef } from '../../types/game';
 import { X, Scale, Briefcase, Megaphone, ShieldAlert, HeartHandshake, CheckCircle2, AlertOctagon, Info } from 'lucide-react';
@@ -192,8 +192,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                     <button type="button" onClick={() => answerQuiz(true)} className="rounded-lg bg-slate-700 px-4 py-2 text-sm">Verdadeiro</button>
                     <button type="button" onClick={() => answerQuiz(false)} className="rounded-lg bg-slate-700 px-4 py-2 text-sm">Falso</button>
                   </div> : <div className="space-y-2 text-sm">
-                    <p className="font-bold text-teal-200">{quiz.answer !== question.isTrue ? 'Vamos aprender juntos:' : quiz.awarded ? 'Resposta correta! Você ganhou +5 pontos de conhecimento.' : 'Resposta correta! Esta missão já teve seus pontos de conhecimento registrados.'}</p>
-                    {quiz.awarded && <p role="status" className="font-semibold text-teal-100">Pontuação de aprendizagem atual: {learningPoints(socketService.roomCode).knowledge} pontos de conhecimento.</p>}
+                    <p className="font-bold text-teal-200">{quiz.answer !== question.isTrue ? 'Vamos aprender juntos:' : quiz.awarded ? '+5 pontos' : 'Resposta correta · pontos já contabilizados'}</p>
                     <p>{question.explanation}</p>
                     <p className="text-xs text-slate-400">{question.sourceNote}</p>
                   </div>}
