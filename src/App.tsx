@@ -116,13 +116,6 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  const handleLeaveRoom = () => {
-    if (window.confirm('Deseja realmente sair da sala atual?')) {
-      socketService.leaveRoom();
-      setState(null);
-      setMyPlayerId(null);
-    }
-  };
 
   // Find active mission definition if in mission phase
   const activeMission = state?.activeMissionId
@@ -180,7 +173,6 @@ export default function App() {
         onOpenInstitutionalGuide={() => setIsInstitutionalGuideOpen(true)}
         onOpenAccessibility={() => setIsAccessibilityOpen(true)}
         onOpenOrganizer={() => setIsOrganizerOpen(true)}
-        onLeaveRoom={handleReturnHome}
         onReturnHome={handleReturnHome}
       />
 
