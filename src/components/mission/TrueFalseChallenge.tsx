@@ -12,12 +12,17 @@ const chooseQuestion = (missionId: string, original: NonNullable<MissionDef['tfC
   const options = [original, ...ADDITIONAL_QUESTIONS];
   if (typeof window === 'undefined') return original;
   const key = 'entre-nos-tf-last-' + missionId;
+  const sessionKey = 'entre-nos-tf-session-' + (socketService.roomCode || 'unknown') + '-' + missionId;
   try {
+    const saved = window.localStorage.getItem(sessionKey);
+    const existing = options.find(q => q.id === saved);
+    if (existing) return existing;
     const previous = window.localStorage.getItem(key);
     const candidates = options.filter(q => q.id !== previous);
     const pool = candidates.length ? candidates : options;
     const chosen = pool[Math.floor(Math.random() * pool.length)];
     window.localStorage.setItem(key, chosen.id);
+    window.localStorage.setItem(sessionKey, chosen.id);
     return chosen;
   } catch {
     return options[Math.floor(Math.random() * options.length)];
