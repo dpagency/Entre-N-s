@@ -16,9 +16,10 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
   const char = CHARACTERS[player.characterId] || CHARACTERS.alex;
   const mission = MISSIONS.find(item => item.id === state.activeMissionId);
   const perspectives = mission?.perspectives ?? [];
-  const guardianPerspectiveIndex: Record<string, number> = { alex: 0, joana: 1, ravi: 2, bia: 0 };
-  const preferredIndex = guardianPerspectiveIndex[player.characterId] ?? 0;
-  const perspective = perspectives[preferredIndex % Math.max(perspectives.length, 1)];
+  // Stable within a journey, but varies across journeys and guardians.
+  const selectionKey = `${state.roomCode}:${mission?.id ?? ''}:${player.characterId}`;
+  const selectionHash = Array.from(selectionKey).reduce((hash, char) => ((hash * 31) + char.charCodeAt(0)) >>> 0, 7);
+  const perspective = perspectives.length ? perspectives[selectionHash % perspectives.length] : undefined;
   const guidance = perspective
     ? perspective.details || perspective.summary
     : mission?.situation.uncertainties?.[0] ?? 'Que perspectivas merecem atenção antes da sua decisão?';
