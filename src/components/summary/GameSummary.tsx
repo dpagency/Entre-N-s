@@ -6,7 +6,7 @@ import { JourneyShareCard } from './JourneyShareCard';
 import { learningPoints } from '../../services/learningScore';
 import { socketService } from '../../services/socket';
 import { CHARACTERS } from '../../data/characters';
-import { Award, CheckCircle2, Users, Compass, Sparkles, MessageSquare, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Award, CheckCircle2, Compass, Sparkles, MessageSquare, RotateCcw, ShieldCheck } from 'lucide-react';
 
 interface GameSummaryProps {
   state: RoomState;
@@ -232,31 +232,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* Roster of participants */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h3 className="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
-          <Users className="w-5 h-5 text-teal-400" />
-          Guardiões Participantes
-        </h3>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {Object.values(state.players).map((p) => (
-            <div
-              key={p.id}
-              className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 shadow-sm"
-            >
-              <CharacterAvatar characterId={p.characterId} variantIndex={p.variantIndex} size="sm" />
-              <div>
-                <div className="font-bold text-xs text-slate-200">{p.isBot ? CHARACTERS[p.characterId]?.name : p.nickname}</div>
-                <div className="text-[10px] text-slate-400">
-                  {p.isHost ? 'Jogador' : 'Guardião'}
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
