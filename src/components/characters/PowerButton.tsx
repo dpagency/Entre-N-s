@@ -22,7 +22,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
 
   return (
     <>
-      <button type="button" onClick={consult} className="px-3 py-2 rounded-xl border border-teal-500/50 bg-teal-950/60 text-teal-200 text-xs font-bold">
+      <button type="button" onClick={consult} className="px-3 py-2 rounded-xl border border-emerald-300 bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-bold shadow-md transition-colors">
         Consultar {char.name} · +5 pontos
       </button>
       {showAdvice && (
