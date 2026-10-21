@@ -1,6 +1,6 @@
 import React from 'react';
 import { RoomState } from '../../types/game';
-import { Shield, BookOpen, Eye, Scale, LogOut, Copy, Wifi, WifiOff } from 'lucide-react';
+import { Shield, BookOpen, Eye, Scale, LogOut, Home, Copy, Wifi, WifiOff } from 'lucide-react';
 
 interface NavbarProps {
   state: RoomState | null;
@@ -10,6 +10,7 @@ interface NavbarProps {
   onOpenAccessibility: () => void;
   onOpenOrganizer: () => void;
   onLeaveRoom: () => void;
+  onReturnHome: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,6 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAccessibility,
   onOpenOrganizer,
   onLeaveRoom,
+  onReturnHome,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 text-slate-100">
@@ -106,6 +108,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="hidden lg:inline">Organizador</span>
           </button>
 
+          {state && (
+            <button type="button" onClick={onReturnHome}
+              className="p-2 sm:px-3 rounded-xl bg-slate-900 hover:bg-teal-950 text-teal-300 border border-slate-800 flex items-center gap-1.5 text-xs font-semibold"
+              title="Voltar ao início sem perder a jornada">
+              <Home className="w-4 h-4" />
+              <span className="hidden lg:inline">Início</span>
+            </button>
+          )}
           {/* Leave room button */}
           {state && (
             <button
