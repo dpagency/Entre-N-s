@@ -15,10 +15,19 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
   const [showAdvice, setShowAdvice] = useState(false);
   const char = CHARACTERS[player.characterId] || CHARACTERS.alex;
   const mission = MISSIONS.find(item => item.id === state.activeMissionId);
-  const question = mission?.situation.uncertainties?.[0];
-  const guidance = question
-    ? `${char.name} convida você a refletir: ${question}`
-    : 'Que informações ou perspectivas ainda precisam ser consideradas antes da sua decisão?';
+  const perspectives = mission?.perspectives ?? [];
+  const guardianPerspectiveIndex: Record<string, number> = { alex: 0, joana: 1, ravi: 2, bia: 0 };
+  const preferredIndex = guardianPerspectiveIndex[player.characterId] ?? 0;
+  const perspective = perspectives[preferredIndex % Math.max(perspectives.length, 1)];
+  const reminders: Record<string, string> = {
+    alex: 'O que essa perspectiva revela sobre o contexto que talvez ainda não tenha sido considerado?',
+    joana: 'Como sua decisão pode afetar essa pessoa e as relações de convivência?',
+    ravi: 'Será que essa pessoa teve espaço para ser realmente ouvida?',
+    bia: 'O que muda quando você considera o ponto de vista dessa pessoa?',
+  };
+  const guidance = perspective
+    ? `Lembre-se de ${perspective.actorName}: ${perspective.summary} ${reminders[player.characterId] ?? 'Como essa perspectiva influencia sua escolha?'}`
+    : mission?.situation.uncertainties?.[0] ?? 'Que perspectivas merecem atenção antes da sua decisão?';
 
   const consult = () => {
     recordLearning(socketService.roomCode, state.activeMissionId ?? null, 'guardian');
