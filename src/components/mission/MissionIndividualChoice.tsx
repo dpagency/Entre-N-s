@@ -88,7 +88,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
                   onClick={onOpenInstitutionalGuide}
                   className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/30 text-xs font-bold transition-colors"
                 >
-                  Consultar Canais
+                  Canais de Atendimento · até +5 pontos
                 </button>
               )}
             </div>
