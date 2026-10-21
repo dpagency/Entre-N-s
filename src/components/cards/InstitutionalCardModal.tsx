@@ -87,7 +87,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
               Canais e Competências Institucionais
             </h2>
             <p className="text-xs text-slate-400">
-              Cada instância possui competência legal e limites próprios. Conheça para onde encaminhar com responsabilidade.
+              Cada instância possui competência legal e limites próprios. Explore os canais e, ao consultar as informações, encontre um desafio opcional de verdadeiro ou falso para ganhar pontos de aprendizagem.
             </p>
           </div>
 
