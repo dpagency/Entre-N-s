@@ -1,6 +1,6 @@
 import React from 'react';
 import { RoomState } from '../../types/game';
-import { Shield, BookOpen, Eye, Scale, LogOut, Home, Copy, Wifi, WifiOff } from 'lucide-react';
+import { Shield, BookOpen, Eye, Scale, Home, Wifi, WifiOff } from 'lucide-react';
 
 interface NavbarProps {
   state: RoomState | null;
@@ -9,7 +9,6 @@ interface NavbarProps {
   onOpenInstitutionalGuide: () => void;
   onOpenAccessibility: () => void;
   onOpenOrganizer: () => void;
-  onLeaveRoom: () => void;
   onReturnHome: () => void;
 }
 
@@ -20,7 +19,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenInstitutionalGuide,
   onOpenAccessibility,
   onOpenOrganizer,
-  onLeaveRoom,
   onReturnHome,
 }) => {
   return (
@@ -111,21 +109,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           {state && (
             <button type="button" onClick={onReturnHome}
               className="p-2 sm:px-3 rounded-xl bg-slate-900 hover:bg-teal-950 text-teal-300 border border-slate-800 flex items-center gap-1.5 text-xs font-semibold"
-              title="Voltar ao início sem perder a jornada">
+              title="Voltar ao início — sua jornada fica salva neste navegador">
               <Home className="w-4 h-4" />
               <span className="hidden lg:inline">Início</span>
             </button>
           )}
-          {/* Leave room button */}
-          {state && (
-            <button
-              onClick={onLeaveRoom}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-rose-950 text-slate-400 hover:text-rose-300 border border-slate-800 transition-colors ml-1"
-              title="Sair da Sala"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          )}
+
         </div>
       </div>
     </header>
