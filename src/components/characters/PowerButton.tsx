@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PlayerSession, RoomState, SanitizedRoomState } from '../../types/game';
 import { CHARACTERS } from '../../data/characters';
+import { MISSIONS } from '../../data/missions';
 import { socketService } from '../../services/socket';
 import { recordLearning } from '../../services/learningScore';
 
@@ -13,10 +14,14 @@ interface PowerButtonProps {
 export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
   const [showAdvice, setShowAdvice] = useState(false);
   const char = CHARACTERS[player.characterId] || CHARACTERS.alex;
-  const [awarded, setAwarded] = useState(false);
+  const mission = MISSIONS.find(item => item.id === state.activeMissionId);
+  const question = mission?.situation.uncertainties?.[0];
+  const guidance = question
+    ? `${char.name} convida você a refletir: ${question}`
+    : 'Que informações ou perspectivas ainda precisam ser consideradas antes da sua decisão?';
 
   const consult = () => {
-    setAwarded(recordLearning(socketService.roomCode, state.activeMissionId ?? null, 'guardian'));
+    recordLearning(socketService.roomCode, state.activeMissionId ?? null, 'guardian');
     setShowAdvice(true);
   };
 
@@ -28,14 +33,13 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
       {showAdvice && (
         <div role="dialog" aria-modal="true" aria-label="Orientação do Guardião" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85">
           <div className="w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-3xl border border-amber-500/50 bg-slate-900 p-5 space-y-4 text-slate-100">
-            <h3 className="text-lg font-black text-amber-200">Orientação de {char.name}</h3>
-            <p className="text-sm leading-relaxed">{char.powerDescription}</p>
-            {player.characterId === 'alex' && <p className="text-sm">Considere que pode haver informações importantes ainda não exploradas.</p>}
-            {player.characterId === 'joana' && <p className="text-sm">Reflita sobre as possíveis consequências de cada caminho.</p>}
-            {player.characterId === 'ravi' && <p className="text-sm">Que voz ainda não ouvimos? Que consequência merece mais atenção? Sua decisão permanece sua.</p>}
-            {player.characterId === 'bia' && <p className="text-sm">Que perspectiva ainda não foi considerada? Releia as vozes dos envolvidos antes de seguir.</p>}
-            <p role="status" className="font-bold text-teal-200">{awarded ? '+5 pontos' : 'Orientação disponível para releitura'}</p>
-            <button type="button" onClick={() => setShowAdvice(false)} className="w-full rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Continuar</button>
+            <h3 className="text-lg font-black text-amber-200">Uma reflexão de {char.name}</h3>
+            <p className="text-sm leading-relaxed">{guidance}</p>
+            <div className="flex justify-end">
+              <button type="button" onClick={() => setShowAdvice(false)} className="rounded-xl bg-amber-400 hover:bg-amber-300 px-5 py-2 text-sm font-bold text-slate-950">
+                Voltar à decisão
+              </button>
+            </div>
           </div>
         </div>
       )}
