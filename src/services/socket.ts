@@ -95,9 +95,12 @@ class GameSocketService {
   }
 
   public discardSavedJourney(): void {
+    // A new solo room must not reuse a connection still bound to the previous player.
+    if (this.localMode) engine.handleClientDisconnect(this.localConnection);
     this.sessionToken = null;
     this.roomCode = null;
     this.myPlayerId = null;
+    this.activeMissionId = null;
     for (const key of ['entre-nos-solo','guardioes_session_token','guardioes_room_code','guardioes_player_id']) localStorage.removeItem(key);
   }
 

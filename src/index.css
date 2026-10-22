@@ -6,7 +6,19 @@
 body, button, input, textarea { font-family: 'Nunito', system-ui, sans-serif; }
 h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-spacing: -.015em; font-weight: 900; }
 /* A abertura usa a largura do conteúdo e mantém as escolhas em ordem de leitura. */
-.game-welcome { max-width: 1280px; }
+.game-welcome { max-width: 1440px; --selection-portrait-size: clamp(5.5rem, 28vw, 7.5rem); }
+.game-welcome .welcome-selection-portrait,
+.game-welcome .welcome-selection-guardian > div:first-child {
+  width: var(--selection-portrait-size);
+  height: var(--selection-portrait-size);
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .game-welcome { --selection-portrait-size: clamp(7rem, 16vw, 9rem); }
+}
+@media (min-width: 1024px) {
+  .game-welcome { --selection-portrait-size: clamp(9rem, 14vw, 12rem); }
+}
 .font-serif { font-family: 'Nunito', system-ui, sans-serif; }
 .game-welcome button, .game-welcome input { min-height: 44px; }
 .game-welcome p, .game-welcome span { overflow-wrap: anywhere; }
@@ -17,10 +29,121 @@ h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-s
   body { overflow-x: hidden; }
   #root { width: 100%; min-width: 0; overflow-x: clip; }
   main, main > div { min-width: 0; max-width: 100%; }
-  main .text-\[10px\], main .text-\[11px\], main .text-xs { font-size: 0.875rem; line-height: 1.45; }
-  main .text-sm { font-size: 1rem; line-height: 1.5; }
-  main .text-base { font-size: 1.0625rem; line-height: 1.5; }
+  main .text-\[10px\], main .text-\[11px\], main .text-xs { font-size: calc(0.875rem * var(--a11y-text-scale)); line-height: 1.45; }
+  main .text-sm { font-size: calc(1rem * var(--a11y-text-scale)); line-height: 1.5; }
+  main .text-base { font-size: calc(1.0625rem * var(--a11y-text-scale)); line-height: 1.5; }
   main button { min-height: 44px; }
   main button, main p, main span, main h1, main h2, main h3 { overflow-wrap: break-word; }
   main .line-clamp-1 { -webkit-line-clamp: 2; }
+}
+
+/* Text scales independently from spacing, controls and original portrait dimensions. */
+:root {
+  --a11y-text-scale: 1;
+  --text-xs: calc(.75rem * var(--a11y-text-scale));
+  --text-sm: calc(.875rem * var(--a11y-text-scale));
+  --text-base: calc(1rem * var(--a11y-text-scale));
+  --text-lg: calc(1.125rem * var(--a11y-text-scale));
+  --text-xl: calc(1.25rem * var(--a11y-text-scale));
+  --text-2xl: calc(1.5rem * var(--a11y-text-scale));
+  --text-3xl: calc(1.875rem * var(--a11y-text-scale));
+  --text-4xl: calc(2.25rem * var(--a11y-text-scale));
+  --text-5xl: calc(3rem * var(--a11y-text-scale));
+  --text-6xl: calc(3.75rem * var(--a11y-text-scale));
+  --text-7xl: calc(4.5rem * var(--a11y-text-scale));
+  --text-8xl: calc(6rem * var(--a11y-text-scale));
+  --text-9xl: calc(8rem * var(--a11y-text-scale));
+}
+html[data-text-size="large"] { --a11y-text-scale: 1.25; }
+html[data-text-size="xlarge"] { --a11y-text-scale: 1.5; }
+body { font-size: var(--text-base); }
+[class~="text-[9px]"] { font-size: calc(9px * var(--a11y-text-scale)); }
+[class~="text-[10px]"] { font-size: calc(10px * var(--a11y-text-scale)); }
+[class~="text-[11px]"] { font-size: calc(11px * var(--a11y-text-scale)); }
+:where(button, input, select, textarea, a, [tabindex]):focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 3px;
+}
+button, input, select, textarea { max-width: 100%; }
+button { overflow-wrap: anywhere; }
+
+/* High contrast uses real foreground/background colors, never filters on artwork. */
+html[data-high-contrast="true"] body,
+html[data-high-contrast="true"] #root { background: #000; color: #fff; }
+html[data-high-contrast="true"] #root :where([class*="bg-"]:not([aria-hidden="true"]):not(.pointer-events-none), button, input, select, textarea) {
+  background-color: #000 !important;
+  background-image: none !important;
+}
+html[data-high-contrast="true"] #root :where([class*="text-"], button, input, select, textarea, a) { color: #fff !important; }
+html[data-high-contrast="true"] #root :where([class*="border"], button, input, select, textarea) { border-color: #fff !important; }
+html[data-high-contrast="true"] #root :where(button, input, select, textarea) { border-width: 2px; }
+html[data-high-contrast="true"] #root :where([aria-pressed="true"], [aria-selected="true"], button[role="switch"][aria-checked="true"], button[type="submit"]) {
+  background-color: #facc15 !important;
+  color: #000 !important;
+  border-color: #facc15 !important;
+}
+html[data-high-contrast="true"] #root :where([aria-pressed="true"], [aria-selected="true"], button[role="switch"][aria-checked="true"], button[type="submit"]) :where(span, div, svg, p, h4) { color: #000 !important; }
+html[data-high-contrast="true"] #root [role="button"][aria-pressed="true"] * { background-color: transparent !important; border-color: #000 !important; }
+html[data-high-contrast="true"] #root button[aria-pressed="true"] div[class*="bg-"] { background-color: transparent !important; }
+html[data-high-contrast="true"] #root [role="switch"] > div { background-color: #fff !important; }
+html[data-high-contrast="true"] #root [role="switch"][aria-checked="true"] > div { background-color: #000 !important; }
+html[data-high-contrast="true"] #root button:disabled { opacity: 1; border-style: dashed; color: #d4d4d4 !important; }
+html[data-high-contrast="true"] #root button:disabled[aria-pressed="true"] { color: #000 !important; }
+html[data-high-contrast="true"] #root :where(input, textarea)::placeholder { color: #d4d4d4; opacity: 1; }
+
+html[data-reduced-motion="true"] *, html[data-reduced-motion="true"] *::before, html[data-reduced-motion="true"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html[data-reduced-motion="true"] button { scale: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 639px) {
+  html[data-text-size="large"] main .grid-cols-3,
+  html[data-text-size="xlarge"] main .grid-cols-3 { grid-template-columns: minmax(0, 1fr); }
+}
+html:not([data-text-size="normal"]) :where([class*="line-clamp-"]) {
+  -webkit-line-clamp: unset;
+  display: block;
+}
+
+/* Journey-wide reading scale; accessibility multipliers remain independent. */
+[data-game-screen="journey"] {
+  --text-xs: calc(.875rem * var(--a11y-text-scale));
+  --text-sm: calc(1rem * var(--a11y-text-scale));
+  --text-base: calc(1.125rem * var(--a11y-text-scale));
+  --text-lg: calc(1.25rem * var(--a11y-text-scale));
+  --text-xl: calc(1.5rem * var(--a11y-text-scale));
+  --text-2xl: calc(2rem * var(--a11y-text-scale));
+  --text-3xl: calc(2.5rem * var(--a11y-text-scale));
+  --text-4xl: calc(2.75rem * var(--a11y-text-scale));
+}
+.game-journey > :where([class~="max-w-3xl"]) { max-width: 1120px; }
+.game-journey > :where([class~="max-w-4xl"]) { max-width: 1280px; }
+.game-journey > :where([class~="max-w-5xl"]) { max-width: 1360px; }
+.game-journey :where(p, li, [data-narration="story"]) { line-height: 1.65; }
+.game-journey :where(button, [role="button"]) { min-height: 52px; }
+.game-journey :where([class~="text-[10px]"], [class~="text-[11px]"]) { font-size: calc(.875rem * var(--a11y-text-scale)); }
+.game-journey :where(button, [role="button"], section, p, span, h1, h2, h3, h4) { overflow-wrap: anywhere; }
+.game-journey > :where([class~="gap-4"], [class~="gap-6"]) { gap: 1.75rem; }
+.territory-region > div:first-child > div > svg { width: 32px; height: 32px; }
+.game-journey .territory-region { min-height: 248px; }
+.game-journey :where([class~="w-10"][class~="h-10"]) { width: 3.5rem; height: 3.5rem; }
+.game-journey :where([class~="w-14"][class~="h-14"]) { width: 4.5rem; height: 4.5rem; }
+.game-journey :where([class~="w-16"][class~="h-16"]) { width: 5rem; height: 5rem; }
+@media (min-width: 640px) {
+  .game-journey :where(section[class~="p-5"], section[class~="p-4"]) { padding: 1.75rem; }
+  .game-journey :where([role="button"]) { padding: 1.5rem; }
+  .game-journey .territory-region { min-height: 280px; }
+}
+@media (max-width: 1279px) {
+  .game-journey [class~="md:grid-cols-3"] { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 639px) {
+  .game-journey .text-xs { font-size: calc(.875rem * var(--a11y-text-scale)); }
+  .game-journey .text-sm { font-size: calc(1rem * var(--a11y-text-scale)); }
+  .game-journey .text-base { font-size: calc(1.125rem * var(--a11y-text-scale)); }
+  .game-journey .grid-cols-3 { grid-template-columns: minmax(0, 1fr); }
 }

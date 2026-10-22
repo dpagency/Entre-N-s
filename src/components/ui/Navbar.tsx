@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 text-slate-100">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap">
         {/* Brand */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-md select-none">
             EN
           </div>
@@ -32,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               Entre Nós
             </span>
           </div>
+          <span className="max-w-56 text-xs leading-relaxed text-slate-300">Jogo sério cooperativo de ética pública</span>
         </div>
 
         {/* Room Code Badge (if in a room) */}
@@ -66,6 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenInstitutionalGuide}
             className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
             title="Guia de Canais Institucionais"
+            aria-label="Canais"
           >
             <Scale className="w-4 h-4 text-teal-400" />
             <span className="hidden lg:inline">Canais</span>
@@ -76,6 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenRules}
             className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
             title="Regras do Jogo"
+            aria-label="Regras"
           >
             <BookOpen className="w-4 h-4 text-indigo-400" />
             <span className="hidden lg:inline">Regras</span>
@@ -86,6 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenAccessibility}
             className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
             title="Acessibilidade Visual"
+            aria-label="Acessibilidade"
           >
             <Eye className="w-4 h-4 text-amber-400" />
             <span className="hidden lg:inline">Acessibilidade</span>

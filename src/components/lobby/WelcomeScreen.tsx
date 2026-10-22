@@ -3,7 +3,7 @@ import { CharacterId } from '../../types/game';
 import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
 import { CharacterAvatar } from '../characters/CharacterAvatar';
 import { socketService } from '../../services/socket';
-import { Play, Compass } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 export const WelcomeScreen: React.FC = () => {
   const [starting, setStarting] = useState(false);
@@ -56,14 +56,9 @@ export const WelcomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-0 py-2 sm:py-4 px-2 text-slate-100 max-w-7xl mx-auto w-full game-welcome">
+    <div className="flex flex-col items-center justify-center min-h-0 py-2 sm:py-4 text-slate-100 mx-auto w-full game-welcome">
       {/* Hero presentation */}
       <div className="text-center max-w-3xl mx-auto mb-3 space-y-1">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-sm font-bold uppercase tracking-wider">
-          <Compass className="w-3.5 h-3.5" />
-          Jogo Sério Cooperativo de Ética Pública
-        </div>
-
         <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-100">
           Entre Nós
           <span className="block text-base sm:text-2xl font-bold text-amber-400 mt-1">
@@ -85,13 +80,13 @@ export const WelcomeScreen: React.FC = () => {
         </section>
       )}
       {/* Main interaction card */}
-      <div className={`w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl space-y-3 ${savedJourney ? "opacity-50 pointer-events-none" : ""}`}>
-        <p className="text-base leading-relaxed text-slate-200">Escolha seu avatar e depois o Guardião que acompanhará você.</p>
-        <form onSubmit={handleStartJourney} className="space-y-5">
+      <div className={`w-full bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 lg:p-6 shadow-2xl space-y-5 ${savedJourney ? "opacity-50 pointer-events-none" : ""}`}>
+        <p className="text-base sm:text-lg leading-relaxed text-slate-200">Escolha seu avatar e seu Guardião para iniciar a jornada.</p>
+        <form onSubmit={handleStartJourney} className="space-y-6 sm:space-y-8">
           {/* Nickname input (no real name required) */}
-          <div className="space-y-1.5">
+          <div className="w-full sm:max-w-md space-y-1.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <label htmlFor="player-nickname" className="text-base font-bold text-slate-300">
+              <label htmlFor="player-nickname" className="text-lg font-bold text-slate-300">
                 Seu Apelido na Sessão:
               </label>
               <span className="text-sm text-slate-500">Não exige nome real</span>
@@ -103,34 +98,34 @@ export const WelcomeScreen: React.FC = () => {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder="Ex.: Lua, Sol, Visitante..."
-              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 gap-8 sm:gap-10">
             {/* Player avatar selection: independent from Guardian choice */}
-            <div className="min-w-0 space-y-2">
-              <p className="text-base font-bold text-slate-300">Escolha seu avatar:</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="min-w-0 space-y-3">
+              <p className="text-lg sm:text-xl font-bold text-slate-300">Escolha seu avatar:</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
                 {playerAvatars.map((avatar, index) => (
                   <button key={avatar.name} type="button" onClick={() => setPreviewAvatar(index)} aria-label={`Conhecer avatar ${avatar.name}`} aria-pressed={variantIndex === index}
-                    className={`flex flex-col items-stretch gap-1 rounded-2xl border p-2 text-center transition-all ${variantIndex === index ? 'border-teal-400 ring-2 ring-teal-400/40 bg-teal-950/70' : 'border-slate-700 bg-slate-950'}`}>
+                    className={`min-w-0 flex flex-col items-stretch gap-3 rounded-2xl border p-2 sm:p-4 text-center transition-all ${variantIndex === index ? 'border-teal-400 ring-2 ring-teal-400/40 bg-teal-950/70' : 'border-slate-700 bg-slate-950'}`}>
                     <div className="flex w-full justify-center">
-                      <img src={avatar.image} alt={avatar.name} className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-teal-300/60" />
+                      <img src={avatar.image} alt={avatar.name} className="welcome-selection-portrait rounded-full object-cover border-2 border-teal-300/60" />
                     </div>
-                    <span className="w-full text-center text-sm font-bold text-slate-200">{avatar.name}</span>
+                    <span className="w-full text-center text-base sm:text-lg font-bold text-slate-200">{avatar.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Character selection cards */}
-            <div className="min-w-0 space-y-2">
+            <div className="min-w-0 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-base font-bold text-slate-300">Escolha seu Guardião acompanhante:</p>
+                <p className="text-lg sm:text-xl font-bold text-slate-300">Escolha seu Guardião acompanhante:</p>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
                 {CHARACTER_LIST.map((char) => {
                   const isSelected = characterId === char.id;
                   return (
@@ -139,25 +134,25 @@ export const WelcomeScreen: React.FC = () => {
                       type="button"
                       aria-pressed={isSelected}
                       onClick={() => setPreviewCharacter(char.id)}
-                      className={`p-2 rounded-2xl border text-center transition-all flex flex-col items-stretch gap-1 ${
+                      className={`min-w-0 p-2 sm:p-4 rounded-2xl border text-center transition-all flex flex-col items-stretch gap-3 ${
                         isSelected
                           ? 'bg-teal-950/70 border-teal-400 ring-2 ring-teal-400/40 text-white shadow-md'
                           : 'bg-slate-950 hover:bg-slate-850 border-slate-800 text-slate-300'
                       }`}
                     >
                       <div className="flex w-full justify-center">
-                        <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="lg" showBadge={false} />
+                        <CharacterAvatar characterId={char.id} variantIndex={variantIndex} size="lg" showBadge={false} className="welcome-selection-guardian" />
                       </div>
-                      <div className="w-full text-center font-bold text-base">{char.name}</div>
+                      <div className="w-full text-center font-bold text-base sm:text-lg">{char.name}</div>
 
                     </button>
                   );
                 })}
               </div>
 
-              <div role="status" aria-live="polite" className="rounded-xl border border-teal-500/40 bg-teal-950/40 px-4 py-3 text-sm text-teal-200">
+              <div role="status" aria-live="polite" className="rounded-xl border border-teal-500/40 bg-teal-950/40 px-4 py-3 text-base sm:text-lg leading-relaxed text-teal-200">
                 {characterConfirmed ? '✓ Seu Guardião acompanhante: ' : 'Guardião em destaque: '}
-                <strong>{selectedChar.name}</strong>. {characterConfirmed ? 'Ele acompanhará você, mas as decisões serão sempre suas.' : 'Toque em um Guardião para conhecê-lo e confirmar quem acompanhará você.'}
+                <strong>{selectedChar.name}</strong>. As decisões serão sempre suas.
               </div>
 
             </div>
@@ -165,14 +160,16 @@ export const WelcomeScreen: React.FC = () => {
           </div>
 
           {/* Submit button */}
-          <button
-            type="submit"
-            disabled={starting}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98"
-          >
-            <Play className="w-5 h-5 fill-current" />
-            <span>{starting ? 'Preparando sua jornada…' : 'Começar minha jornada'}</span>
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={starting}
+              className="min-h-16 max-w-full px-8 py-4 rounded-full bg-gradient-to-r from-teal-500 via-teal-400 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-base sm:text-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-60"
+            >
+              <Play className="w-5 h-5 fill-current" />
+              <span>{starting ? 'Preparando…' : 'Começar'}</span>
+            </button>
+          </div>
         </form>
 
       </div>

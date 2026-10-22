@@ -3,6 +3,7 @@ import { MissionDef, RoomState } from '../../types/game';
 import { DiscoveryCard } from '../cards/CardView';
 import { socketService } from '../../services/socket';
 import { SECOND_CHANCE_SCENARIOS, SETBACK_SCENARIOS } from '../../data/fortuneScenarios';
+import { rotatingItem } from '../../services/questionRotation';
 import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, BookOpen, Lock, LockOpen } from 'lucide-react';
 
 interface MissionConsequenceProps {
@@ -20,6 +21,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   const [showReflection, setShowReflection] = useState(false);
   const [cardAnswer, setCardAnswer] = useState<number | null>(null);
   const [pendingCardAnswer, setPendingCardAnswer] = useState<number | null>(null);
+  const roomCode = socketService.roomCode;
   useEffect(() => {
     setDiscoveryOpened(false);
     setCardAnswer(null);
@@ -27,7 +29,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
     if (!state.fortuneCards?.[mission.id]) return;
     const timer = window.setTimeout(() => setDiscoveryOpened(true), 900);
     return () => window.clearTimeout(timer);
-  }, [mission.id, !!state.fortuneCards?.[mission.id]]);
+  }, [mission.id, !!state.fortuneCards?.[mission.id], roomCode]);
   const isHost = state.hostId === myPlayerId;
   const isSolo = Object.values(state.players).some(p => p.isBot);
   const chosenActionId = state.chosenCollectiveActionId || mission.actions[0].id;
@@ -47,25 +49,15 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
 
   const scenarioFor = (kind: 'reves' | 'segunda_chance') => {
     const pool = kind === 'reves' ? SETBACK_SCENARIOS : SECOND_CHANCE_SCENARIOS;
-    const sessionKey = 'entre-nos-card-scenario-' + (socketService.roomCode || 'solo') + '-' + mission.id + '-' + kind;
+    const sessionKey = 'entre-nos-card-scenario-' + (roomCode || 'solo') + '-' + mission.id + '-' + kind;
     const lastKey = 'entre-nos-card-last-' + kind;
-    try {
-      const saved = localStorage.getItem(sessionKey);
-      const existing = pool.find(item => item.id === saved);
-      if (existing) return existing;
-      const previous = localStorage.getItem(lastKey);
-      const available = pool.filter(item => item.id !== previous);
-      const chosen = available[Math.floor(Math.random() * available.length)];
-      localStorage.setItem(sessionKey, chosen.id);
-      localStorage.setItem(lastKey, chosen.id);
-      return chosen;
-    } catch { return pool[0]; }
+    return rotatingItem(pool, localStorage, { session: sessionKey, history: lastKey, slot: mission.id });
   };
   const [scenario, setScenario] = useState<ReturnType<typeof scenarioFor> | null>(null);
   useEffect(() => {
     const kind = state.fortuneCards?.[mission.id]?.outcome;
     setScenario(kind === 'reves' || kind === 'segunda_chance' ? scenarioFor(kind) : null);
-  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome]);
+  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome, roomCode]);
   const handleProceed = () => {
     socketService.send({
       type: 'PROCEED_AFTER_CONSEQUENCE',
@@ -85,7 +77,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
       <section className="rounded-2xl border border-amber-500/40 bg-slate-900 p-4 space-y-3">
         <h3 className="font-bold text-amber-200">Escolha uma carta do destino</h3>
         <div className="grid grid-cols-3 gap-2">
-          {[0,1,2].map(index => <button key={index} type="button" disabled={!!fortune || !isHost} onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD',cardIndex:index})} className={`min-h-24 rounded-xl border-2 p-2 flex flex-col items-center justify-center gap-2 ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/40 bg-teal-950'}`}>
+          {[0,1,2].map(index => <button key={index} type="button" aria-pressed={fortune?.cardIndex === index} disabled={!!fortune || !isHost} onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD',cardIndex:index})} className={`min-h-24 rounded-xl border-2 p-2 flex flex-col items-center justify-center gap-2 ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/40 bg-teal-950'}`}>
             <span className="text-3xl">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
             <span className="text-xs">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index+1}`}</span>
           </button>)}
@@ -99,7 +91,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         <p className="text-sm">{scenario.prompt}</p>
         {fortune.outcome === 'segunda_chance' && <p className="text-xs text-slate-400">Sua decisão original permanece.</p>}
         {scenario.options.map((option, index) =>
-          <button key={index} type="button" disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{option}</button>
+          <button key={index} type="button" aria-pressed={(cardAnswer ?? pendingCardAnswer) === index} disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{option}</button>
         )}
         {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={() => setCardAnswer(pendingCardAnswer)} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
         {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">{scenario.feedback[cardAnswer]}</p>}

@@ -84,11 +84,11 @@ export const TownMap: React.FC<TownMapProps> = ({
   };
 
   return (
-    <div className="relative w-full min-w-0 max-w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl p-4 sm:p-6 text-white flex flex-col gap-4">
+    <div className="territory-map relative w-full min-w-0 max-w-full rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl p-4 sm:p-8 text-white flex flex-col gap-6">
       {/* Header bar of map */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
               Cidade dos Encontros
             </span>
@@ -96,10 +96,10 @@ export const TownMap: React.FC<TownMapProps> = ({
               Progresso da Jornada: <strong className="text-amber-400">{state.completedMissionIds.length}/4 Missões</strong>
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight mt-1">
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-100 tracking-tight mt-2">
             Mapa Territorial da Convivência
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-base text-slate-300 mt-2 leading-relaxed">
             {isVoting
               ? (isSolo ? 'As regiões concluídas ficam marcadas. Escolha uma região disponível.' : 'Deliberação Coletiva: Votem no próximo destino de atuação do grupo.')
               : `Local Atual: ${currentRegion.name} (${currentRegion.subtitle})`}
@@ -108,8 +108,8 @@ export const TownMap: React.FC<TownMapProps> = ({
 
       </div>
 
-      {/* SVG Map Canvas: desktop only; on phones use accessible region grid below. */}
-      <div className="hidden sm:block relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[520px] rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
+      {/* Original city illustration and marker, independent from the reading area of the cards. */}
+      <div className="territory-canvas relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
         <img
           src={CITY_IMAGE}
           alt=""
@@ -161,8 +161,10 @@ export const TownMap: React.FC<TownMapProps> = ({
             );
           })()}
         </svg>
+      </div>
 
-        {/* Interactive Region Cards placed over SVG coordinates */}
+      {/* Full-size cards remain in reading order without covering the illustration. */}
+      <div className="territory-regions grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" aria-label="Regiões da Cidade dos Encontros">
         {REGION_LIST.map((region) => {
           const isCurrent = state.currentRegionId === region.id;
           const isCompleted = isSolo && completedRegions.has(region.id);
@@ -176,14 +178,10 @@ export const TownMap: React.FC<TownMapProps> = ({
           return (
             <button
               key={region.id}
+              aria-pressed={hasVotedForThis}
               onClick={() => handleVote(region.id)}
               disabled={isSolo && completedRegions.has(region.id)}
-              style={{
-                left: `${region.x}%`,
-                top: `${region.y}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-              className={`absolute group p-3 sm:p-4 rounded-xl text-left transition-all duration-300 max-w-[170px] sm:max-w-[210px] shadow-xl border focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+              className={`territory-region min-w-0 min-h-56 flex flex-col gap-3 group p-4 sm:p-5 rounded-2xl text-left transition-all duration-300 shadow-xl border focus:outline-none focus:ring-2 focus:ring-amber-400 ${
                 isCurrent
                   ? 'bg-slate-900/95 border-amber-400 ring-2 ring-amber-400/50 shadow-amber-500/20'
                   : hasVotedForThis
@@ -191,7 +189,7 @@ export const TownMap: React.FC<TownMapProps> = ({
                   : 'bg-slate-900/85 hover:bg-slate-850 border-slate-700/80 hover:border-slate-500'
               }`}
             >
-              <div className="flex items-center justify-between gap-1 mb-1.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div
                   className="p-1.5 rounded-lg shadow-sm"
                   style={{ backgroundColor: `${region.color}25`, color: region.color }}
@@ -215,15 +213,15 @@ export const TownMap: React.FC<TownMapProps> = ({
                 )}
               </div>
 
-              <div className="font-bold text-xs sm:text-sm text-slate-100 group-hover:text-amber-300 transition-colors line-clamp-1">
+              <div className="text-xl font-bold text-slate-100 group-hover:text-amber-300 transition-colors">
                 {region.name}
               </div>
-              <div className="text-[11px] text-slate-400 line-clamp-1 mb-1.5">
+              <div className="text-sm text-slate-300 leading-relaxed">
                 {region.subtitle}
               </div>
 
               {/* Mission completion indicator */}
-              <div className="flex items-center justify-between text-[10px] font-medium text-slate-400 pt-1 border-t border-slate-800">
+              <div className="w-full flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-slate-300 pt-3 border-t border-slate-800">
                 <span>Missões:</span>
                 <span className="text-teal-400 font-bold">
                   {completedInRegion}/{missionsInRegion.length}
@@ -231,9 +229,9 @@ export const TownMap: React.FC<TownMapProps> = ({
               </div>
 
               {isVoting && (
-                <div className="mt-2 pt-1 border-t border-slate-800/80">
+                <div className="w-full mt-auto pt-3 border-t border-slate-800/80">
                   <span
-                    className={`block text-center text-[11px] font-bold py-1 px-2 rounded-lg transition-colors ${
+                    className={`block text-center text-sm font-bold py-2 px-3 rounded-lg transition-colors ${
                       hasVotedForThis
                         ? 'bg-teal-600 text-white'
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
@@ -245,23 +243,6 @@ export const TownMap: React.FC<TownMapProps> = ({
               )}
             </button>
           );
-        })}
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 sm:hidden" aria-label="Regiões da Cidade dos Encontros">
-        {REGION_LIST.map(region => {
-          const missions = isSolo ? MISSIONS.filter(m => m.regionId === region.id).slice(0, 1) : MISSIONS.filter(m => m.regionId === region.id);
-          const done = missions.filter(m => state.completedMissionIds.includes(m.id)).length;
-          const selected = myVote === region.id;
-          return <button key={region.id} type="button" onClick={() => handleVote(region.id)}
-            disabled={isSolo && completedRegions.has(region.id)}
-            aria-pressed={selected}
-            className={`min-w-0 min-h-36 rounded-2xl border-2 p-3 flex flex-col gap-2 text-left ${selected ? 'bg-teal-950 border-teal-400' : 'bg-slate-900 border-slate-700'}`}>
-            <span className="text-teal-300">{getIcon(region.iconName)}</span>
-            <span className="text-sm font-black leading-tight break-words">{region.name}</span>
-            <span className="text-xs text-slate-400 break-words">{region.subtitle}</span>
-            <span className="mt-auto text-xs text-amber-300">{done}/{missions.length} missões {selected ? ' · Selecionada ✓' : ''}</span>
-          </button>;
         })}
       </div>
 

@@ -79,6 +79,7 @@ export const PreTestModal: React.FC<PreTestModalProps> = ({ isOpen, onCompleted 
             return (
               <button
                 key={opt.id}
+                aria-pressed={isSelected}
                 onClick={() => handleSelectOption(opt.id)}
                 className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start gap-3 min-w-0 break-words ${
                   isSelected

@@ -22,6 +22,9 @@ import { PostTestModal } from './components/evaluation/PostTestModal';
 import { FeedbackModal } from './components/evaluation/FeedbackModal';
 import { GameSummary } from './components/summary/GameSummary';
 import { Zap, AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
+import { MotionConfig } from 'motion/react';
+import { readAccessibilityPreferences, saveAccessibilityPreferences, TextSize } from './services/accessibility';
+import { useDialogAccessibility } from './hooks/useDialogAccessibility';
 
 export default function App() {
   const [state, setState] = useState<SanitizedRoomState | null>(null);
@@ -55,9 +58,19 @@ export default function App() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   // Accessibility settings
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
-  const [highContrast, setHighContrast] = useState(false);
+  const [preferences, setPreferences] = useState(() => readAccessibilityPreferences(localStorage));
+  const { reducedMotion, fontSize, highContrast } = preferences;
+  const setReducedMotion = (value: boolean) => setPreferences(p => ({ ...p, reducedMotion: value }));
+  const setFontSize = (value: TextSize) => setPreferences(p => ({ ...p, fontSize: value }));
+  const setHighContrast = (value: boolean) => setPreferences(p => ({ ...p, highContrast: value }));
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.dataset.textSize = fontSize;
+    root.dataset.highContrast = String(highContrast);
+    root.dataset.reducedMotion = String(reducedMotion);
+    saveAccessibilityPreferences(localStorage, preferences);
+  }, [preferences, fontSize, highContrast, reducedMotion]);
+  useDialogAccessibility();
 
   // Notifications
   const [notifications, setNotifications] = useState<{ id: string; text: string; variant: 'info' | 'success' | 'warning' }[]>([]);
@@ -122,17 +135,11 @@ export default function App() {
     ? MISSIONS.find((m) => m.id === state.activeMissionId) || MISSIONS[0]
     : MISSIONS[0];
 
-  const fontSizeClass = {
-    normal: 'text-base',
-    large: 'text-lg',
-    xlarge: 'text-xl',
-  }[fontSize];
-
   return (
+    <MotionConfig reducedMotion={reducedMotion ? 'always' : 'user'}>
     <div
-      className={`min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-slate-950 ${fontSizeClass} ${
-        highContrast ? 'contrast-125' : ''
-      } ${reducedMotion ? 'motion-reduce' : ''}`}
+      data-game-screen={showWelcome || !state || !myPlayerId ? 'welcome' : 'journey'}
+      className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-slate-950"
     >
       {/* Toast notifications */}
       <div className="fixed top-16 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
@@ -156,6 +163,7 @@ export default function App() {
             )}
             <span className="flex-1 leading-snug">{n.text}</span>
             <button
+              aria-label="Fechar notificação"
               onClick={() => setNotifications((prev) => prev.filter((item) => item.id !== n.id))}
               className="text-slate-400 hover:text-white"
             >
@@ -178,7 +186,7 @@ export default function App() {
       <JourneyAudio phase={state?.phase} missionId={state?.activeMissionId} />
 
       {/* Main content body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
+      <main className={`flex-1 max-w-[1440px] ${showWelcome || !state || !myPlayerId ? '' : 'game-journey'} w-full mx-auto p-4 sm:p-6 flex flex-col`}>
         {showWelcome || !state || !myPlayerId ? (
           /* Welcome screen when not in a room */
           <WelcomeScreen />
@@ -310,5 +318,6 @@ export default function App() {
         onClose={() => setIsFeedbackOpen(false)}
       />
     </div>
+    </MotionConfig>
   );
 }

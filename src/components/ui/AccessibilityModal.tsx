@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Eye, Type, ZapOff, Keyboard, Check } from 'lucide-react';
+import { X, Eye, Type, ZapOff, Keyboard } from 'lucide-react';
 
 interface AccessibilityModalProps {
   isOpen: boolean;
@@ -31,13 +31,13 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
       aria-labelledby="acc-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in"
     >
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col text-slate-100">
+      <div className="relative w-full min-w-0 max-w-lg max-h-[90dvh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col text-slate-100">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/40">
+          <div className="min-w-0 flex items-center gap-2.5">
+            <div className="hidden sm:block shrink-0 p-2 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/40">
               <Eye className="w-5 h-5" />
             </div>
-            <h2 id="acc-title" className="text-lg font-bold text-slate-100">
+            <h2 id="acc-title" className="min-w-0 break-words text-lg font-bold text-slate-100">
               Acessibilidade e Preferências Visuais
             </h2>
           </div>
@@ -45,7 +45,7 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Fechar"
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="shrink-0 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -66,10 +66,11 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
 
             <button
               onClick={() => setReducedMotion(!reducedMotion)}
-              className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              className={`shrink-0 w-12 h-8 ml-3 rounded-full p-1 transition-colors ${
                 reducedMotion ? 'bg-teal-500' : 'bg-slate-800'
               }`}
               role="switch"
+              aria-label="Reduzir Animações"
               aria-checked={reducedMotion}
             >
               <div
@@ -94,10 +95,11 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
 
             <button
               onClick={() => setHighContrast(!highContrast)}
-              className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              className={`shrink-0 w-12 h-8 ml-3 rounded-full p-1 transition-colors ${
                 highContrast ? 'bg-teal-500' : 'bg-slate-800'
               }`}
               role="switch"
+              aria-label="Alto Contraste"
               aria-checked={highContrast}
             >
               <div
@@ -114,7 +116,7 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
               <Type className="w-4 h-4 text-teal-400" />
               <span>Tamanho do Texto</span>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div role="group" aria-label="Tamanho do Texto" className="flex flex-wrap gap-2">
               {[
                 { id: 'normal', label: 'Padrão' },
                 { id: 'large', label: 'Grande' },
@@ -123,7 +125,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
                 <button
                   key={opt.id}
                   onClick={() => setFontSize(opt.id as any)}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
+                  aria-pressed={fontSize === opt.id}
+                  className={`flex-1 min-h-11 py-2 px-3 rounded-xl text-sm font-bold border transition-all ${
                     fontSize === opt.id
                       ? 'bg-teal-500 text-slate-950 border-teal-400 shadow-sm'
                       : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-850'

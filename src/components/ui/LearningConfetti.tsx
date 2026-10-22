@@ -1,10 +1,11 @@
-import React from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import React, { useContext } from 'react';
+import { motion, useReducedMotion, MotionConfigContext } from 'motion/react';
 
 /** Decoração breve e não interativa; respeita a preferência por movimento reduzido. */
 export const LearningConfetti: React.FC = () => {
   const reducedMotion = useReducedMotion();
-  if (reducedMotion) return null;
+  const configuration = useContext(MotionConfigContext);
+  if (reducedMotion || configuration.reducedMotion === 'always') return null;
   const colors = ['#2dd4bf', '#fbbf24', '#fb7185', '#a78bfa', '#38bdf8'];
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden z-20">

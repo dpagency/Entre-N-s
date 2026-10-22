@@ -32,15 +32,17 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
   const renderStarRating = (value: number, onChange: (val: number) => void, label: string) => (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-xs sm:text-sm font-semibold text-slate-200">{label}</label>
+        <span className="text-xs sm:text-sm font-semibold text-slate-200">{label}</span>
         <span className="text-xs font-bold text-amber-400">{value}/5</span>
       </div>
-      <div className="flex items-center gap-1.5">
+      <div role="group" aria-label={label} className="flex flex-wrap items-center gap-1.5">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
             onClick={() => onChange(star)}
+            aria-label={`${star} de 5 estrelas`}
+            aria-pressed={star === value}
             className={`p-2 rounded-xl border transition-all ${
               star <= value
                 ? 'bg-amber-500/20 border-amber-400 text-amber-400 shadow-sm'
@@ -61,6 +63,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     <div
       role="dialog"
       aria-modal="true"
+      aria-label="Avaliação da experiência"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in"
     >
       <div className="relative w-full max-w-lg max-h-[88dvh] overflow-y-auto overscroll-contain bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-8 shadow-2xl flex flex-col text-slate-100">
@@ -100,7 +103,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
 
             {/* Optional Comment */}
             <div className="space-y-2 pt-2 border-t border-slate-800">
-              <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+              <label htmlFor="experience-comment" className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
                 <MessageSquare className="w-3.5 h-3.5 text-teal-400" />
                 Comentário ou Sugestão Opcional:
               </label>
@@ -115,6 +118,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
               </div>
 
               <textarea
+                id="experience-comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 maxLength={500}

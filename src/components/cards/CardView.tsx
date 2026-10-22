@@ -93,6 +93,9 @@ export const ActionCard: React.FC<ActionCardProps> = ({
     <div
       onClick={() => !disabled && onSelect && onSelect()}
       role="button"
+      aria-pressed={Boolean(isSelected)}
+      aria-disabled={Boolean(disabled)}
+      aria-label={action.title}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={(e) => {
         if (!disabled && onSelect && (e.key === 'Enter' || e.key === ' ')) {
