@@ -1,3 +1,4 @@
+import { assetUrl } from '../../distribution';
 import React from 'react';
 import { CharacterId } from '../../types/game';
 import { CHARACTERS } from '../../data/characters';
@@ -132,7 +133,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   return (
     <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
       <div className={`relative rounded-full overflow-hidden shadow-lg border-2 ${char.borderColor} ${sizeDimensions}`}>
-        <img src={`/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[characterId] || "rin"}.png`} alt={char.name} className="w-full h-full object-cover" />
+        <img src={assetUrl(`/personagens/${({alex:"rin",joana:"wa",ravi:"satori",bia:"yuki"} as Record<string,string>)[characterId] || "rin"}.png`)} alt={char.name} className="w-full h-full object-cover" />
 
         {/* Variant color highlight aura */}
         <div

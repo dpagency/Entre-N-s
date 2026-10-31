@@ -1,11 +1,15 @@
+import { MISSIONS } from '../../data/missions';
+import { CityImage } from './CityImage';
+import { cityArtworkSource } from '../../data/cityArtwork';
 import React from 'react';
+import { assetUrl } from '../../distribution';
 
-const CITY_IMAGE = '/personagens/cidade-dos-encontros.webp';
+const CITY_IMAGE = assetUrl(cityArtworkSource());
 let cityImageReady = false;
 
 import { RegionId, RoomState } from '../../types/game';
 import { REGIONS, REGION_LIST } from '../../data/regions';
-import { MISSIONS } from '../../data/missions';
+import { journeyMissions } from '../../data/journeys';
 import { socketService } from '../../services/socket';
 import { Users, Building2, Wrench, Compass, CheckCircle2, Navigation, Sparkles } from 'lucide-react';
 
@@ -37,7 +41,8 @@ export const TownMap: React.FC<TownMapProps> = ({
   const isSolo = state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
 
   const currentRegion = REGIONS[state.currentRegionId] || REGIONS.praca;
-  const completedRegions = new Set(state.completedMissionIds.map(id => MISSIONS.find(m => m.id === id)?.regionId));
+  const missions = state.pilotVersion === 2 ? journeyMissions(state.journeyDefinitionId) : MISSIONS;
+  const completedRegions = new Set(state.completedMissionIds.map(id => missions.find(m => m.id === id)?.regionId));
 
   // Count votes per region
   const voteCounts: Record<RegionId, number> = {
@@ -93,7 +98,7 @@ export const TownMap: React.FC<TownMapProps> = ({
               Cidade dos Encontros
             </span>
             <span className="text-xs text-slate-400">
-              Progresso da Jornada: <strong className="text-amber-400">{state.completedMissionIds.length}/4 Missões</strong>
+              Progresso da Jornada: <strong className="text-amber-400">{state.completedMissionIds.length}/{missions.length} Missões</strong>
             </span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-slate-100 tracking-tight mt-2">
@@ -110,14 +115,7 @@ export const TownMap: React.FC<TownMapProps> = ({
 
       {/* Original city illustration and marker, independent from the reading area of the cards. */}
       <div className="territory-canvas relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border border-slate-800 shadow-inner select-none">
-        <img
-          src={CITY_IMAGE}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          draggable={false}
-          fetchPriority="high"
-        />
+        <CityImage decorative className="absolute inset-0 h-full w-full object-cover object-center" />
         {!imageReady && <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-900 text-sm text-teal-200" role="status">Preparando a Cidade dos Encontros…</div>}
         <div className="absolute inset-0 bg-slate-950/10 pointer-events-none" aria-hidden="true" />
         <svg
@@ -170,7 +168,7 @@ export const TownMap: React.FC<TownMapProps> = ({
           const isCompleted = isSolo && completedRegions.has(region.id);
           const votes = voteCounts[region.id];
           const hasVotedForThis = myVote === region.id;
-          const missionsInRegion = isSolo ? MISSIONS.filter((m) => m.regionId === region.id).slice(0, 1) : MISSIONS.filter((m) => m.regionId === region.id);
+          const missionsInRegion = isSolo ? missions.filter((m) => m.regionId === region.id).slice(0, 1) : missions.filter((m) => m.regionId === region.id);
           const completedInRegion = missionsInRegion.filter((m) =>
             state.completedMissionIds.includes(m.id)
           ).length;

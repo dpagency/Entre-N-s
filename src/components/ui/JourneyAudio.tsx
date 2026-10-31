@@ -1,3 +1,4 @@
+import { browserStorage } from '../../services/browserStorage';
 import React, { useEffect, useRef, useState } from 'react';
 import { Pause, Play, Volume2, Square } from 'lucide-react';
 
@@ -6,7 +7,7 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
   const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [rate, setRate] = useState(() => {
-    try { const saved = Number(localStorage.getItem('entre-nos-narration-rate')); return [0.8, 1, 1.2, 1.5].includes(saved) ? saved : 1; } catch { return 1; }
+    try { const saved = Number(browserStorage.getItem('entre-nos-narration-rate')); return [0.8, 1, 1.2, 1.5].includes(saved) ? saved : 1; } catch { return 1; }
   });
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const rateRef = useRef(rate);
@@ -14,7 +15,7 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
   const positionRef = useRef(0);
   const rateChangedRef = useRef(false);
   const [rateChanged, setRateChanged] = useState(false);
-  useEffect(() => { try { localStorage.setItem('entre-nos-narration-rate', String(rate)); } catch { /* Playback still works without storage. */ } }, [rate]);
+  useEffect(() => { try { browserStorage.setItem('entre-nos-narration-rate', String(rate)); } catch { /* Playback still works without storage. */ } }, [rate]);
   useEffect(() => {
     setSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
     return () => { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); };
@@ -37,7 +38,8 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
     }
     // Narrate only passages explicitly identified as story/dialogue.
     // Never read navigation, instructions, scores or other interface text.
-    const passages = Array.from(document.querySelectorAll<HTMLElement>('main [data-narration="story"]'));
+    const passages = Array.from(document.querySelectorAll<HTMLElement>('main [data-narration="story"]'))
+      .filter(el => el.getClientRects().length > 0);
     const resumingAtNewRate = status === 'paused' && rateChangedRef.current && narrationRef.current;
     const text = resumingAtNewRate ? narrationRef.current : passages.map(el => (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join(' ');
     if (!text) { setStatus('idle'); return; }

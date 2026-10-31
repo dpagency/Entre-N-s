@@ -1,13 +1,15 @@
 import React from 'react';
-import { X, BookOpen, Users, Compass, Award, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
-import { CHARACTER_LIST } from '../../data/characters';
+import { X, BookOpen } from 'lucide-react';
 
 interface RulesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  rulesVersion?: 3 | 4;
 }
 
-export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
+export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, rulesVersion }) => {
+  const voluntary = rulesVersion === 4;
+  const legacy = !voluntary && rulesVersion !== 3;
   if (!isOpen) return null;
 
   return (
@@ -48,38 +50,33 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
             <h3 className="font-bold text-lg text-teal-300">Como jogar</h3>
             <p>Você percorre a Cidade dos Encontros em quatro missões. Em cada uma, conhece uma história, considera diferentes perspectivas e escolhe como agir. Não há necessidade de acertar a resposta de um Guardião: a decisão é sua.</p>
             <ol className="list-decimal pl-6 space-y-2">
-              <li>Escolha seu Guardião e comece a jornada.</li>
+              <li>Escolha seu avatar e comece a jornada.</li>
               <li>No mapa, selecione uma região e leia ou ouça o dilema.</li>
-              <li>Explore as informações disponíveis e escolha sua ação.</li>
-              <li>Conheça outras perspectivas. Se o Guardião escolhido preferiria outra ação, ele poderá compartilhar uma reflexão, sem mudar sua decisão.</li>
+              <li>Conheça seu papel na situação e participe do Desafio dos Guardiões da Integridade.</li>
+              <li>Escolha livremente sua ação e conheça as escolhas dos outros três participantes virtuais. Não há pontos por concordância.</li>
               <li>Observe as consequências e escolha uma das três cartas do destino.</li>
               <li>Ao concluir a missão, descubra o aprendizado desbloqueado e siga para a próxima região.</li>
             </ol>
-            <p className="text-teal-200">Você pode pausar a narração e ajustar sua velocidade. As cartas trazem elementos de sorte, revés ou segunda chance, sem representar punição moral.</p>
+            <p className="text-teal-200">Você pode pausar a narração e ajustar sua velocidade. As cartas são Caminhos, Segunda Chance e Revés, sem representar punição moral. Partidas antigas preservam Sorte.</p>
           </section>
           <section className="space-y-3 border-t border-slate-700 pt-5">
             <h3 className="font-bold text-lg text-teal-300">Como ganhar pontos de aprendizagem</h3>
             <p>Os pontos reconhecem a busca de orientação e o conhecimento demonstrado. Não há pontuação por escolher uma ação considerada moralmente certa nos dilemas.</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong className="text-slate-100">Consultar seu Guardião:</strong> +5 pontos por missão, na primeira consulta registrada.</li>
-              <li><strong className="text-slate-100">Consultar a Comissão de Ética:</strong> +5 pontos por missão, na primeira consulta registrada. Buscar orientação não exige acertar uma pergunta.</li>
-              <li><strong className="text-slate-100">Responder corretamente ao desafio de verdadeiro ou falso:</strong> +15 pontos por missão.</li>
-              <li><strong className="text-slate-100">Cartas do destino:</strong> Sorte +3, Revés −3 e Segunda chance +1 ponto, conforme a carta revelada.</li>
+              <li><strong className="text-slate-100">Iniciar o desafio dos Guardiões:</strong> {voluntary ? '0 ponto; a abertura registra somente o progresso.' : '+5 pontos de consulta por missão, conforme a regra desta jornada.'}</li>
+              <li><strong className="text-slate-100">Consultar os Canais:</strong> acesso livre e informativo, sem pontos pelo acesso à Comissão de Ética ou a outro canal.</li>
+              <li><strong className="text-slate-100">Acertar o desafio do Guardião:</strong> +15 pontos por missão. Erros recebem explicação e não retiram pontos.</li>
+              <li><strong className="text-slate-100">{voluntary ? 'Atividade voluntária dos Canais:' : 'Prática dos Canais:'}</strong> {voluntary ? 'cinco perguntas próprias, +4 por resposta adequada, até 20 pontos. Uma tentativa por pergunta, sem penalidade pelo erro. Disponível no mapa, nas missões e no resumo; pode sair e continuar depois.' : 'atividade opcional de verdadeiro ou falso, com feedback e sem pontuação.'}</li>
+              <li><strong className="text-slate-100">Cartas do destino:</strong> Caminhos não concede pontos pelo sorteio; Revés −3 e Segunda Chance +1, registrados separadamente da aprendizagem.</li>
+              <li><strong className="text-slate-100">Perguntas de Caminhos, Segunda Chance e Revés:</strong> três alternativas, uma mais adequada, com explicação após confirmar. Resposta adequada concede +5 pontos de conhecimento uma única vez; as demais não retiram pontos. Sua decisão na missão permanece registrada.</li>
             </ul>
-            <p>As consultas somam até 40 pontos e as respostas corretas, até 60. As cartas ajustam o resultado; a pontuação final permanece entre 0 e 100. Repetir a mesma consulta na missão não gera pontos extras.</p>
+            <p>{voluntary ? 'Os quatro desafios dos Guardiões oferecem até 60 pontos. A atividade voluntária dos Canais oferece até 20, sem ser necessária para a medalha ou avaliação.' : 'Cada encontro apresentado oferece +5 de consulta e até +15 pelo desafio do Guardião.'} As perguntas apresentadas pelas cartas acrescentam oportunidades de +5 pontos cada. O resumo informa o máximo efetivamente disponível, sem tratar todas as partidas como se tivessem as mesmas oportunidades. Caminhos aborda os canais institucionais. Sorte de partidas antigas não apresenta pergunta. Respostas de versões anteriores são preservadas sem bônus retroativo. Repetir a mesma consulta ou resposta não gera pontos extras. Ao final, escolha o Guardião com quem mais se identificou; essa identificação não altera pontos.</p>
+            {legacy && <p className="text-amber-200">Esta jornada mantém Sorte +3, Revés −3 e Segunda Chance +1. Créditos anteriores de consulta à Comissão (+5) e acertos nos Canais (+5) são preservados; o acesso e a prática atuais não geram novos pontos. Respostas anteriores não são reavaliadas.</p>}
             <p className="text-xs text-slate-400">A pontuação é experimental e serve à aprendizagem, não à avaliação moral ou funcional do jogador.</p>
           </section>
           <section className="space-y-2 border-t border-slate-700 pt-5">
-            <h3 className="font-bold text-lg text-teal-300">Os quatro Guardiões</h3>
-            <p>Cada Guardião simboliza uma maneira de observar dilemas. Eles são guias de reflexão, não juízes das suas escolhas.</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {CHARACTER_LIST.map(c => (
-                <div key={c.id} className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <strong className="text-slate-100">{c.name} — {c.title}</strong>
-                  <p className="text-sm mt-1">{c.description}</p>
-                </div>
-              ))}
-            </div>
+            <h3 className="font-bold text-lg text-teal-300">Encontros durante a jornada</h3>
+            <p>Os quatro Guardiões da Integridade aparecem progressivamente, um por missão, sem repetição. Eles oferecem orientação e desafios educativos, sem determinar suas escolhas. Somente ao final, indique aquele com quem mais se identificou.</p>
           </section>
           <section className="space-y-2 border-t border-slate-700 pt-5">
             <h3 className="font-bold text-lg text-teal-300">Por trás da jornada: proposta pedagógica</h3>

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { assetUrl, applicationUrl } from '../../distribution';
 import { CHARACTERS } from '../../data/characters';
 import type { CharacterId } from '../../types/game';
 
-interface Props { guardianId: CharacterId; playerAvatarIndex: number; }
+interface Props { guardianId: CharacterId; playerAvatarIndex: number; showMedal?: boolean; }
 
 const REFLECTION = 'Nem sempre escolhemos o mesmo caminho. Mas podemos aprender a caminhar juntos.';
 const PLAYER_AVATARS = ['exploradora', 'observador', 'construtora', 'estrategista'];
 const GUARDIAN_FILES: Record<CharacterId, string> = { alex: 'rin', joana: 'wa', ravi: 'satori', bia: 'yuki' };
-const playerImage = (index: number) => '/personagens/avatar_' + PLAYER_AVATARS[index % PLAYER_AVATARS.length] + '_corpo.png';
-const guardianImage = (id: CharacterId) => '/personagens/' + GUARDIAN_FILES[id] + '_corpo.png';
+const playerImage = (index: number) => assetUrl('/personagens/avatar_' + PLAYER_AVATARS[index % PLAYER_AVATARS.length] + '_corpo.png');
+const guardianImage = (id: CharacterId) => assetUrl('/personagens/' + GUARDIAN_FILES[id] + '_corpo.png');
 async function loadPortrait(src: string): Promise<HTMLImageElement> {
   const image = new Image();
   await new Promise<void>((resolve, reject) => { image.onload = () => resolve(); image.onerror = () => reject(new Error('Não foi possível carregar a ilustração.')); image.src = src; });
@@ -28,7 +29,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
   return lines;
 }
 
-export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarIndex }) => {
+export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarIndex, showMedal = false }) => {
   const [message, setMessage] = useState('');
   const guardian = CHARACTERS[guardianId];
 
@@ -43,7 +44,8 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
     ctx.strokeStyle = '#b5d8c6'; ctx.lineWidth = 5; ctx.strokeRect(42, 42, 996, 996);
     ctx.textAlign = 'center';
     ctx.fillStyle = '#d9f5e8'; ctx.font = 'bold 76px Georgia, serif'; ctx.fillText('Entre Nós', 540, 152);
-    ctx.font = '30px sans-serif'; ctx.fillText('GUARDIÕES DA CONVIVÊNCIA', 540, 210);
+    ctx.font = '30px sans-serif'; ctx.fillText('GUARDIÕES DA INTEGRIDADE', 540, 210);
+    if (showMedal) { ctx.font = '44px sans-serif'; ctx.fillText('🏅 Jornada concluída', 540, 1030); }
     ctx.fillStyle = '#164e49'; ctx.beginPath(); ctx.arc(340, 420, 160, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#e0f2fe'; ctx.beginPath(); ctx.arc(740, 420, 160, 0, Math.PI * 2); ctx.fill();
     const [playerPortrait, guardianPortrait] = await Promise.all([loadPortrait(playerImage(playerAvatarIndex)), loadPortrait(guardianImage(guardianId))]);
@@ -51,7 +53,7 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
     ctx.drawImage(guardianPortrait, 595, 270, 290, 330);
     ctx.fillStyle = '#d9f5e8'; ctx.font = 'bold 36px sans-serif'; ctx.fillText('Minha jornada', 340, 625);
     ctx.fillText(guardian.name, 740, 625);
-    ctx.font = '27px sans-serif'; ctx.fillText('Meu Guardião', 740, 664);
+    ctx.font = '27px sans-serif'; ctx.fillText('Identificação ao final', 740, 664);
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 41px Georgia, serif';
     const lines = wrapLines(ctx, '“' + REFLECTION + '”', 890);
     lines.forEach((line, i) => ctx.fillText(line, 540, 770 + i * 54));
@@ -77,7 +79,7 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
       const blob = await createImage();
       const file = new File([blob], 'entre-nos-minha-jornada.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'Entre Nós — Guardiões da Convivência', text: REFLECTION });
+        await navigator.share({ files: [file], title: 'Entre Nós — Guardiões da Integridade', text: REFLECTION });
         setMessage('Compartilhamento aberto.');
       } else {
         await download();
@@ -90,11 +92,11 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
   };
 
   const invite = async () => {
-    const url = window.location.origin + '/';
-    const text = 'Venha conhecer o Entre Nós — Guardiões da Convivência. Que caminhos você escolheria?';
+    const url = applicationUrl(window.location);
+    const text = 'Venha conhecer o Entre Nós — Guardiões da Integridade. Que caminhos você escolheria?';
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Entre Nós — Guardiões da Convivência', text, url });
+        await navigator.share({ title: 'Entre Nós — Guardiões da Integridade', text, url });
         setMessage('Convite pronto para compartilhar.');
       } else if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(text + '\n' + url);
@@ -115,15 +117,16 @@ export const JourneyShareCard: React.FC<Props> = ({ guardianId, playerAvatarInde
 
   return <section className="rounded-3xl border border-teal-500/40 bg-slate-900 p-5 space-y-4" aria-label="Compartilhe sua jornada">
     <h2 className="text-xl font-black text-teal-200">Compartilhe sua jornada</h2>
-    <p className="text-sm text-slate-300">Uma lembrança com seu avatar e o Guardião que acompanhou você, sem revelar decisões ou pontuações.</p>
+    <p className="text-sm text-slate-300">{showMedal ? 'Uma lembrança com seu avatar, o Guardião com quem você se identificou e a medalha de conclusão.' : 'Uma lembrança com seu avatar e o Guardião que acompanhou você, sem revelar decisões ou pontuações.'}</p>
     <div className="rounded-2xl bg-gradient-to-br from-teal-950 to-slate-950 border border-teal-600/40 p-5 text-center space-y-3">
       <h3 className="text-2xl font-black text-teal-100">Entre Nós</h3>
-      <p className="text-xs tracking-wide text-teal-200">GUARDIÕES DA CONVIVÊNCIA</p>
+      <p className="text-xs tracking-wide text-teal-200">GUARDIÕES DA INTEGRIDADE</p>
       <div className="flex items-center justify-center gap-8">
         <div className="flex-1 min-w-0"><img src={playerImage(playerAvatarIndex)} alt="Seu avatar" className="h-44 sm:h-60 w-full object-contain" /><p className="text-xs mt-2">Você</p></div>
-        <div className="flex-1 min-w-0"><img src={guardianImage(guardianId)} alt={guardian.name} className="h-44 sm:h-60 w-full object-contain" /><p className="text-xs mt-2">{guardian.name} · seu Guardião</p></div>
+        <div className="flex-1 min-w-0"><img src={guardianImage(guardianId)} alt={guardian.name} className="h-44 sm:h-60 w-full object-contain" /><p className="text-xs mt-2">{guardian.name} · identificação ao final</p></div>
       </div>
       <p className="font-semibold text-lg text-white">“{REFLECTION}”</p>
+      {showMedal && <p className="text-lg text-amber-200">🏅 Medalha Caminhos da Escuta</p>}
       <p className="text-sm text-teal-200">E você, que caminhos escolheria?</p>
     </div>
     <div className="flex flex-wrap gap-2">

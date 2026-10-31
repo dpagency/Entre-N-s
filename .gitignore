@@ -1,6 +1,9 @@
 node_modules/
 build/
 dist/
+dist-institucional/
+/artifacts/
+/Imagens/
 coverage/
 .DS_Store
 *.log

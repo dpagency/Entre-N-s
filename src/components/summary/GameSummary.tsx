@@ -112,7 +112,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {affinityCounts.map(({characterId, count}) => <div key={characterId} className={`rounded-xl border p-3 flex items-center gap-3 ${characterId === companion?.characterId ? 'border-teal-400 bg-teal-950/40 ring-1 ring-teal-400/40' : 'border-slate-700 bg-slate-950'}`}>
             <CharacterAvatar characterId={characterId} size="sm" />
-            <div><p className="font-bold text-amber-200">{CHARACTERS[characterId].name}{characterId === companion?.characterId && <span className="block text-xs font-bold text-teal-300">★ Seu Guardião nesta jornada</span>}</p><p className="text-sm text-slate-300">{count} {count === 1 ? 'talismã' : 'talismãs'}</p></div>
+            <div><p className="font-bold text-amber-200">{CHARACTERS[characterId].name}{characterId === companion?.characterId && <span className="block text-xs font-bold text-teal-300">★ Guardião de referência nesta jornada</span>}</p><p className="text-sm text-slate-300">{count} {count === 1 ? 'talismã' : 'talismãs'}</p></div>
           </div>)}
         </div>
         <div className="space-y-3 pt-2">

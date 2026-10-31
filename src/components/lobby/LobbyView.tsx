@@ -1,3 +1,5 @@
+import { INSTITUTIONAL } from '../../distribution';
+import { browserStorage } from '../../services/browserStorage';
 import React, { useState } from 'react';
 import { CharacterId, RoomState } from '../../types/game';
 import { CHARACTER_LIST, AVATAR_VARIANTS, CHARACTERS } from '../../data/characters';
@@ -23,7 +25,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
   const totalConnected = connectedPlayers.length;
   const allReady = connectedPlayers.length >= 1 && connectedPlayers.every((p) => p.isReady);
 
-  const isSolo = localStorage.getItem('entre-nos-mode') === 'solo' || state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
+  const isSolo = INSTITUTIONAL || browserStorage.getItem('entre-nos-mode') === 'solo' || state.roomCode.startsWith('SOLO-') || Object.values(state.players).some(p => p.isBot);
   const inviteUrl = `${window.location.origin}?room=${state.roomCode}`;
 
   const handleCopyLink = () => {
@@ -52,10 +54,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ state, myPlayerId, onOpenR
       {isSolo ? (
         <section className="w-full max-w-xl mx-auto rounded-3xl border border-teal-500/40 bg-slate-900 p-5 sm:p-8 space-y-5 text-center">
           <h1 className="text-2xl sm:text-3xl font-black">Sua jornada na Cidade dos Encontros</h1>
-          <p className="text-base text-slate-200">Você viverá quatro missões, acompanhado pelo Guardião que escolheu. Os outros três serão jogadores robôs e escolherão suas próprias alternativas. As decisões serão sempre suas.</p>
-          <p className="text-sm text-teal-300">Guardião acompanhante: <strong>{CHARACTERS[myPlayer?.characterId || 'alex'].name}</strong>. Você decide os caminhos da jornada.</p>
+          <p className="text-base text-slate-200">Você viverá quatro missões. Os outros três avatares serão participantes virtuais, sem preferências fixas. Em cada missão, um Guardião apresentará um desafio educativo antes da sua decisão.</p>
+          <p className="text-sm text-teal-300">Os quatro Guardiões estarão presentes ao longo da jornada. As decisões serão suas.</p>
           <button type="button" onClick={handleStartGame} className="w-full min-h-12 rounded-2xl bg-teal-400 text-slate-950 text-lg font-black p-4">Começar minha jornada</button>
-          {onBackToGuardianSelection && <button type="button" onClick={onBackToGuardianSelection} className="w-full min-h-11 rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-slate-100">← Voltar à escolha do Guardião</button>}
+          {onBackToGuardianSelection && <button type="button" onClick={onBackToGuardianSelection} className="w-full min-h-11 rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-slate-100">← Voltar à escolha do avatar</button>}
           {onOpenRules && <button type="button" onClick={onOpenRules} className="text-sm text-teal-300 underline">Como jogar</button>}
         </section>
       ) : <>

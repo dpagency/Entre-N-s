@@ -1,3 +1,4 @@
+import { browserStorage } from '../../services/browserStorage';
 import React from 'react';
 import { LearningConfetti } from '../ui/LearningConfetti';
 import { MissionDef, RoomState } from '../../types/game';
@@ -13,17 +14,17 @@ const chooseQuestion = (missionId: string, original: NonNullable<MissionDef['tfC
   const options = [original, ...ADDITIONAL_QUESTIONS];
   if (typeof window === 'undefined') return original;
   const key = 'entre-nos-tf-last-' + missionId;
-  const sessionKey = 'entre-nos-tf-session-' + (socketService.roomCode || 'unknown') + '-' + missionId;
+  const sessionKey = 'entre-nos-tf-session-' + (socketService.learningId || 'unknown') + '-' + missionId;
   try {
-    const saved = window.localStorage.getItem(sessionKey);
+    const saved = browserStorage.getItem(sessionKey);
     const existing = options.find(q => q.id === saved);
     if (existing) return existing;
-    const previous = window.localStorage.getItem(key);
+    const previous = browserStorage.getItem(key);
     const candidates = options.filter(q => q.id !== previous);
     const pool = candidates.length ? candidates : options;
     const chosen = pool[Math.floor(Math.random() * pool.length)];
-    window.localStorage.setItem(key, chosen.id);
-    window.localStorage.setItem(sessionKey, chosen.id);
+    browserStorage.setItem(key, chosen.id);
+    browserStorage.setItem(sessionKey, chosen.id);
     return chosen;
   } catch {
     return options[Math.floor(Math.random() * options.length)];
@@ -50,7 +51,7 @@ export const TrueFalseChallenge: React.FC<TrueFalseChallengeProps> = ({
   const hasAnswered = myAnswer !== undefined;
 
   const handleAnswer = (answer: boolean) => {
-    if (answer === tf.isTrue) recordLearning(socketService.roomCode, mission.id, 'correct');
+    if (answer === tf.isTrue) recordLearning(socketService.learningId, mission.id, 'correct');
     socketService.send({
       type: 'SUBMIT_TF_ANSWER',
       answer,

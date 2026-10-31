@@ -1,3 +1,4 @@
+import { INSTITUTIONAL } from '../../distribution';
 import React from 'react';
 import { MissionDef, SanitizedRoomState } from '../../types/game';
 import { ActionCard } from '../cards/CardView';
@@ -11,14 +12,12 @@ interface MissionIndividualChoiceProps {
   mission: MissionDef;
   state: SanitizedRoomState;
   myPlayerId: string;
-  onOpenInstitutionalGuide?: () => void;
 }
 
 export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = ({
   mission,
   state,
   myPlayerId,
-  onOpenInstitutionalGuide,
 }) => {
   const isHost = state.hostId === myPlayerId;
   const myPlayer = state.players[myPlayerId];
@@ -30,7 +29,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
     ravi: ['cautela', 'orientacao', 'dialogo', 'formalizacao', 'acolhimento'],
     bia: ['orientacao', 'formalizacao', 'dialogo', 'acolhimento', 'cautela'],
   };
-  const companionChoice = myPlayer && mission.actions.slice().sort((a, b) =>
+  const companionChoice = !INSTITUTIONAL && state.pilotVersion !== 2 && myPlayer && mission.actions.slice().sort((a, b) =>
     (companionPriorities[myPlayer.characterId]?.indexOf(a.actionType) ?? 9) -
     (companionPriorities[myPlayer.characterId]?.indexOf(b.actionType) ?? 9)
   )[0];
@@ -80,26 +79,14 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
           </div>
 
           {/* Power button for current player */}
-          {myPlayer && (
-            <div className="flex items-center gap-2">
-              <PowerButton player={myPlayer} state={state} />
-              {onOpenInstitutionalGuide && (
-                <button
-                  onClick={onOpenInstitutionalGuide}
-                  className="px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 border border-amber-300 text-xs font-bold shadow-md transition-colors"
-                >
-                  Canais de Atendimento · até +5 pontos
-                </button>
-              )}
-            </div>
-          )}
+          {myPlayer && state.pilotVersion !== 2 && <PowerButton player={myPlayer} state={state} />}
         </div>
 
         <h2 className="text-xl sm:text-2xl font-black text-slate-100 mt-1">
           O que você faria?
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1">
-          Escolha como agir. Os outros Guardiões também tomarão suas próprias decisões.
+          {state.pilotVersion === 2 ? 'Escolha como agir. Os outros três participantes virtuais também farão suas escolhas, sem alterar a sua.' : 'Escolha como agir. Os outros Guardiões também tomarão suas próprias decisões.'}
         </p>
 
         {state.isRaviSecondRoundActive && (
@@ -157,8 +144,8 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
         })}
       </div>
 
-      {isSolo && myChoice && myPlayer && companionChoice && (
-        <section className="rounded-2xl border border-teal-500/40 bg-teal-950/20 p-4 space-y-2" aria-label="Seu Guardião companheiro">
+      {state.pilotVersion !== 2 && isSolo && myChoice && myPlayer && companionChoice && (
+        <section className="rounded-2xl border border-teal-500/40 bg-teal-950/20 p-4 space-y-2" aria-label="Guardião em diálogo">
           <div className="flex items-center gap-3">
             <CharacterAvatar characterId={myPlayer.characterId} variantIndex={myPlayer.variantIndex} size="sm" />
             <strong className="text-teal-200 text-sm">{CHARACTERS[myPlayer.characterId].name} · seu companheiro</strong>
@@ -168,7 +155,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
               “Eu teria seguido outro caminho: {companionChoice.title.toLocaleLowerCase('pt-BR')}. {companionPrompts[myPlayer.characterId]}”
             </p>
           ) : (
-            <p className="text-sm text-slate-300">Seu Guardião também seguiria esse caminho.</p>
+            <p className="text-sm text-slate-300">Este Guardião também seguiria esse caminho.</p>
           )}
           <p className="text-xs text-slate-400">Sua decisão permanece registrada. O Guardião oferece outro olhar, não uma correção.</p>
         </section>
@@ -197,7 +184,7 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-98 disabled:opacity-40"
             >
               <Eye className="w-4 h-4" />
-              <span>Ver como os Guardiões decidiram</span>
+              <span>{state.pilotVersion === 2 ? 'Ver as escolhas dos participantes' : 'Ver como os Guardiões decidiram'}</span>
             </button>
           )}
 

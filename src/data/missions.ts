@@ -1,3 +1,4 @@
+import { legacyMissionQuestion } from './trueFalseQuestions';
 import { MissionDef } from '../types/game';
 
 export const MISSIONS: MissionDef[] = [
@@ -209,13 +210,7 @@ export const MISSIONS: MissionDef[] = [
         consequenceDetails: 'Ambos os servidores são chamados para apuração, e a situação desgasta a unidade inteira sem resolver a fórmula nem educar para a convivência.'
       }
     ],
-    tfChallenge: {
-      id: 'tf-2',
-      statement: 'No serviço público, quando um colega comete um erro técnico relevante sob prazo crítico, é justificável usar expressões duras e desqualificantes para demonstrar a gravidade da situação à equipe.',
-      isTrue: false,
-      explanation: 'FALSO. A urbanidade e o respeito à pessoa são deveres absolutos do servidor público. Erros técnicos devem ser apontados com precisão e clareza objetiva, sem qualquer ataque à dignidade pessoal.',
-      sourceNote: 'Orientação Pedagógica Proposta / Código de Conduta e Ética Profissional no Serviço Público.'
-    },
+    tfChallenge: legacyMissionQuestion('tf-2'),
     discovery: {
       key: 'respeito',
       title: 'Respeito e Urbanidade em Momentos de Tensão',
@@ -551,13 +546,7 @@ export const MISSIONS: MissionDef[] = [
         consequenceDetails: 'Outros colegas também passam a ser alvo de comentários pejorativos, demonstrando que a omissão coletiva encoraja o assédio moral.'
       }
     ],
-    tfChallenge: {
-      id: 'tf-5',
-      statement: 'Comentários pejorativos sobre a origem regional, sotaque ou cultura de colegas no ambiente de trabalho podem ser tratados como mera liberdade de expressão se o autor declarar que não tinha intenção de ofender.',
-      isTrue: false,
-      explanation: 'FALSO. A discriminação e o preconceito são expressamente vedados no serviço público e na legislação brasileira. A ausência alegada de intenção não elide a ilicitude do ato nem o dano moral causado à dignidade da pessoa e ao ambiente de trabalho.',
-      sourceNote: 'Orientação Pedagógica Proposta / Lei nº 7.716/1989 e Código de Ética Profissional.'
-    },
+    tfChallenge: legacyMissionQuestion('tf-5'),
     discovery: {
       key: 'respeito',
       title: 'Dignidade, Diversidade e Não Tolerância ao Preconceito',

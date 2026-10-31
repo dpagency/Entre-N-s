@@ -26,7 +26,7 @@ export const PowerButton: React.FC<PowerButtonProps> = ({ player, state }) => {
     : mission?.situation.uncertainties?.[0] ?? 'Que perspectivas merecem atenção antes da sua decisão?';
 
   const consult = () => {
-    recordLearning(socketService.roomCode, state.activeMissionId ?? null, 'guardian');
+    recordLearning(socketService.learningId, state.activeMissionId ?? null, 'guardian');
     setShowAdvice(true);
   };
 

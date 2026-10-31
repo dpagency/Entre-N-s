@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
+    "build:institutional": "vite build --config vite.institutional.config.ts --mode institutional",
+    "verify:institutional": "node scripts/institutional-package.mjs verify",
+    "package:institutional": "npm run build:institutional && node scripts/institutional-package.mjs package",
+    "test:institutional:browser": "node --import tsx scripts/verify-institutional-browser.mjs",
     "preview": "vite preview",
     "start": "tsx server.ts",
     "clean": "rm -rf dist server.js",

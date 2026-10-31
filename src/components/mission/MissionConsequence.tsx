@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { journeyMissions } from '../../data/journeys';
+import { INSTITUTIONAL } from '../../distribution';
+import { browserStorage } from '../../services/browserStorage';
+import React, { useState, useEffect, useRef } from 'react';
 import { MissionDef, RoomState } from '../../types/game';
 import { DiscoveryCard } from '../cards/CardView';
 import { socketService } from '../../services/socket';
-import { SECOND_CHANCE_SCENARIOS, SETBACK_SCENARIOS } from '../../data/fortuneScenarios';
+import { LEGACY_SECOND_CHANCE_SCENARIOS, LEGACY_SETBACK_SCENARIOS, SECOND_CHANCE_SCENARIOS, SETBACK_SCENARIOS, type CardScenario } from '../../data/fortuneScenarios';
+import { presentCardQuestion, confirmCardAnswer, cardScenario, cardAward, type CardRecord } from '../../services/cardKnowledge';
+import { PATH_SCENARIOS } from '../../data/pathScenarios';
 import { rotatingItem } from '../../services/questionRotation';
+import { MOTIVATION } from '../../data/pilot';
 import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, BookOpen, Lock, LockOpen } from 'lucide-react';
 
 interface MissionConsequenceProps {
@@ -21,7 +27,9 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   const [showReflection, setShowReflection] = useState(false);
   const [cardAnswer, setCardAnswer] = useState<number | null>(null);
   const [pendingCardAnswer, setPendingCardAnswer] = useState<number | null>(null);
-  const roomCode = socketService.roomCode;
+  const [cardRecord, setCardRecord] = useState<CardRecord | null>(null);
+  const cardFeedback = useRef<HTMLDivElement>(null);
+  const roomCode = socketService.learningId;
   useEffect(() => {
     setDiscoveryOpened(false);
     setCardAnswer(null);
@@ -44,27 +52,42 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
     ? state.completedMissionIds.length
     : state.completedMissionIds.length + 1;
 
-  const isLastMission = completedCount >= 4;
+  const isLastMission = completedCount >= journeyMissions(state.journeyDefinitionId).length;
   const fortune = state.fortuneCards?.[mission.id];
 
   const scenarioFor = (kind: 'reves' | 'segunda_chance') => {
-    const pool = kind === 'reves' ? SETBACK_SCENARIOS : SECOND_CHANCE_SCENARIOS;
+    const pool = kind === 'reves' ? LEGACY_SETBACK_SCENARIOS : LEGACY_SECOND_CHANCE_SCENARIOS;
     const sessionKey = 'entre-nos-card-scenario-' + (roomCode || 'solo') + '-' + mission.id + '-' + kind;
     const lastKey = 'entre-nos-card-last-' + kind;
-    return rotatingItem(pool, localStorage, { session: sessionKey, history: lastKey, slot: mission.id });
+    return rotatingItem(pool, browserStorage, { session: sessionKey, history: lastKey, slot: mission.id });
   };
-  const [scenario, setScenario] = useState<ReturnType<typeof scenarioFor> | null>(null);
+  const [scenario, setScenario] = useState<CardScenario | null>(null);
   useEffect(() => {
     const kind = state.fortuneCards?.[mission.id]?.outcome;
-    setScenario(kind === 'reves' || kind === 'segunda_chance' ? scenarioFor(kind) : null);
-  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome, roomCode]);
+    if (kind !== 'reves' && kind !== 'segunda_chance' && kind !== 'caminhos') { setScenario(null); setCardRecord(null); return; }
+    if (state.pilotVersion === 2 && roomCode) {
+      const record = presentCardQuestion(browserStorage, roomCode, mission.id, kind);
+      setCardRecord(record); setScenario(cardScenario(record)); setCardAnswer(record.answer ?? null);
+    } else if (kind !== 'caminhos') setScenario(scenarioFor(kind));
+  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome, roomCode, state.pilotVersion]);
+  useEffect(() => { if (cardAnswer !== null) cardFeedback.current?.focus(); }, [cardAnswer]);
+  const knowledgeQuestion = cardRecord?.version === 2 ? [...SECOND_CHANCE_SCENARIOS, ...SETBACK_SCENARIOS, ...PATH_SCENARIOS].find(q => q.id === cardRecord.questionId) : null;
+  const confirmReflection = () => {
+    if (pendingCardAnswer === null || !scenario || cardAnswer !== null) return;
+    if (state.pilotVersion === 2 && roomCode) {
+      const record = confirmCardAnswer(browserStorage, roomCode, mission.id, pendingCardAnswer);
+      if (!record) return;
+      setCardRecord(record); setCardAnswer(record.answer ?? null);
+      window.dispatchEvent(new Event('entre-nos-learning-update'));
+    } else setCardAnswer(pendingCardAnswer);
+  };
   const handleProceed = () => {
     socketService.send({
       type: 'PROCEED_AFTER_CONSEQUENCE',
     });
   };
 
-  if (isSolo) {
+  if (INSTITUTIONAL || isSolo) {
     return <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto text-slate-100">
       <section className="rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-3">
         <span className="text-xs text-teal-300 font-bold">{mission.title}</span>
@@ -78,26 +101,36 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         <h3 className="font-bold text-amber-200">Escolha uma carta do destino</h3>
         <div className="grid grid-cols-3 gap-2">
           {[0,1,2].map(index => <button key={index} type="button" aria-pressed={fortune?.cardIndex === index} disabled={!!fortune || !isHost} onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD',cardIndex:index})} className={`min-h-24 rounded-xl border-2 p-2 flex flex-col items-center justify-center gap-2 ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/40 bg-teal-950'}`}>
-            <span className="text-3xl">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
-            <span className="text-xs">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index+1}`}</span>
+            <span className="text-3xl">{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? '🧭' : fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
+            <span className="text-xs">{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? 'Caminhos' : fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index+1}`}</span>
           </button>)}
         </div>
-        {fortune && <p role="status" className="text-lg font-black text-amber-200">{fortune.outcome === 'sorte' ? '+3 pontos' : fortune.outcome === 'reves' ? '−3 pontos' : '+1 ponto'}</p>}
-        {fortune && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
+        {fortune && <p role="status" className="text-lg font-black text-amber-200">Sorteio: {fortune.outcome === 'caminhos' ? 'sem pontos automáticos' : fortune.outcome === 'sorte' ? '+3 pontos' : fortune.outcome === 'reves' ? '−3 pontos' : '+1 ponto'}</p>}
+        {fortune && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'caminhos' ? 'Conheça os canais institucionais.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
       </section>
 
-      {(fortune?.outcome === 'reves' || fortune?.outcome === 'segunda_chance') && scenario && <section className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 space-y-3">
-        <h3 className="font-bold text-amber-200">{fortune.outcome === 'reves' ? 'Revés · desafio rápido' : 'Segunda chance · outro olhar'}</h3>
-        <p className="text-sm">{scenario.prompt}</p>
-        {fortune.outcome === 'segunda_chance' && <p className="text-xs text-slate-400">Sua decisão original permanece.</p>}
+      {(fortune?.outcome === 'caminhos' || fortune?.outcome === 'reves' || fortune?.outcome === 'segunda_chance') && scenario && <section data-card-question={scenario.id} data-card-version={cardRecord?.version ?? 1} aria-labelledby="card-question-title" className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 sm:p-6 space-y-4">
+        <h3 id="card-question-title" className="text-xl font-bold text-amber-200">{fortune.outcome === 'caminhos' ? 'Caminhos · canais institucionais' : fortune.outcome === 'reves' ? 'Revés · desafio rápido' : 'Segunda chance · outro olhar'}</h3>
+        <p data-narration="story" className="text-lg">{scenario.prompt}</p>
+        <p className="text-sm text-slate-300">Sua decisão original permanece. {knowledgeQuestion ? 'Resposta mais adequada: +5 pontos de conhecimento, separados do sorteio.' : 'Registro da versão anterior preservado, sem reavaliação ou bônus retroativo.'}</p>
+        <div role="group" aria-label="Alternativas da pergunta da carta" className="space-y-3">
         {scenario.options.map((option, index) =>
-          <button key={index} type="button" aria-pressed={(cardAnswer ?? pendingCardAnswer) === index} disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={(cardAnswer ?? pendingCardAnswer) === index ? 'w-full text-left p-3 rounded-xl border border-teal-400 bg-teal-950/50 text-sm' : 'w-full text-left p-3 rounded-xl border border-slate-700 text-sm'}>{option}</button>
+          <button key={index} type="button" aria-pressed={(cardAnswer ?? pendingCardAnswer) === index} disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={`w-full text-left p-4 rounded-xl border-2 text-base leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${(cardAnswer ?? pendingCardAnswer) === index ? 'border-teal-400 bg-teal-950 text-teal-100' : 'border-slate-600 bg-slate-950 text-slate-100'}`}>
+            {(cardAnswer ?? pendingCardAnswer) === index && <span className="block font-bold">{cardAnswer !== null ? 'Sua resposta registrada' : 'Selecionada'}</span>}{option}
+          </button>
         )}
-        {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={() => setCardAnswer(pendingCardAnswer)} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
-        {cardAnswer !== null && <p role="status" className="text-sm text-teal-200">{scenario.feedback[cardAnswer]}</p>}
+        </div>
+        {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={confirmReflection} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
+        {cardAnswer !== null && <div ref={cardFeedback} data-card-feedback role="status" tabIndex={-1} className="rounded-xl border border-teal-400 bg-slate-950 p-4 space-y-3 text-base">
+          {knowledgeQuestion && <p className="font-bold text-teal-200">{cardAnswer === knowledgeQuestion.correctIndex ? 'Você escolheu a alternativa mais adequada. +5 pontos de conhecimento.' : 'Há um caminho mais adequado nesta situação. +0 pontos de conhecimento; nenhum ponto foi retirado pela resposta.'}</p>}
+          <p data-narration="story">{scenario.feedback[cardAnswer]}</p>
+          {knowledgeQuestion && <><p data-narration="story">{knowledgeQuestion.rationale}</p><p><strong>Alternativa mais adequada:</strong> {knowledgeQuestion.options[knowledgeQuestion.correctIndex]}</p><p className="text-sm text-slate-300">{knowledgeQuestion.basis}</p><p className="font-bold text-amber-200">Nesta carta: sorteio {fortune.outcome === 'caminhos' ? '0' : fortune.outcome === 'reves' ? '−3' : '+1'} · conhecimento +{cardRecord ? cardAward(cardRecord) : 0}.</p></>}
+          {!knowledgeQuestion && <p className="text-slate-300">Resposta anterior preservada, sem bônus retroativo.</p>}
+        </div>}
       </section>}
       {fortune?.outcome === 'sorte' && <section className="rounded-xl bg-slate-900 border border-teal-500/40 p-4"><p className="text-sm text-teal-200">Sorte! Você encontrou uma pista: {mission.discovery.subtitle}</p></section>}
       {fortune && <section className="rounded-xl bg-slate-900 border border-slate-700 p-4"><p className="text-sm text-amber-200 font-bold">Descoberta: {mission.discovery.title}</p></section>}
+      {state.pilotVersion === 2 && fortune && (fortune.outcome === 'sorte' || cardAnswer !== null) && <p data-narration="story" role="status" className="rounded-xl border border-teal-500/50 bg-teal-950/30 p-4 font-bold text-teal-200">{MOTIVATION[Math.min(3, completedCount - 1)]}</p>}
       <button type="button" disabled={!fortune || (fortune.outcome !== 'sorte' && cardAnswer === null)} onClick={handleProceed} className="w-full rounded-xl bg-teal-400 text-slate-950 font-black p-4 disabled:opacity-40">{!fortune ? 'Vire uma carta para continuar' : fortune.outcome !== 'sorte' && cardAnswer === null ? 'Responda ao desafio para continuar' : isLastMission ? 'Ver resumo e medalha' : 'Próxima missão →'}</button>
     </div>;
   }
@@ -180,13 +213,13 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
             aria-label={fortune?.cardIndex === index ? `Carta ${index + 1} revelada: ${fortune.outcome}` : `Virar carta ${index + 1}`}
             aria-pressed={fortune?.cardIndex === index}
             className={`min-h-28 sm:min-h-36 rounded-2xl border-2 p-2 sm:p-3 flex flex-col items-center justify-center gap-2 transition-transform ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/50 bg-teal-950 hover:-translate-y-1'} disabled:cursor-default`}>
-            <span className="text-4xl" aria-hidden="true">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
-            <span className="text-xs font-bold text-amber-100">{fortune?.cardIndex === index ? (fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index + 1}`}</span>
+            <span className="text-4xl" aria-hidden="true">{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? '🧭' : fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
+            <span className="text-xs font-bold text-amber-100">{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? 'Caminhos' : fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index + 1}`}</span>
           </button>)}
         </div>
         {fortune && <div role="status" className="rounded-2xl border border-amber-400/50 bg-amber-950/40 p-4 text-center animate-in zoom-in duration-500">
           <div className="text-3xl" aria-hidden="true">✨ 🏅 ✨</div>
-          <p className="font-black text-amber-200 mt-2">{fortune.outcome === 'sorte' ? 'Um caminho favorável!' : fortune.outcome === 'reves' ? 'Um imprevisto no caminho!' : 'Uma nova oportunidade!'}</p>
+          <p className="font-black text-amber-200 mt-2">{fortune.outcome === 'caminhos' ? 'Conheça os canais institucionais.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : fortune.outcome === 'reves' ? 'Um imprevisto no caminho!' : 'Uma nova oportunidade!'}</p>
           <p className="text-sm text-slate-200 mt-2">{fortune.outcome === 'reves' ? 'O revés faz parte da sorte, não é punição pela sua escolha. Você pode continuar.' : 'Esta carta acrescenta uma conquista à sua jornada.'}</p>
         </div>}
       </section>

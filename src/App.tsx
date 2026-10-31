@@ -1,3 +1,5 @@
+import { browserStorage } from './services/browserStorage';
+import { INSTITUTIONAL } from './distribution';
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { RoomState, SanitizedRoomState } from './types/game';
 import { MISSIONS } from './data/missions';
@@ -8,7 +10,7 @@ import { AccessibilityModal } from './components/ui/AccessibilityModal';
 import { RulesModal } from './components/ui/RulesModal';
 import { InstitutionalCardModal } from './components/cards/InstitutionalCardModal';
 import { OrganizerDashboard } from './components/admin/OrganizerDashboard';
-import { WelcomeScreen } from './components/lobby/WelcomeScreen';
+import { JourneyHome } from './components/lobby/JourneyHome';
 import { LobbyView } from './components/lobby/LobbyView';
 import { TownMap } from './components/board/TownMap';
 import { MissionSituation } from './components/mission/MissionSituation';
@@ -25,6 +27,9 @@ import { Zap, AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
 import { MotionConfig } from 'motion/react';
 import { readAccessibilityPreferences, saveAccessibilityPreferences, TextSize } from './services/accessibility';
 import { useDialogAccessibility } from './hooks/useDialogAccessibility';
+import { GuardianEncounter } from './components/mission/GuardianEncounter';
+import { ParticipantReveal } from './components/mission/ParticipantReveal';
+import { PilotSummary } from './components/summary/PilotSummary';
 
 export default function App() {
   const [state, setState] = useState<SanitizedRoomState | null>(null);
@@ -58,7 +63,7 @@ export default function App() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   // Accessibility settings
-  const [preferences, setPreferences] = useState(() => readAccessibilityPreferences(localStorage));
+  const [preferences, setPreferences] = useState(() => readAccessibilityPreferences(browserStorage));
   const { reducedMotion, fontSize, highContrast } = preferences;
   const setReducedMotion = (value: boolean) => setPreferences(p => ({ ...p, reducedMotion: value }));
   const setFontSize = (value: TextSize) => setPreferences(p => ({ ...p, fontSize: value }));
@@ -68,7 +73,7 @@ export default function App() {
     root.dataset.textSize = fontSize;
     root.dataset.highContrast = String(highContrast);
     root.dataset.reducedMotion = String(reducedMotion);
-    saveAccessibilityPreferences(localStorage, preferences);
+    saveAccessibilityPreferences(browserStorage, preferences);
   }, [preferences, fontSize, highContrast, reducedMotion]);
   useDialogAccessibility();
 
@@ -77,7 +82,7 @@ export default function App() {
 
   const addNotification = (text: string, variant: 'info' | 'success' | 'warning' = 'info') => {
     const id = `${Date.now()}_${Math.random()}`;
-    setNotifications((prev) => [...prev, { id, text, variant }]);
+    setNotifications((prev) => [...prev.slice(-1), { id, text, variant }]);
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     }, 4500);
@@ -123,9 +128,17 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showWelcome) {
+      const heading = document.querySelector<HTMLElement>('main h1, main h2');
+      if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true }); }
+    }
+  }, [showWelcome]);
+
   const handleReturnHome = () => {
     // Pausar apenas a visualização: o snapshot solo permanece salvo no navegador.
     setShowWelcome(true);
+    setNotifications([]);
     window.scrollTo(0, 0);
   };
 
@@ -175,7 +188,7 @@ export default function App() {
 
       {/* Main navigation */}
       <Navbar
-        state={state as any}
+        state={showWelcome ? null : state}
         isConnected={isConnected}
         onOpenRules={() => setIsRulesOpen(true)}
         onOpenInstitutionalGuide={() => setIsInstitutionalGuideOpen(true)}
@@ -183,13 +196,20 @@ export default function App() {
         onReturnHome={handleReturnHome}
       />
 
-      <JourneyAudio phase={state?.phase} missionId={state?.activeMissionId} />
+      <JourneyAudio phase={showWelcome ? undefined : state?.phase} missionId={showWelcome ? undefined : state?.activeMissionId} />
 
       {/* Main content body */}
       <main className={`flex-1 max-w-[1440px] ${showWelcome || !state || !myPlayerId ? '' : 'game-journey'} w-full mx-auto p-4 sm:p-6 flex flex-col`}>
+        {!showWelcome && state?.journeyId && myPlayerId && <div className="mx-auto mb-4 flex w-full max-w-5xl justify-end">
+          <button type="button" data-channel-invitation onClick={() => setIsInstitutionalGuideOpen(true)} className="min-h-11 w-full max-w-full whitespace-normal break-words rounded-xl border border-amber-300 bg-amber-400 px-4 py-3 text-sm font-bold leading-relaxed text-slate-950 shadow-md hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400 sm:w-auto">
+            Explore os Canais de Atendimento e ganhe pontos!
+          </button>
+        </div>}
+        {!browserStorage.persistent && <p role="status" className="rounded-xl border border-amber-400 p-3 text-sm text-amber-200">O navegador bloqueou o salvamento. Você pode jogar nesta página, mas o progresso poderá ser perdido ao fechá-la.</p>}
+        {!showWelcome && state && state.pilotVersion !== 2 && <p className="rounded-xl border border-slate-600 p-3 text-sm">Esta partida salva usa a dinâmica anterior. Ela foi preservada; ao jogar novamente, você encontrará a nova dinâmica dos quatro Guardiões.</p>}
         {showWelcome || !state || !myPlayerId ? (
           /* Welcome screen when not in a room */
-          <WelcomeScreen />
+          <JourneyHome />
         ) : (
           /* Game Phase Routing */
           <>
@@ -202,7 +222,7 @@ export default function App() {
               />
             )}
 
-            {state.phase === 'PRE_TEST' && (
+            {!INSTITUTIONAL && state.phase === 'PRE_TEST' && (
               <div className="flex flex-col gap-6">
                 <TownMap state={state as any} myPlayerId={myPlayerId} />
                 <PreTestModal
@@ -223,16 +243,17 @@ export default function App() {
               />
             )}
 
+            {state.phase === 'MISSION_GUARDIAN' && <GuardianEncounter key={`${state.journeyId}-${activeMission.id}`} state={state} mission={activeMission} />}
             {(state.phase === 'MISSION_EXPLORE' || state.phase === 'MISSION_INDIVIDUAL_CHOICE') && (
               <MissionIndividualChoice
                 mission={activeMission}
                 state={state as any}
                 myPlayerId={myPlayerId}
-                onOpenInstitutionalGuide={() => setIsInstitutionalGuideOpen(true)}
               />
             )}
 
             {state.phase === 'MISSION_REVEAL' && (
+              INSTITUTIONAL || state.pilotVersion === 2 ? <ParticipantReveal key={`${state.journeyId}-${activeMission.id}`} state={state} mission={activeMission} myPlayerId={myPlayerId} /> :
               <MissionReveal
                 mission={activeMission}
                 state={state as any}
@@ -240,7 +261,7 @@ export default function App() {
               />
             )}
 
-            {state.phase === 'MISSION_COLLECTIVE_VOTE' && (
+            {!INSTITUTIONAL && state.phase === 'MISSION_COLLECTIVE_VOTE' && (
               <MissionCollectiveVote
                 mission={activeMission}
                 state={state as any}
@@ -248,7 +269,7 @@ export default function App() {
               />
             )}
 
-            {state.phase === 'MISSION_TF_CHALLENGE' && (
+            {!INSTITUTIONAL && state.phase === 'MISSION_TF_CHALLENGE' && (
               <TrueFalseChallenge
                 mission={activeMission}
                 state={state as any}
@@ -264,7 +285,7 @@ export default function App() {
               />
             )}
 
-            {state.phase === 'POST_TEST' && (
+            {!INSTITUTIONAL && state.phase === 'POST_TEST' && (
               <PostTestModal
                 isOpen={true}
                 onCompleted={() => {
@@ -278,13 +299,18 @@ export default function App() {
             )}
 
             {(state.phase === 'GAME_SUMMARY' || state.phase === 'FEEDBACK') && (
-              <GameSummary
+              <SummaryForVersion
                 state={state as any}
                 myPlayerId={myPlayerId}
                 onOpenFeedback={() => setIsFeedbackOpen(true)}
                 onRestartGame={() => {
                   if (window.confirm('Começar uma nova jornada? O progresso e as decisões desta partida serão substituídos.')) {
-                    socketService.send({ type: 'START_GAME' });
+                    if (state.pilotVersion === 2) socketService.send({ type: 'START_GAME' });
+                    else {
+                      const player = state.players[myPlayerId];
+                      socketService.discardSavedJourney();
+                      socketService.send({ type: 'CREATE_ROOM', pilotVersion: 2, nickname: player.nickname, variantIndex: player.variantIndex, characterId: player.characterId });
+                    }
                   }
                 }}
               />
@@ -294,8 +320,9 @@ export default function App() {
       </main>
 
       {/* Global Modals */}
-      <RulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
+      <RulesModal rulesVersion={showWelcome ? 4 : state?.learningRulesVersion} isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
       <InstitutionalCardModal
+        state={showWelcome ? null : state}
         isOpen={isInstitutionalGuideOpen}
         onClose={() => setIsInstitutionalGuideOpen(false)}
       />
@@ -309,10 +336,10 @@ export default function App() {
         highContrast={highContrast}
         setHighContrast={setHighContrast}
       />
-      <OrganizerDashboard
+      {!INSTITUTIONAL && isOrganizerOpen && <OrganizerDashboard
         isOpen={isOrganizerOpen}
         onClose={() => setIsOrganizerOpen(false)}
-      />
+      />}
       <FeedbackModal
         isOpen={isFeedbackOpen}
         onClose={() => setIsFeedbackOpen(false)}
@@ -320,4 +347,8 @@ export default function App() {
     </div>
     </MotionConfig>
   );
+}
+
+function SummaryForVersion(props: React.ComponentProps<typeof GameSummary>) {
+  return INSTITUTIONAL || props.state.pilotVersion === 2 ? <PilotSummary {...props} /> : <GameSummary {...props} />;
 }

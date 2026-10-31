@@ -1,6 +1,8 @@
+import { ORIGINAL_JOURNEY_ID, journeyMissions, playableJourney } from '../data/journeys';
 import type {CharacterId, RegionId, ClientMessage, RoomState, SanitizedRoomState, ServerMessage} from '../types/game';
 import {MISSIONS} from '../data/missions';
 import {CHARACTERS} from '../data/characters';
+import { GUARDIAN_IDS, GUARDIAN_QUESTIONS, PLAYER_AVATARS, PILOT_MISSIONS } from '../data/pilot';
 import {PRE_TEST_QUESTIONS, POST_TEST_QUESTIONS} from '../data/evaluations';
 export interface GameConnection {readyState: number; send(data: string): void}
 function randomHex(bytes: number) {return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), b => b.toString(16).padStart(2,'0')).join('');}
@@ -71,6 +73,14 @@ function getSanitizedState(room: RoomState, viewerPlayerId: string): SanitizedRo
   ].includes(room.phase);
 
   const sanitized: SanitizedRoomState = {
+    pilotVersion: room.pilotVersion,
+    learningRulesVersion: room.learningRulesVersion,
+    journeyId: room.journeyId,
+    journeyDefinitionId: room.journeyDefinitionId || ORIGINAL_JOURNEY_ID,
+    journeyContentVersion: room.journeyContentVersion || 1,
+    guardianOrder: room.guardianOrder,
+    guardianEncounters: room.guardianEncounters,
+    finalGuardianId: room.finalGuardianId,
     roomCode: room.roomCode,
     createdAt: room.createdAt,
     phase: room.phase,
@@ -182,6 +192,10 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
   }
   // 1. CREATE_ROOM
   if (msg.type === 'CREATE_ROOM') {
+    const definitionId = msg.journeyDefinitionId || ORIGINAL_JOURNEY_ID;
+    try { playableJourney(definitionId); } catch {
+      ws.send(JSON.stringify({type: 'ERROR', message: 'Jornada indisponível.'})); return;
+    }
     let roomCode = generateRoomCode();
     while (rooms.has(roomCode)) {
       roomCode = generateRoomCode();
@@ -191,6 +205,9 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     const sessionToken = randomHex(16);
 
     const newRoom: RoomState = {
+      pilotVersion: msg.pilotVersion === 2 ? 2 : undefined,
+      journeyDefinitionId: definitionId,
+      journeyContentVersion: playableJourney(definitionId).version,
       roomCode,
       createdAt: Date.now(),
       phase: 'LOBBY',
@@ -369,7 +386,27 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     if (room.phase !== 'LOBBY' && room.phase !== 'GAME_SUMMARY') return;
     const humans = Object.values(room.players).filter(p => p.isConnected && !p.isBot);
     if (!humans.length || humans.some(p => !p.isReady)) return;
-    if (humans.length === 1 && !Object.values(room.players).some(p => p.isBot)) {
+    if (room.pilotVersion === 2) {
+      const definition = playableJourney(room.journeyDefinitionId || ORIGINAL_JOURNEY_ID);
+      room.journeyDefinitionId = definition.id;
+      room.journeyContentVersion ||= definition.version;
+      room.journeyId = randomHex(16);
+      room.learningRulesVersion = 4;
+      room.guardianOrder = [...GUARDIAN_IDS];
+      for (let i = room.guardianOrder.length - 1; i > 0; i--) {
+        const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
+        [room.guardianOrder[i], room.guardianOrder[j]] = [room.guardianOrder[j], room.guardianOrder[i]];
+      }
+      room.guardianEncounters = {};
+      room.finalGuardianId = undefined;
+      for (const p of Object.values(room.players)) if (p.isBot) delete room.players[p.id];
+      if (humans.length === 1) PLAYER_AVATARS.forEach((avatar, index) => {
+        if (index === player.variantIndex % 4) return;
+        const id = `avatar_${index}`;
+        room.players[id] = { id, nickname: avatar.name, characterId: 'alex', variantIndex: index, isBot: true, isHost: false, isReady: true, isConnected: true, hasUsedPower: false };
+      });
+    }
+    if (room.pilotVersion !== 2 && humans.length === 1 && !Object.values(room.players).some(p => p.isBot)) {
       for (const characterId of ['alex','joana','ravi','bia'] as CharacterId[]) {
         if (characterId === player.characterId) continue;
         const id = `bot_${characterId}`;
@@ -377,6 +414,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       }
     }
     room.completedMissionIds = []; room.historyLog = []; room.unlockedDiscoveries = []; room.destinationVotes = {};
+    room.individualChoices = {}; room.collectiveVotes = {}; room.tfAnsweredPlayers = {};
     // A new journey must never inherit drawn cards or decisions from the previous one.
     room.fortuneCards = {};
     room.activeMissionId = undefined;
@@ -462,7 +500,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     room.currentRegionId = chosenRegion;
 
     // Jornada-piloto: quatro etapas, uma missão por região.
-    const nextMission = MISSIONS.find(m => m.regionId === chosenRegion);
+    const nextMission = journeyMissions(room.journeyDefinitionId).find(m => m.regionId === chosenRegion);
     if (!nextMission || room.completedMissionIds.includes(nextMission.id)) {
       broadcastRoomState(room, 'Esta região já foi explorada. Escolha outra região para continuar.', 'warning');
       return;
@@ -476,6 +514,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
   // 8. START_MISSION directly
   if (msg.type === 'START_MISSION') {
+    if (room.pilotVersion === 2 && !journeyMissions(room.journeyDefinitionId).some(m => m.id === msg.missionId)) return;
     if (room.hostId !== playerId || room.phase !== 'BOARD_SELECT' || !MISSIONS.some(m => m.id === msg.missionId && !room.completedMissionIds.includes(m.id))) return;
     startMission(room, msg.missionId);
     broadcastRoomState(room);
@@ -484,7 +523,24 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
   if (msg.type === 'EXPLORE_MISSION') {
     if (room.hostId !== playerId || room.phase !== 'MISSION_SITUATION') return;
-    room.phase = 'MISSION_EXPLORE'; broadcastRoomState(room); return;
+    room.phase = room.pilotVersion === 2 ? 'MISSION_GUARDIAN' : 'MISSION_EXPLORE'; broadcastRoomState(room); return;
+  }
+  if (room.pilotVersion === 2 && room.activeMissionId && room.phase === 'MISSION_GUARDIAN') {
+    const encounter = room.guardianEncounters?.[room.activeMissionId];
+    if (!encounter || player.isBot) return;
+    if (msg.type === 'OPEN_GUARDIAN_CHALLENGE' && !encounter.questionId) {
+      if (!GUARDIAN_QUESTIONS.some(q => q.id === msg.questionId && q.guardians.includes(encounter.guardianId))) return;
+      encounter.questionId = msg.questionId;
+    } else if (msg.type === 'SUBMIT_GUARDIAN_ANSWER' && encounter.questionId && encounter.answer === undefined && typeof msg.answer === 'boolean') {
+      encounter.answer = msg.answer;
+    } else if (msg.type === 'COMPLETE_GUARDIAN_CHALLENGE' && encounter.answer !== undefined) {
+      room.phase = 'MISSION_EXPLORE';
+    } else return;
+    broadcastRoomState(room); return;
+  }
+  if (msg.type === 'SELECT_FINAL_GUARDIAN') {
+    if (room.pilotVersion !== 2 || room.phase !== 'GAME_SUMMARY' || !GUARDIAN_IDS.includes(msg.guardianId) || player.isBot) return;
+    room.finalGuardianId = msg.guardianId; broadcastRoomState(room); return;
   }
   if (msg.type === 'OPEN_COLLECTIVE_VOTE') {
     if (room.hostId !== playerId || room.phase !== 'MISSION_REVEAL') return;
@@ -496,9 +552,9 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       room.chosenCollectiveActionId = selected;
       room.isNonConsensualResult = false;
       room.nonConsensualActionIds = undefined;
-      room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false, affinityGuardianIds: Object.values(room.players).filter(p => p.isBot && room.individualChoices[p.id] === selected).map(p => p.characterId)});
+      room.historyLog.push({timestamp: Date.now(), missionId: mission.id, actionChosenId: selected, voteType: 'unanimous', perspectivesExploredCount: room.sharedPerspectiveIds.length, reconsiderationOccurred: false, affinityGuardianIds: room.pilotVersion === 2 ? undefined : Object.values(room.players).filter(p => p.isBot && room.individualChoices[p.id] === selected).map(p => p.characterId)});
       if (!room.unlockedDiscoveries.includes(mission.discovery.key)) room.unlockedDiscoveries.push(mission.discovery.key);
-      room.phase = mission.tfChallenge ? 'MISSION_TF_CHALLENGE' : 'MISSION_CONSEQUENCE';
+      room.phase = room.pilotVersion !== 2 && mission.tfChallenge ? 'MISSION_TF_CHALLENGE' : 'MISSION_CONSEQUENCE';
       broadcastRoomState(room, 'Sua escolha foi registrada. Vamos conhecer os desdobramentos.', 'success');
       return;
     }
@@ -521,6 +577,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
   // 10. USE_POWER (Alex, Joana, Ravi, Bia)
   if (msg.type === 'USE_POWER') {
+    if (room.pilotVersion === 2) return;
     if (msg.powerType !== player.characterId || !['MISSION_EXPLORE','MISSION_INDIVIDUAL_CHOICE','MISSION_REVEAL'].includes(room.phase)) return;
     if (player.hasUsedPower) {
       ws.send(JSON.stringify({ type: 'ERROR', message: 'Seu poder especial só pode ser usado uma vez por partida.' }));
@@ -658,7 +715,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
         !Number.isInteger(msg.cardIndex) || msg.cardIndex < 0 || msg.cardIndex > 2 || !room.activeMissionId) return;
     room.fortuneCards ||= {};
     if (room.fortuneCards[room.activeMissionId]) return;
-    const outcomes = ['sorte', 'reves', 'segunda_chance'] as const;
+    const outcomes = [room.learningRulesVersion === 3 || room.learningRulesVersion === 4 ? 'caminhos' : 'sorte', 'reves', 'segunda_chance'] as const;
     const shuffled = [...outcomes];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const bytes = new Uint32Array(1);
@@ -689,7 +746,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       }
 
       // Check if 4 missions are completed
-      if (room.completedMissionIds.length >= 4) {
+      if (room.completedMissionIds.length >= journeyMissions(room.journeyDefinitionId).length) {
         room.phase = 'GAME_SUMMARY';
         broadcastRoomState(room, 'Jornada concluída! Quatro missões realizadas. Conheça suas descobertas e seu reconhecimento final.');
       } else {
@@ -780,6 +837,10 @@ function startMission(room: RoomState, missionId: string) {
   room.futureLooks = [];
   room.isRaviSecondRoundActive = false;
   room.tfAnsweredPlayers = {};
+  if (room.pilotVersion === 2) {
+    room.guardianEncounters ||= {};
+    room.guardianEncounters[mission.id] ||= { guardianId: room.guardianOrder![room.completedMissionIds.length] };
+  }
 
   const playerIds = Object.keys(room.players);
   room.perspectiveAssignments = Object.fromEntries(mission.perspectives.map((p, i) => [p.id, playerIds[i % playerIds.length]]));
@@ -873,6 +934,11 @@ function fillBotChoices(room: RoomState, collective: boolean) {
   if (!mission) return;
   const preferences: Record<CharacterId, string[]> = {alex:['formalizacao','orientacao','cautela','dialogo','acolhimento'], joana:['acolhimento','dialogo','orientacao','cautela','formalizacao'], ravi:['cautela','orientacao','dialogo','formalizacao','acolhimento'], bia:['orientacao','formalizacao','dialogo','acolhimento','cautela']};
   for (const bot of Object.values(room.players).filter(p => p.isBot)) {
+    if (room.pilotVersion === 2) {
+      const choices = collective ? room.collectiveVotes : room.individualChoices;
+      if (!choices[bot.id]) choices[bot.id] = mission.actions[crypto.getRandomValues(new Uint32Array(1))[0] % mission.actions.length].id;
+      continue;
+    }
     const preferred = preferences[bot.characterId];
     const action = preferred.map(type => mission.actions.find(a => a.actionType === type)).find(Boolean) || mission.actions[0];
     (collective ? room.collectiveVotes : room.individualChoices)[bot.id] = action.id;

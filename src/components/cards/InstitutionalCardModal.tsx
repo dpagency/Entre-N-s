@@ -1,21 +1,24 @@
+import { browserStorage } from '../../services/browserStorage';
 import React, { useState, useRef, useEffect } from 'react';
-import { LearningConfetti } from '../ui/LearningConfetti';
+
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
 import { ADDITIONAL_QUESTIONS } from '../../data/ethicsQuestions';
-import { recordLearning } from '../../services/learningScore';
-import { socketService } from '../../services/socket';
+
+import { ChannelActivity } from './ChannelActivity';
 import { ChannelQuiz, loadChannelQuiz, saveChannelQuiz } from '../../services/questionRotation';
-import { InstitutionalChannelDef } from '../../types/game';
+import { InstitutionalChannelDef, SanitizedRoomState } from '../../types/game';
 import { X, Scale, Briefcase, Megaphone, ShieldAlert, HeartHandshake, CheckCircle2, AlertOctagon, Info } from 'lucide-react';
 
 interface InstitutionalCardModalProps {
   isOpen: boolean;
   onClose: () => void;
+  state: SanitizedRoomState | null;
 }
 
 export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   isOpen,
   onClose,
+  state,
 }) => {
   const [selectedChannel, setSelectedChannel] = useState<InstitutionalChannelDef>(
     INSTITUTIONAL_CHANNELS[0]
@@ -26,16 +29,17 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   const feedbackRef = useRef<HTMLDivElement>(null);
   const [quiz, setQuiz] = useState<ChannelQuiz | null>(null);
   const [educationOpen, setEducationOpen] = useState(false);
-  const missionId = socketService.activeMissionId;
-  const roomCode = socketService.roomCode;
+  const missionId = state?.activeMissionId ?? null;
+  const roomCode = state?.journeyId ?? state?.roomCode ?? null;
+  const voluntary = state?.learningRulesVersion === 4 && !!state.journeyId;
   const currentQuiz = quiz?.missionId === missionId && quiz?.roomCode === roomCode ? quiz : null;
   const question = currentQuiz && ADDITIONAL_QUESTIONS[currentQuiz.index];
   useEffect(() => {
     if (!isOpen) return;
-    const next = roomCode && missionId ? loadChannelQuiz(localStorage, roomCode, missionId) : null;
+    const next = !voluntary && roomCode && missionId ? loadChannelQuiz(browserStorage, roomCode, missionId) : null;
     setQuiz(next);
-    setEducationOpen(!missionId || next?.answer !== undefined);
-  }, [isOpen, roomCode, missionId]);
+    setEducationOpen(voluntary || !missionId || next?.answer !== undefined);
+  }, [isOpen, roomCode, missionId, voluntary]);
   useEffect(() => {
     if (!isOpen || currentQuiz?.answer === undefined) return;
     const feedback = feedbackRef.current;
@@ -47,12 +51,12 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   }, [isOpen, currentQuiz?.roomCode, currentQuiz?.missionId, currentQuiz?.answer]);
   const answerQuiz = (answer: boolean) => {
     if (!currentQuiz || !question || currentQuiz.answer !== undefined) return;
-    const saved = loadChannelQuiz(localStorage, currentQuiz.roomCode, currentQuiz.missionId);
+    const saved = loadChannelQuiz(browserStorage, currentQuiz.roomCode, currentQuiz.missionId);
     if (saved.answer !== undefined) { setQuiz(saved); setEducationOpen(true); return; }
-    const awarded = answer === question.isTrue && recordLearning(roomCode, currentQuiz.missionId, 'channelCorrect');
+    const awarded = false;
     const next = { ...currentQuiz, answer, awarded };
     setQuiz(next);
-    saveChannelQuiz(localStorage, next);
+    saveChannelQuiz(browserStorage, next);
     setEducationOpen(true);
   };
   if (!isOpen) return null;
@@ -85,7 +89,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-800 bg-slate-950/60">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
                 Guia Institucional
               </span>
@@ -118,7 +122,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                 <button
                   key={ch.id}
                   aria-pressed={isSelected}
-                  onClick={() => { setSelectedChannel(ch); setEducationOpen(!missionId || currentQuiz?.answer !== undefined); if (window.innerWidth < 768) window.requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: document.documentElement.dataset.reducedMotion === 'true' ? 'auto' : 'smooth', block: 'start' })); if (/comiss[aã]o de [eé]tica/i.test(ch.name)) recordLearning(socketService.roomCode, socketService.activeMissionId, 'commission'); }}
+                  onClick={() => { setSelectedChannel(ch); setEducationOpen(!missionId || currentQuiz?.answer !== undefined); if (window.innerWidth < 768) window.requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: document.documentElement.dataset.reducedMotion === 'true' ? 'auto' : 'smooth', block: 'start' })); }}
                   className={`w-full p-3 rounded-2xl text-left transition-all flex items-start gap-3 border ${
                     isSelected
                       ? 'bg-teal-950/70 border-teal-500/60 ring-1 ring-teal-500/40 text-white'
@@ -155,13 +159,13 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
               </div>
             </div>
 
-            <section aria-labelledby="channel-challenge-title" className="relative overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-amber-950/25 p-4 sm:p-5 space-y-4">
-              {currentQuiz?.awarded && <LearningConfetti />}
+            {voluntary ? <ChannelActivity key={state.journeyId} journey={state.journeyId!} /> : <section aria-labelledby="channel-challenge-title" className="relative overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-amber-950/25 p-4 sm:p-5 space-y-4">
+
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h4 id="channel-challenge-title" className="font-black text-lg text-amber-200">Desafio de conhecimento</h4>
-                <span className="rounded-full border border-amber-400 bg-amber-400 px-3 py-1 font-black text-slate-950">+5 pontos</span>
+                <h4 id="channel-challenge-title" className="font-black text-lg text-amber-200">Prática dos Canais</h4>
+                <span className="rounded-full border border-amber-400 bg-amber-400 px-3 py-1 font-black text-slate-950">Sem pontuação</span>
               </div>
-              <p className="text-sm text-slate-200">Verdadeiro ou falso · acerto vale +5 pontos de conhecimento por missão. A consulta ao canal é livre.</p>
+              <p className="text-sm text-slate-200">Verdadeiro ou falso · prática opcional, sem pontos. A consulta ao canal é livre.</p>
               {!missionId ? <p className="text-sm text-slate-300">O desafio fica disponível durante as missões.</p> : question && currentQuiz ? <>
                 <p data-question-id={question.id} className="text-base font-semibold leading-relaxed text-slate-100">{question.statement}</p>
                 <div role="group" aria-label="Resposta ao desafio" className="flex flex-wrap gap-3">
@@ -169,12 +173,12 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                   <button type="button" disabled={currentQuiz.answer !== undefined} aria-pressed={currentQuiz.answer === false} onClick={() => answerQuiz(false)} className="min-h-12 rounded-xl border border-slate-500 bg-slate-800 px-5 py-3 text-base font-bold">Falso</button>
                 </div>
                 {currentQuiz.answer !== undefined && <div ref={feedbackRef} role="status" tabIndex={-1} className="rounded-xl border border-teal-400/50 bg-slate-950 p-4 space-y-2 text-sm">
-                  <p className="font-bold text-teal-200">{currentQuiz.answer !== question.isTrue ? 'Vamos aprender juntos:' : currentQuiz.awarded ? '+5 pontos' : 'Resposta correta · pontos já contabilizados'}</p>
+                  <p className="font-bold text-teal-200">{currentQuiz.answer !== question.isTrue ? 'Vamos aprender juntos:' : 'Resposta adequada · prática sem pontuação'}</p>
                   <p>{question.explanation}</p>
                   <p className="text-xs text-slate-300">{question.sourceNote}</p>
                 </div>}
               </> : null}
-            </section>
+            </section>}
             <button type="button" aria-expanded={educationOpen} aria-controls="channel-educational-content" onClick={() => setEducationOpen(open => !open)} className="min-h-12 w-full rounded-xl border border-teal-400 px-4 py-3 text-base font-bold text-teal-200">
               {educationOpen ? 'Ocultar conteúdo complementar' : currentQuiz?.answer !== undefined ? 'Ver conteúdo complementar do canal' : 'Consultar conteúdo do canal sem responder'}
             </button>

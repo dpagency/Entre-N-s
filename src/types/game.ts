@@ -136,6 +136,7 @@ export type GamePhase =
   | 'BOARD_SELECT'
   | 'MISSION_SITUATION'
   | 'MISSION_EXPLORE'
+  | 'MISSION_GUARDIAN'
   | 'MISSION_INDIVIDUAL_CHOICE'
   | 'MISSION_REVEAL'
   | 'MISSION_COLLECTIVE_VOTE'
@@ -163,6 +164,14 @@ export interface PlayerSession {
 }
 
 export interface RoomState {
+  pilotVersion?: 2;
+  learningRulesVersion?: 3 | 4;
+  journeyId?: string;
+  journeyDefinitionId?: string;
+  journeyContentVersion?: number;
+  guardianOrder?: CharacterId[];
+  guardianEncounters?: Record<string, { guardianId: CharacterId; questionId?: string; answer?: boolean }>;
+  finalGuardianId?: CharacterId;
   roomCode: string;
   createdAt: number;
   phase: GamePhase;
@@ -193,7 +202,7 @@ export interface RoomState {
   // Discoveries acquired by team
   unlockedDiscoveries: DiscoveryKey[];
   // Sorteio registrado por missão: independente das respostas éticas.
-  fortuneCards?: Record<string, { cardIndex: number; outcome: 'sorte' | 'reves' | 'segunda_chance' }>;
+  fortuneCards?: Record<string, { cardIndex: number; outcome: 'sorte' | 'caminhos' | 'reves' | 'segunda_chance' }>;
   // History
   historyLog: {
     timestamp: number;
@@ -217,8 +226,12 @@ export interface SanitizedRoomState extends Omit<RoomState, 'individualChoices'>
 
 // Socket messages
 export type ClientMessage =
+  | { type: 'OPEN_GUARDIAN_CHALLENGE'; questionId: string }
+  | { type: 'SUBMIT_GUARDIAN_ANSWER'; answer: boolean }
+  | { type: 'COMPLETE_GUARDIAN_CHALLENGE' }
+  | { type: 'SELECT_FINAL_GUARDIAN'; guardianId: CharacterId }
   | { type: 'JOIN_ROOM'; roomCode: string; nickname: string; characterId: CharacterId; variantIndex: number; sessionToken?: string }
-  | { type: 'CREATE_ROOM'; nickname: string; characterId: CharacterId; variantIndex: number }
+  | { type: 'CREATE_ROOM'; nickname: string; characterId: CharacterId; variantIndex: number; pilotVersion?: 2; journeyDefinitionId?: string }
   | { type: 'TOGGLE_READY' }
   | { type: 'START_GAME' }
   | { type: 'EXPLORE_MISSION' }

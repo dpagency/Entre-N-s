@@ -28,7 +28,7 @@ export function useDialogAccessibility() {
       if (!active) return;
       if (event.key === 'Escape') {
         const close = active.querySelector<HTMLButtonElement>('[data-dialog-close], button[aria-label^="Fechar"]')
-          || Array.from(active.querySelectorAll<HTMLButtonElement>('button')).find(b => /^(Voltar|Concluir|Fechar)$/.test(b.textContent?.trim() || ''));
+          || Array.from(active.querySelectorAll<HTMLButtonElement>('button')).find(b => /^(Voltar(?: à decisão)?|Concluir|Fechar)$/.test(b.textContent?.trim() || ''));
         if (close) { event.preventDefault(); event.stopPropagation(); close.click(); }
       }
       if (event.key !== 'Tab') return;

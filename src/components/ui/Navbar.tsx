@@ -1,9 +1,10 @@
 import React from 'react';
-import { RoomState } from '../../types/game';
+import { INSTITUTIONAL } from '../../distribution';
+import { SanitizedRoomState } from '../../types/game';
 import { BookOpen, Eye, Scale, Home, Wifi, WifiOff } from 'lucide-react';
 
 interface NavbarProps {
-  state: RoomState | null;
+  state: SanitizedRoomState | null;
   isConnected: boolean;
   onOpenRules: () => void;
   onOpenInstitutionalGuide: () => void;
@@ -36,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Room Code Badge (if in a room) */}
-        {state && (
+        {!INSTITUTIONAL && state && (
           <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               Sala:
@@ -56,10 +57,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
                 : 'bg-rose-950/60 text-rose-300 border-rose-500/40 animate-pulse'
             }`}
-            title={isConnected ? 'Conectado ao servidor' : 'Reconectando...'}
+            title={INSTITUTIONAL ? 'Jogo individual; progresso salvo neste navegador' : isConnected ? 'Conectado ao servidor' : 'Reconectando...'}
           >
             {isConnected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-            <span className="hidden md:inline">{isConnected ? 'Online' : 'Reconectando'}</span>
+            <span className="hidden md:inline">{INSTITUTIONAL ? 'Jogo individual' : isConnected ? 'Online' : 'Reconectando'}</span>
           </div>
 
           {/* Institutional Guide Button */}
@@ -96,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {state && (
-            <button type="button" onClick={onReturnHome}
+            <button type="button" aria-label="Início" onClick={onReturnHome}
               className="p-2 sm:px-3 rounded-xl bg-slate-900 hover:bg-teal-950 text-teal-300 border border-slate-800 flex items-center gap-1.5 text-sm font-semibold"
               title="Voltar ao início — sua jornada fica salva neste navegador">
               <Home className="w-4 h-4" />
