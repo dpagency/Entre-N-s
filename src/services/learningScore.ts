@@ -4,6 +4,7 @@ import type { RoomState } from '../types/game';
 import { GUARDIAN_QUESTIONS, PILOT_MISSIONS } from '../data/pilot';
 import { cardKnowledgePoints } from './cardKnowledge';
 import { channelActivityPoints } from './channelActivity';
+import { hasMissionChannels, missionChannelPoints } from './missionChannels';
 // Pontos de aprendizagem: consultas e conhecimento, nunca decisões éticas.
 // A chave da sala separa jornadas e mantém o registro após recarregar a página.
 type LearningRecord = { guardian: string[]; commission: string[]; correct: string[]; channelCorrect: string[] };
@@ -40,7 +41,7 @@ export function learningPoints(roomCode: string | null, fortuneCards?: Record<st
   const fortune = Object.values(fortuneCards || {}).reduce((sum, card) => sum + (card.outcome === 'sorte' ? (current ? 0 : 3) : card.outcome === 'reves' ? -3 : card.outcome === 'segunda_chance' ? 1 : 0), 0);
   const cards = pilot && roomCode ? cardKnowledgePoints(browserStorage, roomCode, fortuneCards || {}, missions.map(m => m.id)) : { points: 0, maximum: 0 };
   const journeyMax = consultationMax + knowledgeMax;
-  const channels = channelActivityPoints(browserStorage, roomCode, state?.learningRulesVersion);
+  const channels = hasMissionChannels(state) ? missionChannelPoints(state!) : channelActivityPoints(browserStorage, roomCode, state?.learningRulesVersion);
   const maximum = pilot ? journeyMax + cards.maximum + channels.maximum : 87;
   return { consultation, knowledge, fortune, maximum, consultationMax, knowledgeMax, journeyTotal: consultation + knowledge, journeyMax, cardPoints: cards.points, cardMax: cards.maximum, channelPoints: channels.points, channelMax: channels.maximum, channelAnswered: channels.answered, total: pilot ? consultation + knowledge + cards.points + channels.points : Math.max(0, Math.min(100, consultation + knowledge + fortune)), ...data };
 }

@@ -87,6 +87,9 @@ export interface MissionDef {
   regionId: RegionId;
   missionType: MissionType;
   pedagogicalGoal: string;
+  dialogue?: { speaker: string; text: string; avatarIndex?: number; player?: boolean }[];
+  decisionPrompt?: string;
+  finalReflection?: string;
   situation: {
     context: string;
     trigger: string;
@@ -137,11 +140,13 @@ export type GamePhase =
   | 'MISSION_SITUATION'
   | 'MISSION_EXPLORE'
   | 'MISSION_GUARDIAN'
+  | 'MISSION_CHANNELS'
   | 'MISSION_INDIVIDUAL_CHOICE'
   | 'MISSION_REVEAL'
   | 'MISSION_COLLECTIVE_VOTE'
   | 'MISSION_TF_CHALLENGE'
   | 'MISSION_CONSEQUENCE'
+  | 'MISSION_CARDS'
   | 'POST_TEST'
   | 'GAME_SUMMARY'
   | 'FEEDBACK';
@@ -164,11 +169,16 @@ export interface PlayerSession {
 }
 
 export interface RoomState {
+  cardStageVersion?: 1;
+  missionFlowVersion?: 2;
+  cardChallenges?: Record<string, { questionId: string; answer: number }>;
+  missionChannelActivity?: import('../services/missionChannels').MissionChannelActivity;
   pilotVersion?: 2;
   learningRulesVersion?: 3 | 4;
   journeyId?: string;
   journeyDefinitionId?: string;
   journeyContentVersion?: number;
+  dialoguePositions?: Record<string, number>;
   guardianOrder?: CharacterId[];
   guardianEncounters?: Record<string, { guardianId: CharacterId; questionId?: string; answer?: boolean }>;
   finalGuardianId?: CharacterId;
@@ -226,6 +236,11 @@ export interface SanitizedRoomState extends Omit<RoomState, 'individualChoices'>
 
 // Socket messages
 export type ClientMessage =
+  | { type: 'OPEN_CARD_CHALLENGE' }
+  | { type: 'COMPLETE_CARD_CHALLENGE'; questionId: string; answer: number }
+  | { type: 'OPEN_MISSION_CHANNEL' }
+  | { type: 'ANSWER_MISSION_CHANNEL'; questionId: string; answer: number }
+  | { type: 'SET_DIALOGUE_STEP'; step: number }
   | { type: 'OPEN_GUARDIAN_CHALLENGE'; questionId: string }
   | { type: 'SUBMIT_GUARDIAN_ANSWER'; answer: boolean }
   | { type: 'COMPLETE_GUARDIAN_CHALLENGE' }

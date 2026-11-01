@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { JOURNEYS } from '../../data/journeys';
+import { JOURNEYS, isJourneyAvailable } from '../../data/journeys';
 import { browserStorage } from '../../services/browserStorage';
 import { savedJourneyAttempts } from '../../services/journeySelection';
 import type { SavedAttempt } from '../../services/journeyStorage';
@@ -38,7 +38,7 @@ export function JourneyHome() {
     <div role="group" aria-label="Jornadas educativas" aria-busy={!loaded} className="space-y-3">
       {JOURNEYS.map((journey, index) => {
         const expanded = open === journey.id;
-        const available = journey.status === 'available' && journey.missionIds.length > 0;
+        const available = isJourneyAvailable(journey);
         const saved = attempts[journey.id] || [];
         const latest = saved[0];
         const room = latest?.snapshot.rooms[0][1];
@@ -66,7 +66,7 @@ export function JourneyHome() {
           </h3>
           <p className="min-w-0 text-base leading-relaxed text-slate-200 lg:min-w-48 lg:flex-1">{journey.description}</p>
           <div className="space-y-1 lg:ml-auto lg:max-w-48 lg:shrink-0">
-          <p className={`text-sm font-semibold ${available ? 'text-teal-200' : 'text-amber-200'}`}>{available ? 'Disponível' : 'Em desenvolvimento'}</p>
+          <p className={`text-sm font-semibold ${available ? 'text-teal-200' : 'text-amber-200'}`}>{available ? (journey.localOnly ? 'Disponível · teste local' : 'Disponível') : 'Em desenvolvimento'}</p>
           {room && <p data-journey-progress className="text-sm font-bold text-teal-200">{completed ? 'Jornada concluída' : 'Jornada em andamento'} · {journey.missionIds.filter(m => room.completedMissionIds.includes(m)).length} de {journey.missionIds.length} missões concluídas</p>}
           </div>
           </div>

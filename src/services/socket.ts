@@ -117,12 +117,15 @@ class GameSocketService {
       this.errorListeners.forEach(listener => listener('Esta partida usa a dinâmica anterior e foi preservada. Retome-a na edição original ou inicie uma nova partida nesta edição.'));
       return;
     }
+    const savedRoom = engine.snapshot().rooms.find(([code]) => code === this.roomCode)?.[1];
+    try { playableJourney(savedRoom?.journeyDefinitionId); } catch { this.errorListeners.forEach(l => l('Esta jornada está disponível somente para testes locais. O progresso foi preservado.')); return; }
     this.send({type:'JOIN_ROOM',roomCode:this.roomCode,sessionToken:this.sessionToken,nickname:browserStorage.getItem('guardioes_nickname') || 'Jogador',characterId:(browserStorage.getItem('guardioes_character') as any) || 'alex',variantIndex:Number(browserStorage.getItem('guardioes_variant')) || 0});
   }
 
   // Restore the selected attempt without erasing other archived journeys.
   public resumeAttempt(journey: string, attempt: string): void {
     this.queue = this.queue.then(() => {
+      playableJourney(journey);
       const record = loadAttempt(browserStorage, journey, attempt);
       if (!record?.credentials) throw new Error('Partida sem credenciais de retomada.');
       archiveSnapshot(browserStorage, engine.snapshot());

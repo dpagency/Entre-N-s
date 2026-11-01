@@ -22,13 +22,18 @@ export const JourneyAudio: React.FC<Props> = ({ phase, missionId }) => {
   }, []);
   useEffect(() => {
     if (!supported) return;
-    window.speechSynthesis.cancel();
-    utteranceRef.current = null;
-    narrationRef.current = '';
-    positionRef.current = 0;
-    rateChangedRef.current = false;
-    setRateChanged(false);
-    setStatus('idle');
+    const reset = () => {
+      window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+      narrationRef.current = '';
+      positionRef.current = 0;
+      rateChangedRef.current = false;
+      setRateChanged(false);
+      setStatus('idle');
+    };
+    reset();
+    window.addEventListener('entre-nos-narration-reset', reset);
+    return () => window.removeEventListener('entre-nos-narration-reset', reset);
   }, [phase, missionId, supported]);
   const start = () => {
     if (!supported) return;

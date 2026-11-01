@@ -4,7 +4,7 @@ import { ORIGINAL_JOURNEY_ID } from '../data/journeys';
 // This archive is additive. The old active snapshot remains a compatibility cache.
 export const LEGACY_BACKUP_KEY = 'entre-nos-journeys-v1-legacy-backup';
 const INDEX = 'entre-nos-journeys-v1-index';
-type Storage = Pick<globalThis.Storage, 'getItem' | 'setItem'>;
+type Storage = Pick<globalThis.Storage, 'getItem' | 'setItem'> & { isPersisted?: (key: string) => boolean };
 type Snapshot = { rooms: [string, RoomState][]; tokens: unknown[]; evaluations: unknown[]; feedback: unknown[] };
 export interface AttemptRef { journey: string; attempt: string; key: string }
 export interface SavedAttempt extends AttemptRef {
@@ -18,6 +18,8 @@ const attemptKey = (journey: string, attempt: string) =>
 function write(storage: Storage, key: string, value: string) {
   storage.setItem(key, value);
   if (storage.getItem(key) !== value) throw new Error('Não foi possível preservar a partida.');
+  // Session-only data allows play, but is not a completed durable save.
+  return storage.isPersisted?.(key) !== false;
 }
 
 export function listAttempts(storage: Storage): AttemptRef[] {
@@ -30,7 +32,8 @@ export function listAttempts(storage: Storage): AttemptRef[] {
   return index;
 }
 
-export function archiveSnapshot(storage: Storage, snapshot: Snapshot): void {
+export function archiveSnapshot(storage: Storage, snapshot: Snapshot): boolean {
+  let persisted = true;
   const index = listAttempts(storage);
   for (const [roomCode, room] of snapshot.rooms) {
     const journey = room.journeyDefinitionId || ORIGINAL_JOURNEY_ID;
@@ -42,10 +45,10 @@ export function archiveSnapshot(storage: Storage, snapshot: Snapshot): void {
       snapshot: { ...snapshot, rooms: [[roomCode, structuredClone(room)]],
         tokens: snapshot.tokens.filter(entry => (entry as [string, { roomCode: string }])[1].roomCode === roomCode) },
       credentials: token ? { roomCode, sessionToken: token[0], playerId: token[1].playerId } : null };
-    write(storage, key, JSON.stringify(record));
+    persisted = write(storage, key, JSON.stringify(record)) && persisted;
     if (!index.some(r => r.key === key)) index.push({ journey, attempt, key });
   }
-  write(storage, INDEX, JSON.stringify(index));
+  return write(storage, INDEX, JSON.stringify(index)) && persisted;
 }
 
 export function loadAttempt(storage: Storage, journey: string, attempt: string): SavedAttempt | null {

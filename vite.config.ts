@@ -3,9 +3,10 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ command, mode }) => {
   return {
     plugins: [react(), tailwindcss()],
+    define: { __ENTRE_NOS_LOCAL_JOURNEYS__: JSON.stringify(command === 'serve' && mode === 'development') },
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),

@@ -5,6 +5,8 @@ import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
 import { ADDITIONAL_QUESTIONS } from '../../data/ethicsQuestions';
 
 import { ChannelActivity } from './ChannelActivity';
+import { MissionChannelActivity } from './MissionChannelActivity';
+import { hasMissionChannels } from '../../services/missionChannels';
 import { ChannelQuiz, loadChannelQuiz, saveChannelQuiz } from '../../services/questionRotation';
 import { InstitutionalChannelDef, SanitizedRoomState } from '../../types/game';
 import { X, Scale, Briefcase, Megaphone, ShieldAlert, HeartHandshake, CheckCircle2, AlertOctagon, Info } from 'lucide-react';
@@ -27,15 +29,24 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   const detailsRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const channelHeadingRef = useRef<HTMLHeadingElement>(null);
+  const [consultationContext, setConsultationContext] = useState<string | null>(null);
   const [quiz, setQuiz] = useState<ChannelQuiz | null>(null);
   const [educationOpen, setEducationOpen] = useState(false);
   const missionId = state?.activeMissionId ?? null;
   const roomCode = state?.journeyId ?? state?.roomCode ?? null;
   const voluntary = state?.learningRulesVersion === 4 && !!state.journeyId;
+  const perMission = hasMissionChannels(state);
+  const context = `${roomCode}-${missionId}-${state?.missionFlowVersion === 2 ? state.phase : ''}`;
+  const missionActive = !!state && state.phase.startsWith('MISSION_') && !!missionId && !state.completedMissionIds.includes(missionId);
+  const questionActive = missionActive && (state?.missionFlowVersion !== 2 || state.phase === 'MISSION_CHANNELS');
+  const consultation = perMission && (consultationContext === context || !questionActive);
+  const missionAnswered = !!missionId && state?.missionChannelActivity?.missions[missionId]?.answer !== undefined;
   const currentQuiz = quiz?.missionId === missionId && quiz?.roomCode === roomCode ? quiz : null;
   const question = currentQuiz && ADDITIONAL_QUESTIONS[currentQuiz.index];
   useEffect(() => {
     if (!isOpen) return;
+    if (perMission) window.dispatchEvent(new Event('entre-nos-narration-reset'));
     const next = !voluntary && roomCode && missionId ? loadChannelQuiz(browserStorage, roomCode, missionId) : null;
     setQuiz(next);
     setEducationOpen(voluntary || !missionId || next?.answer !== undefined);
@@ -58,6 +69,20 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
     setQuiz(next);
     saveChannelQuiz(browserStorage, next);
     setEducationOpen(true);
+  };
+  const showChannelInformation = (channel = selectedChannel) => {
+    setSelectedChannel(channel);
+    setConsultationContext(context);
+    setEducationOpen(true);
+    window.requestAnimationFrame(() => {
+      const details = detailsRef.current;
+      const scroller = window.innerWidth < 768 ? contentRef.current : details;
+      if (details && scroller) {
+        if (scroller === details) scroller.scrollTop = 0;
+        else scroller.scrollTop += details.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+      }
+      channelHeadingRef.current?.focus({ preventScroll: true });
+    });
   };
   if (!isOpen) return null;
 
@@ -98,9 +123,9 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
             <h2 id="modal-title" className="break-words text-xl sm:text-2xl font-black text-slate-100 mt-1">
               Canais e Competências Institucionais
             </h2>
-            <p className="text-xs text-slate-400">
-              Conheça a finalidade de cada canal. O desafio é opcional e a consulta ao conteúdo é livre.
-            </p>
+            {state?.missionFlowVersion !== 2 && <p className="text-xs text-slate-400">
+              {perMission ? 'Participe de uma pergunta antes de concluir cada missão. Não é necessário acertar. A consulta ao conteúdo é livre.' : 'Conheça a finalidade de cada canal. O desafio é opcional e a consulta ao conteúdo é livre.'}
+            </p>}
           </div>
 
           <button
@@ -122,7 +147,12 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                 <button
                   key={ch.id}
                   aria-pressed={isSelected}
-                  onClick={() => { setSelectedChannel(ch); setEducationOpen(!missionId || currentQuiz?.answer !== undefined); if (window.innerWidth < 768) window.requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: document.documentElement.dataset.reducedMotion === 'true' ? 'auto' : 'smooth', block: 'start' })); }}
+                  onClick={() => {
+                    if (perMission && (missionAnswered || consultation)) { showChannelInformation(ch); return; }
+                    setSelectedChannel(ch); setEducationOpen(!missionId || currentQuiz?.answer !== undefined);
+                    if (window.innerWidth < 768) window.requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: document.documentElement.dataset.reducedMotion === 'true' ? 'auto' : 'smooth', block: 'start' }));
+                  }}
+                  data-channel-id={ch.id}
                   className={`w-full p-3 rounded-2xl text-left transition-all flex items-start gap-3 border ${
                     isSelected
                       ? 'bg-teal-950/70 border-teal-500/60 ring-1 ring-teal-500/40 text-white'
@@ -154,12 +184,12 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                 {getIcon(selectedChannel.icon)}
               </div>
               <div className="min-w-0">
-                <h3 className="text-lg font-bold text-slate-100">{selectedChannel.name}</h3>
+                <h3 ref={channelHeadingRef} tabIndex={-1} data-channel-heading className="text-lg font-bold text-slate-100">{selectedChannel.name}</h3>
                 <p className="text-xs font-medium text-teal-400">{selectedChannel.role}</p>
               </div>
             </div>
 
-            {voluntary ? <ChannelActivity key={state.journeyId} journey={state.journeyId!} /> : <section aria-labelledby="channel-challenge-title" className="relative overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-amber-950/25 p-4 sm:p-5 space-y-4">
+            {perMission && state ? !consultation && <MissionChannelActivity key={`${state.journeyId}-${state.activeMissionId}`} state={state} onExploreChannels={() => showChannelInformation()} /> : voluntary ? <ChannelActivity key={state.journeyId} journey={state.journeyId!} /> : <section aria-labelledby="channel-challenge-title" className="relative overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-amber-950/25 p-4 sm:p-5 space-y-4">
 
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h4 id="channel-challenge-title" className="font-black text-lg text-amber-200">Prática dos Canais</h4>
@@ -179,10 +209,10 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
                 </div>}
               </> : null}
             </section>}
-            <button type="button" aria-expanded={educationOpen} aria-controls="channel-educational-content" onClick={() => setEducationOpen(open => !open)} className="min-h-12 w-full rounded-xl border border-teal-400 px-4 py-3 text-base font-bold text-teal-200">
+            {!consultation && <button type="button" aria-expanded={educationOpen} aria-controls="channel-educational-content" onClick={() => setEducationOpen(open => !open)} className="min-h-12 w-full rounded-xl border border-teal-400 px-4 py-3 text-base font-bold text-teal-200">
               {educationOpen ? 'Ocultar conteúdo complementar' : currentQuiz?.answer !== undefined ? 'Ver conteúdo complementar do canal' : 'Consultar conteúdo do canal sem responder'}
-            </button>
-            {educationOpen && <section id="channel-educational-content" aria-label="Conteúdo educativo do canal" className="space-y-4">
+            </button>}
+            {(consultation || educationOpen) && <section id="channel-educational-content" aria-label="Conteúdo educativo do canal" className="space-y-4">
             {/* When to use */}
             <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30">
               <div className="flex items-center gap-2 text-xs font-bold text-emerald-300 uppercase tracking-wide mb-1">
@@ -232,7 +262,7 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors"
           >
-            Fechar
+            {(perMission || state?.missionFlowVersion === 2) && missionActive ? 'Voltar ao jogo' : 'Fechar'}
           </button>
         </div>
       </div>

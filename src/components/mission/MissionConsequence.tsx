@@ -1,4 +1,8 @@
+import { MissionOutcome, outcomeKey } from './MissionOutcome';
+import { readNarrativePosition } from './NarrativeReader';
 import { journeyMissions } from '../../data/journeys';
+import { independentCardScenario } from '../../data/independentCardScenarios';
+import { hasMissionChannels } from '../../services/missionChannels';
 import { INSTITUTIONAL } from '../../distribution';
 import { browserStorage } from '../../services/browserStorage';
 import React, { useState, useEffect, useRef } from 'react';
@@ -10,19 +14,24 @@ import { presentCardQuestion, confirmCardAnswer, cardScenario, cardAward, type C
 import { PATH_SCENARIOS } from '../../data/pathScenarios';
 import { rotatingItem } from '../../services/questionRotation';
 import { MOTIVATION } from '../../data/pilot';
+import { celebrateLearning } from '../../services/learningCelebration';
 import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, BookOpen, Lock, LockOpen } from 'lucide-react';
 
 interface MissionConsequenceProps {
   mission: MissionDef;
   state: RoomState;
   myPlayerId: string;
+  onOpenChannels?: () => void;
 }
 
 export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   mission,
   state,
   myPlayerId,
+  onOpenChannels,
 }) => {
+  const integrated = state.missionFlowVersion === 2;
+  const [outcomeReady, setOutcomeReady] = useState(() => integrated || !mission.dialogue || readNarrativePosition(outcomeKey(state.journeyId || '', mission.id), 3) === 2);
   const [discoveryOpened, setDiscoveryOpened] = useState(false);
   const [showReflection, setShowReflection] = useState(false);
   const [cardAnswer, setCardAnswer] = useState<number | null>(null);
@@ -54,6 +63,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
 
   const isLastMission = completedCount >= journeyMissions(state.journeyDefinitionId).length;
   const fortune = state.fortuneCards?.[mission.id];
+  const needsChannels = !integrated && hasMissionChannels(state) && !state.completedMissionIds.includes(mission.id) && state.missionChannelActivity!.missions[mission.id]?.answer === undefined;
 
   const scenarioFor = (kind: 'reves' | 'segunda_chance') => {
     const pool = kind === 'reves' ? LEGACY_SETBACK_SCENARIOS : LEGACY_SECOND_CHANCE_SCENARIOS;
@@ -67,10 +77,15 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
     if (kind !== 'reves' && kind !== 'segunda_chance' && kind !== 'caminhos') { setScenario(null); setCardRecord(null); return; }
     if (state.pilotVersion === 2 && roomCode) {
       const record = presentCardQuestion(browserStorage, roomCode, mission.id, kind);
-      setCardRecord(record); setScenario(cardScenario(record)); setCardAnswer(record.answer ?? null);
+      setCardRecord(record); setScenario((mission.dialogue || integrated) ? independentCardScenario(cardScenario(record)) : cardScenario(record)); setCardAnswer(record.answer ?? null);
     } else if (kind !== 'caminhos') setScenario(scenarioFor(kind));
-  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome, roomCode, state.pilotVersion]);
+  }, [mission.id, state.fortuneCards?.[mission.id]?.outcome, roomCode, state.pilotVersion, integrated]);
   useEffect(() => { if (cardAnswer !== null) cardFeedback.current?.focus(); }, [cardAnswer]);
+  useEffect(() => {
+    if (integrated && cardRecord?.version === 2 && cardRecord.answer !== undefined && !state.cardChallenges?.[mission.id]) {
+      socketService.send({ type: 'COMPLETE_CARD_CHALLENGE', questionId: cardRecord.questionId, answer: cardRecord.answer });
+    }
+  }, [integrated, cardRecord?.questionId, cardRecord?.answer, mission.id, !!state.cardChallenges?.[mission.id]]);
   const knowledgeQuestion = cardRecord?.version === 2 ? [...SECOND_CHANCE_SCENARIOS, ...SETBACK_SCENARIOS, ...PATH_SCENARIOS].find(q => q.id === cardRecord.questionId) : null;
   const confirmReflection = () => {
     if (pendingCardAnswer === null || !scenario || cardAnswer !== null) return;
@@ -78,6 +93,7 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
       const record = confirmCardAnswer(browserStorage, roomCode, mission.id, pendingCardAnswer);
       if (!record) return;
       setCardRecord(record); setCardAnswer(record.answer ?? null);
+      if (cardAward(record) > 0) celebrateLearning(`${state.journeyId}-card-${mission.id}`);
       window.dispatchEvent(new Event('entre-nos-learning-update'));
     } else setCardAnswer(pendingCardAnswer);
   };
@@ -88,31 +104,40 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
   };
 
   if (INSTITUTIONAL || isSolo) {
-    return <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto text-slate-100">
-      <section className="rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-3">
+    if (state.cardStageVersion === 1 && state.phase === 'MISSION_CONSEQUENCE') return <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 text-slate-100">
+      <MissionOutcome mission={mission} action={chosenAction} journey={state.journeyId!} onReady={setOutcomeReady} unified />
+      <button type="button" onClick={() => socketService.send({ type: 'OPEN_CARD_CHALLENGE' })} className="min-h-12 w-full rounded-xl bg-teal-400 p-4 font-black text-slate-950">Vamos ao Desafio das Cartas do Destino!</button>
+    </div>;
+    const separateCards = state.phase === 'MISSION_CARDS';
+    return <div data-card-challenge={separateCards ? '' : undefined} className={`flex flex-col gap-4 w-full ${separateCards ? 'max-w-5xl' : 'max-w-3xl'} mx-auto text-slate-100`}>
+      {!separateCards && (integrated || mission.dialogue ? <MissionOutcome mission={mission} action={chosenAction} journey={state.journeyId!} onReady={setOutcomeReady} unified={integrated} /> : <section className="rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-3">
         <span className="text-xs text-teal-300 font-bold">{mission.title}</span>
         <h2 className="text-2xl font-black">O que aconteceu?</h2>
         <p className="text-sm font-semibold text-teal-200">{chosenAction.title}</p>
         <p data-narration="story" className="text-base leading-relaxed">{chosenAction.consequenceSummary}</p>
         <button type="button" onClick={() => setShowReflection(v => !v)} className="text-sm text-teal-300 underline underline-offset-4">{showReflection ? 'Ocultar reflexão' : 'Para refletir (opcional)'}</button>
         {showReflection && <p className="text-sm text-slate-300">{chosenAction.pedagogicalFeedback}</p>}
-      </section>
-      <section className="rounded-2xl border border-amber-500/40 bg-slate-900 p-4 space-y-3">
-        <h3 className="font-bold text-amber-200">Escolha uma carta do destino</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {[0,1,2].map(index => <button key={index} type="button" aria-pressed={fortune?.cardIndex === index} disabled={!!fortune || !isHost} onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD',cardIndex:index})} className={`min-h-24 rounded-xl border-2 p-2 flex flex-col items-center justify-center gap-2 ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/40 bg-teal-950'}`}>
-            <span className="text-3xl">{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? '🧭' : fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
+      </section>)
+      }
+      {outcomeReady && <>
+      {mission.dialogue && !integrated && <p className="text-sm text-slate-300">As cartas são sorteadas independentemente da sua decisão. As escolhas dos dilemas não recebem nota.</p>}
+      <section className={`rounded-3xl border border-amber-400/60 bg-slate-900 ${separateCards ? 'p-5 sm:p-8 space-y-6' : 'p-4 space-y-3'}`}>
+        {separateCards ? <h1 className="text-2xl font-black">Desafio das Cartas do Destino</h1> : <h3 className="font-bold text-amber-200">{integrated ? 'Desafio das Cartas do Destino' : 'Escolha uma carta do destino'}</h3>}
+        <div className={`grid grid-cols-3 gap-2 ${separateCards ? 'mx-auto w-full max-w-2xl sm:gap-4' : ''}`}>
+          {[0,1,2].map(index => <button key={index} data-fortune-index={index} type="button" aria-pressed={fortune?.cardIndex === index} disabled={!!fortune || !isHost} onClick={() => socketService.send({type:'DRAW_FORTUNE_CARD',cardIndex:index})} className={`${separateCards ? 'min-h-44 sm:min-h-56' : 'min-h-24'} rounded-xl border-2 p-2 flex flex-col items-center justify-center gap-2 ${fortune?.cardIndex === index ? 'border-amber-300 bg-amber-950' : 'border-teal-500/40 bg-teal-950'}`}>
+            <span aria-hidden="true" className={separateCards ? 'text-6xl' : 'text-3xl'}>{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? '🧭' : fortune.outcome === 'sorte' ? '✨' : fortune.outcome === 'reves' ? '🌧️' : '🌟') : '🂠'}</span>
             <span className="text-xs">{fortune?.cardIndex === index ? (fortune.outcome === 'caminhos' ? 'Caminhos' : fortune.outcome === 'sorte' ? 'Sorte' : fortune.outcome === 'reves' ? 'Revés' : 'Segunda chance') : `Carta ${index+1}`}</span>
           </button>)}
         </div>
-        {fortune && <p role="status" className="text-lg font-black text-amber-200">Sorteio: {fortune.outcome === 'caminhos' ? 'sem pontos automáticos' : fortune.outcome === 'sorte' ? '+3 pontos' : fortune.outcome === 'reves' ? '−3 pontos' : '+1 ponto'}</p>}
-        {fortune && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'caminhos' ? 'Conheça os canais institucionais.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
+        {fortune && (!integrated || fortune.outcome !== 'caminhos') && <p role="status" className="text-lg font-black text-amber-200">Sorteio: {fortune.outcome === 'caminhos' ? 'sem pontos automáticos' : fortune.outcome === 'sorte' ? '+3 pontos' : fortune.outcome === 'reves' ? '−3 pontos' : '+1 ponto'}</p>}
+        {fortune && !integrated && <p className="text-sm text-amber-200">{fortune.outcome === 'reves' ? 'Um imprevisto! Você pode continuar.' : fortune.outcome === 'caminhos' ? 'Conheça os canais institucionais.' : fortune.outcome === 'sorte' ? 'Um caminho favorável!' : 'Uma nova oportunidade!'}</p>}
       </section>
 
       {(fortune?.outcome === 'caminhos' || fortune?.outcome === 'reves' || fortune?.outcome === 'segunda_chance') && scenario && <section data-card-question={scenario.id} data-card-version={cardRecord?.version ?? 1} aria-labelledby="card-question-title" className="rounded-xl bg-slate-900 border border-amber-500/40 p-4 sm:p-6 space-y-4">
         <h3 id="card-question-title" className="text-xl font-bold text-amber-200">{fortune.outcome === 'caminhos' ? 'Caminhos · canais institucionais' : fortune.outcome === 'reves' ? 'Revés · desafio rápido' : 'Segunda chance · outro olhar'}</h3>
+        {mission.dialogue && !separateCards && <p className="text-sm text-slate-300">Situação educativa independente da história desta missão.</p>}
         <p data-narration="story" className="text-lg">{scenario.prompt}</p>
-        <p className="text-sm text-slate-300">Sua decisão original permanece. {knowledgeQuestion ? 'Resposta mais adequada: +5 pontos de conhecimento, separados do sorteio.' : 'Registro da versão anterior preservado, sem reavaliação ou bônus retroativo.'}</p>
+        {!integrated && <p className="text-sm text-slate-300">Sua decisão original permanece. {knowledgeQuestion ? 'Resposta mais adequada: +5 pontos de conhecimento, separados do sorteio.' : 'Registro da versão anterior preservado, sem reavaliação ou bônus retroativo.'}</p>}
         <div role="group" aria-label="Alternativas da pergunta da carta" className="space-y-3">
         {scenario.options.map((option, index) =>
           <button key={index} type="button" aria-pressed={(cardAnswer ?? pendingCardAnswer) === index} disabled={cardAnswer !== null} onClick={() => setPendingCardAnswer(index)} className={`w-full text-left p-4 rounded-xl border-2 text-base leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${(cardAnswer ?? pendingCardAnswer) === index ? 'border-teal-400 bg-teal-950 text-teal-100' : 'border-slate-600 bg-slate-950 text-slate-100'}`}>
@@ -122,16 +147,18 @@ export const MissionConsequence: React.FC<MissionConsequenceProps> = ({
         </div>
         {cardAnswer === null && <button type="button" disabled={pendingCardAnswer === null} onClick={confirmReflection} className="w-full rounded-xl bg-teal-400 text-slate-950 font-bold p-3 disabled:opacity-40">Confirmar resposta</button>}
         {cardAnswer !== null && <div ref={cardFeedback} data-card-feedback role="status" tabIndex={-1} className="rounded-xl border border-teal-400 bg-slate-950 p-4 space-y-3 text-base">
-          {knowledgeQuestion && <p className="font-bold text-teal-200">{cardAnswer === knowledgeQuestion.correctIndex ? 'Você escolheu a alternativa mais adequada. +5 pontos de conhecimento.' : 'Há um caminho mais adequado nesta situação. +0 pontos de conhecimento; nenhum ponto foi retirado pela resposta.'}</p>}
+          {knowledgeQuestion && <p className="font-bold text-teal-200">{integrated ? (cardAnswer === knowledgeQuestion.correctIndex ? 'Resposta adequada · +5 pontos' : 'Vamos aprender juntos:') : cardAnswer === knowledgeQuestion.correctIndex ? 'Você escolheu a alternativa mais adequada. +5 pontos de conhecimento.' : 'Há um caminho mais adequado nesta situação. +0 pontos de conhecimento; nenhum ponto foi retirado pela resposta.'}</p>}
           <p data-narration="story">{scenario.feedback[cardAnswer]}</p>
-          {knowledgeQuestion && <><p data-narration="story">{knowledgeQuestion.rationale}</p><p><strong>Alternativa mais adequada:</strong> {knowledgeQuestion.options[knowledgeQuestion.correctIndex]}</p><p className="text-sm text-slate-300">{knowledgeQuestion.basis}</p><p className="font-bold text-amber-200">Nesta carta: sorteio {fortune.outcome === 'caminhos' ? '0' : fortune.outcome === 'reves' ? '−3' : '+1'} · conhecimento +{cardRecord ? cardAward(cardRecord) : 0}.</p></>}
+          {knowledgeQuestion && <><p data-narration="story">{knowledgeQuestion.rationale}</p><p><strong>Alternativa mais adequada:</strong> {knowledgeQuestion.options[knowledgeQuestion.correctIndex]}</p><p className="text-sm text-slate-300">{knowledgeQuestion.basis}</p>{!integrated && <p className="font-bold text-amber-200">Nesta carta: sorteio {fortune.outcome === 'caminhos' ? '0' : fortune.outcome === 'reves' ? '−3' : '+1'} · conhecimento +{cardRecord ? cardAward(cardRecord) : 0}.</p>}</>}
           {!knowledgeQuestion && <p className="text-slate-300">Resposta anterior preservada, sem bônus retroativo.</p>}
         </div>}
       </section>}
       {fortune?.outcome === 'sorte' && <section className="rounded-xl bg-slate-900 border border-teal-500/40 p-4"><p className="text-sm text-teal-200">Sorte! Você encontrou uma pista: {mission.discovery.subtitle}</p></section>}
       {fortune && <section className="rounded-xl bg-slate-900 border border-slate-700 p-4"><p className="text-sm text-amber-200 font-bold">Descoberta: {mission.discovery.title}</p></section>}
-      {state.pilotVersion === 2 && fortune && (fortune.outcome === 'sorte' || cardAnswer !== null) && <p data-narration="story" role="status" className="rounded-xl border border-teal-500/50 bg-teal-950/30 p-4 font-bold text-teal-200">{MOTIVATION[Math.min(3, completedCount - 1)]}</p>}
-      <button type="button" disabled={!fortune || (fortune.outcome !== 'sorte' && cardAnswer === null)} onClick={handleProceed} className="w-full rounded-xl bg-teal-400 text-slate-950 font-black p-4 disabled:opacity-40">{!fortune ? 'Vire uma carta para continuar' : fortune.outcome !== 'sorte' && cardAnswer === null ? 'Responda ao desafio para continuar' : isLastMission ? 'Ver resumo e medalha' : 'Próxima missão →'}</button>
+      {!integrated && state.pilotVersion === 2 && fortune && (fortune.outcome === 'sorte' || cardAnswer !== null) && <p data-narration="story" role="status" className="rounded-xl border border-teal-500/50 bg-teal-950/30 p-4 font-bold text-teal-200">{MOTIVATION[Math.min(3, completedCount - 1)]}</p>}
+      {needsChannels && <p role="status" className="rounded-xl border border-amber-400 p-4 text-amber-200">Antes de concluir esta missão, participe de uma pergunta dos Canais de Atendimento. Não é necessário acertar. Você pode consultar os canais a qualquer momento pelo botão superior.</p>}
+      <button type="button" disabled={!fortune || (fortune.outcome !== 'sorte' && cardAnswer === null)} onClick={needsChannels ? onOpenChannels : handleProceed} className="w-full rounded-xl bg-teal-400 text-slate-950 font-black p-4 disabled:opacity-40">{!fortune ? 'Vire uma carta para continuar' : fortune.outcome !== 'sorte' && cardAnswer === null ? 'Responda ao desafio para continuar' : integrated ? 'Continuar para os Guardiões' : needsChannels ? 'Participar dos Canais de Atendimento' : isLastMission ? 'Ver resumo e medalha' : 'Próxima missão →'}</button>
+      </>}
     </div>;
   }
 

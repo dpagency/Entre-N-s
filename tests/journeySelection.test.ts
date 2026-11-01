@@ -51,7 +51,7 @@ test('completion resources require editorial approval, all missions and a comple
   const draft = JOURNEYS[1];
   assert.equal(draft.missionIds.length, 0);
   assert.equal(draft.plannedMissions?.length, 4);
-  const definition: JourneyDefinition = { ...draft, status: 'available', missionIds: ['fixture-only'],
+  const definition: JourneyDefinition = { ...draft, localOnly: false, status: 'available', missionIds: ['fixture-only'],
     presentation: { resources: draft.presentation!.resources!.map(r => ({ ...r, editorialStatus: 'approved' })) } };
   const state = { journeyDefinitionId: draft.id, phase: 'GAME_SUMMARY' as const, completedMissionIds: ['fixture-only'] };
   assert.equal(completedJourneyResources(state).length, 0);

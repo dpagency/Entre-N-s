@@ -1,4 +1,5 @@
 import { INSTITUTIONAL } from '../../distribution';
+import { Journey2Decision } from './Journey2Decision';
 import React from 'react';
 import { MissionDef, SanitizedRoomState } from '../../types/game';
 import { ActionCard } from '../cards/CardView';
@@ -62,6 +63,8 @@ export const MissionIndividualChoice: React.FC<MissionIndividualChoiceProps> = (
       type: 'CONTINUE_WITHOUT_DISCONNECTED',
     });
   };
+
+  if (mission.dialogue) return <Journey2Decision mission={mission} choice={myChoice} />;
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto text-slate-100">

@@ -2,6 +2,16 @@
 /* Identidade tipográfica de jogo: títulos expressivos e texto legível. */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 @import "tailwindcss";
+
+@keyframes learning-confetti-fall {
+  0% { opacity: 0; transform: translateY(-20px) rotate(0deg); }
+  20% { opacity: 1; }
+  65% { opacity: 1; transform: translate(var(--confetti-drift), 210px) rotate(240deg); }
+  100% { opacity: 0; transform: translateY(330px) rotate(360deg); }
+}
+.learning-confetti-piece { animation: learning-confetti-fall 1.65s ease-out both; }
+@media (prefers-reduced-motion: reduce) { [data-learning-confetti] { display: none; } }
+[data-reduced-motion="true"] [data-learning-confetti] { display: none; }
 :root { font-family: 'Nunito', system-ui, sans-serif; }
 body, button, input, textarea { font-family: 'Nunito', system-ui, sans-serif; }
 h1, h2, h3, .game-title { font-family: 'Nunito', system-ui, sans-serif; letter-spacing: -.015em; font-weight: 900; }

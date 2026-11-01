@@ -1,3 +1,4 @@
+import { JourneyOpening } from './JourneyOpening';
 import { ORIGINAL_JOURNEY_ID, journeyDefinition } from '../../data/journeys';
 import { assetUrl } from '../../distribution';
 import { PLAYER_AVATARS } from '../../data/pilot';
@@ -10,6 +11,7 @@ export const WelcomeScreen = ({ journeyDefinitionId = ORIGINAL_JOURNEY_ID, onBac
   const journey = journeyDefinition(journeyDefinitionId);
   const title = useRef<HTMLHeadingElement>(null);
   useEffect(() => { title.current?.focus(); }, []);
+  const [openingDone, setOpeningDone] = useState(!journey.presentation?.opening);
   const [starting, setStarting] = useState(false);
   const [nickname, setNickname] = useState(
     browserStorage.getItem('guardioes_nickname') || ''
@@ -28,6 +30,8 @@ export const WelcomeScreen = ({ journeyDefinitionId = ORIGINAL_JOURNEY_ID, onBac
     catch { setStarting(false); }
   };
 
+
+  if (!openingDone) return <JourneyOpening journey={journey} onContinue={() => setOpeningDone(true)} onBack={onBack} />;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-0 py-2 sm:py-4 text-slate-100 mx-auto w-full game-welcome">

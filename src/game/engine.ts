@@ -1,6 +1,11 @@
 import { ORIGINAL_JOURNEY_ID, journeyMissions, playableJourney } from '../data/journeys';
+import { CHANNEL_ACTIVITY_QUESTIONS } from '../data/channelActivity';
+import { hasMissionChannels } from '../services/missionChannels';
+import { shuffledGuardianOrder, knownJourneyGuardians } from '../services/guardianJourney';
+import { PATH_SCENARIOS } from '../data/pathScenarios';
+import { SECOND_CHANCE_SCENARIOS, SETBACK_SCENARIOS } from '../data/fortuneScenarios';
 import type {CharacterId, RegionId, ClientMessage, RoomState, SanitizedRoomState, ServerMessage} from '../types/game';
-import {MISSIONS} from '../data/missions';
+import {GAME_MISSIONS as MISSIONS} from '../data/missionRegistry';
 import {CHARACTERS} from '../data/characters';
 import { GUARDIAN_IDS, GUARDIAN_QUESTIONS, PLAYER_AVATARS, PILOT_MISSIONS } from '../data/pilot';
 import {PRE_TEST_QUESTIONS, POST_TEST_QUESTIONS} from '../data/evaluations';
@@ -67,17 +72,23 @@ function getSanitizedState(room: RoomState, viewerPlayerId: string): SanitizedRo
     'MISSION_COLLECTIVE_VOTE',
     'MISSION_TF_CHALLENGE',
     'MISSION_CONSEQUENCE',
+    'MISSION_CARDS',
     'POST_TEST',
     'GAME_SUMMARY',
     'FEEDBACK',
-  ].includes(room.phase);
+  ].includes(room.phase) || (room.missionFlowVersion === 2 && ['MISSION_GUARDIAN', 'MISSION_CHANNELS'].includes(room.phase));
 
   const sanitized: SanitizedRoomState = {
     pilotVersion: room.pilotVersion,
     learningRulesVersion: room.learningRulesVersion,
+    missionChannelActivity: room.missionChannelActivity,
+    missionFlowVersion: room.missionFlowVersion,
+    cardStageVersion: room.cardStageVersion,
+    cardChallenges: room.cardChallenges,
     journeyId: room.journeyId,
     journeyDefinitionId: room.journeyDefinitionId || ORIGINAL_JOURNEY_ID,
     journeyContentVersion: room.journeyContentVersion || 1,
+    dialoguePositions: room.dialoguePositions,
     guardianOrder: room.guardianOrder,
     guardianEncounters: room.guardianEncounters,
     finalGuardianId: room.finalGuardianId,
@@ -392,12 +403,14 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       room.journeyContentVersion ||= definition.version;
       room.journeyId = randomHex(16);
       room.learningRulesVersion = 4;
-      room.guardianOrder = [...GUARDIAN_IDS];
-      for (let i = room.guardianOrder.length - 1; i > 0; i--) {
-        const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
-        [room.guardianOrder[i], room.guardianOrder[j]] = [room.guardianOrder[j], room.guardianOrder[i]];
-      }
+      room.missionFlowVersion = 2;
+      room.cardStageVersion = 1;
+      room.cardChallenges = {};
+      // New attempts only: older snapshots keep their original voluntary credits.
+      room.missionChannelActivity = { version: 1, missions: {} };
+      room.guardianOrder = shuffledGuardianOrder();
       room.guardianEncounters = {};
+      room.dialoguePositions = {};
       room.finalGuardianId = undefined;
       for (const p of Object.values(room.players)) if (p.isBot) delete room.players[p.id];
       if (humans.length === 1) PLAYER_AVATARS.forEach((avatar, index) => {
@@ -427,6 +440,29 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     for (const p of Object.values(room.players)) p.preTestCompleted = true;
     room.phase = 'BOARD_SELECT';
     broadcastRoomState(room, 'A jornada começou! Escolha a primeira região da Cidade dos Encontros.');
+    return;
+  }
+
+  if (msg.type === 'OPEN_MISSION_CHANNEL' || msg.type === 'ANSWER_MISSION_CHANNEL') {
+    if (!hasMissionChannels(room) || room.hostId !== playerId || !room.phase.startsWith('MISSION_') || !room.activeMissionId || room.completedMissionIds.includes(room.activeMissionId)) return;
+    if (room.missionFlowVersion === 2 && room.phase !== 'MISSION_CHANNELS') return;
+    const missionId = room.activeMissionId;
+    if (!journeyMissions(room.journeyDefinitionId).some(m => m.id === missionId)) return;
+    const records = room.missionChannelActivity!.missions;
+    if (msg.type === 'OPEN_MISSION_CHANNEL') {
+      if (!records[missionId]) {
+        const used = new Set(Object.values(records).map(r => r.questionId));
+        const question = CHANNEL_ACTIVITY_QUESTIONS.find(q => !used.has(q.id));
+        if (!question) return;
+        records[missionId] = { questionId: question.id };
+      }
+    } else {
+      const record = records[missionId];
+      const q = CHANNEL_ACTIVITY_QUESTIONS.find(q => q.id === record?.questionId);
+      if (!q || record.answer !== undefined || msg.questionId !== q.id || !Number.isInteger(msg.answer) || msg.answer < 0 || msg.answer >= q.options.length) return;
+      record.answer = msg.answer;
+    }
+    broadcastRoomState(room);
     return;
   }
 
@@ -468,7 +504,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
   // 6. VOTE_DESTINATION (on the board)
   if (msg.type === 'VOTE_DESTINATION') {
     if (room.phase !== 'BOARD_SELECT') return;
-    if (!MISSIONS.some(m => m.regionId === msg.regionId && !room.completedMissionIds.includes(m.id))) return;
+    if (!(room.pilotVersion === 2 ? journeyMissions(room.journeyDefinitionId) : MISSIONS).some(m => m.regionId === msg.regionId && !room.completedMissionIds.includes(m.id))) return;
     room.destinationVotes[playerId] = msg.regionId;
     broadcastRoomState(room);
     return;
@@ -521,9 +557,19 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     return;
   }
 
+  if (msg.type === 'SET_DIALOGUE_STEP') {
+    const mission = MISSIONS.find(m => m.id === room.activeMissionId);
+    if (room.hostId !== playerId || room.phase !== 'MISSION_SITUATION' || !mission?.dialogue
+        || !Number.isInteger(msg.step) || msg.step < 0 || msg.step >= mission.dialogue.length) return;
+    room.dialoguePositions ||= {};
+    room.dialoguePositions[mission.id] = msg.step;
+    broadcastRoomState(room); return;
+  }
   if (msg.type === 'EXPLORE_MISSION') {
     if (room.hostId !== playerId || room.phase !== 'MISSION_SITUATION') return;
-    room.phase = room.pilotVersion === 2 ? 'MISSION_GUARDIAN' : 'MISSION_EXPLORE'; broadcastRoomState(room); return;
+    const scene = MISSIONS.find(m => m.id === room.activeMissionId);
+    if (scene?.dialogue && (room.dialoguePositions?.[scene.id] || 0) < scene.dialogue.length - 1) return;
+    room.phase = room.pilotVersion === 2 && room.missionFlowVersion !== 2 ? 'MISSION_GUARDIAN' : 'MISSION_EXPLORE'; broadcastRoomState(room); return;
   }
   if (room.pilotVersion === 2 && room.activeMissionId && room.phase === 'MISSION_GUARDIAN') {
     const encounter = room.guardianEncounters?.[room.activeMissionId];
@@ -534,12 +580,13 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     } else if (msg.type === 'SUBMIT_GUARDIAN_ANSWER' && encounter.questionId && encounter.answer === undefined && typeof msg.answer === 'boolean') {
       encounter.answer = msg.answer;
     } else if (msg.type === 'COMPLETE_GUARDIAN_CHALLENGE' && encounter.answer !== undefined) {
-      room.phase = 'MISSION_EXPLORE';
+      room.phase = room.missionFlowVersion === 2 ? 'MISSION_CHANNELS' : 'MISSION_EXPLORE';
     } else return;
     broadcastRoomState(room); return;
   }
   if (msg.type === 'SELECT_FINAL_GUARDIAN') {
     if (room.pilotVersion !== 2 || room.phase !== 'GAME_SUMMARY' || !GUARDIAN_IDS.includes(msg.guardianId) || player.isBot) return;
+    if (knownJourneyGuardians(room, journeyMissions(room.journeyDefinitionId).map(m => m.id)).length !== GUARDIAN_IDS.length) return;
     room.finalGuardianId = msg.guardianId; broadcastRoomState(room); return;
   }
   if (msg.type === 'OPEN_COLLECTIVE_VOTE') {
@@ -711,7 +758,7 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
 
   // Carta de sorte: escolha visual entre três cartas fechadas; sorteio não depende da decisão ética.
   if (msg.type === 'DRAW_FORTUNE_CARD') {
-    if (room.phase !== 'MISSION_CONSEQUENCE' || room.hostId !== playerId ||
+    if (room.phase !== (room.cardStageVersion === 1 ? 'MISSION_CARDS' : 'MISSION_CONSEQUENCE') || room.hostId !== playerId ||
         !Number.isInteger(msg.cardIndex) || msg.cardIndex < 0 || msg.cardIndex > 2 || !room.activeMissionId) return;
     room.fortuneCards ||= {};
     if (room.fortuneCards[room.activeMissionId]) return;
@@ -728,6 +775,23 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
     return;
   }
 
+  if (msg.type === 'OPEN_CARD_CHALLENGE') {
+    if (room.cardStageVersion !== 1 || room.missionFlowVersion !== 2 || room.hostId !== playerId || room.phase !== 'MISSION_CONSEQUENCE' || !room.activeMissionId) return;
+    room.phase = 'MISSION_CARDS'; broadcastRoomState(room); return;
+  }
+  if (msg.type === 'COMPLETE_CARD_CHALLENGE') {
+    const missionId = room.activeMissionId;
+    if (room.missionFlowVersion !== 2 || room.hostId !== playerId || room.phase !== (room.cardStageVersion === 1 ? 'MISSION_CARDS' : 'MISSION_CONSEQUENCE') || !missionId) return;
+    const kind = room.fortuneCards?.[missionId]?.outcome;
+    const pool = kind === 'caminhos' ? PATH_SCENARIOS : kind === 'reves' ? SETBACK_SCENARIOS : kind === 'segunda_chance' ? SECOND_CHANCE_SCENARIOS : [];
+    const question = pool.find(q => q.id === msg.questionId);
+    if (!question || !Number.isInteger(msg.answer) || msg.answer < 0 || msg.answer >= question.options.length) return;
+    room.cardChallenges ||= {};
+    if (room.cardChallenges[missionId]) return;
+    room.cardChallenges[missionId] = { questionId: question.id, answer: msg.answer };
+    broadcastRoomState(room); return;
+  }
+
   // 16. PROCEED_AFTER_CONSEQUENCE
   if (msg.type === 'PROCEED_AFTER_CONSEQUENCE') {
     if (room.hostId !== playerId) return;
@@ -738,8 +802,17 @@ export function handleClientMessage(ws: GameConnection, msg: ClientMessage) {
       return;
     }
 
-    if (room.phase === 'MISSION_CONSEQUENCE') {
+    if (room.missionFlowVersion === 2 && room.phase === (room.cardStageVersion === 1 ? 'MISSION_CARDS' : 'MISSION_CONSEQUENCE')) {
+      if (!room.activeMissionId || !room.fortuneCards?.[room.activeMissionId] || !room.cardChallenges?.[room.activeMissionId]) return;
+      room.phase = 'MISSION_GUARDIAN'; broadcastRoomState(room); return;
+    }
+    if (room.cardStageVersion === 1 && room.phase === 'MISSION_CONSEQUENCE') return;
+    if (room.phase === 'MISSION_CONSEQUENCE' || (room.phase === 'MISSION_CHANNELS' && room.missionFlowVersion === 2)) {
       if (!room.activeMissionId || !room.fortuneCards?.[room.activeMissionId]) return;
+      if (hasMissionChannels(room) && room.missionChannelActivity!.missions[room.activeMissionId]?.answer === undefined && !room.completedMissionIds.includes(room.activeMissionId)) {
+        ws.send(JSON.stringify({ type: 'NOTIFICATION', message: 'Antes de concluir a missão, participe de uma pergunta dos Canais de Atendimento. Não é necessário acertar.', variant: 'info' }));
+        return;
+      }
       // Record completed mission
       if (room.activeMissionId && !room.completedMissionIds.includes(room.activeMissionId)) {
         room.completedMissionIds.push(room.activeMissionId);

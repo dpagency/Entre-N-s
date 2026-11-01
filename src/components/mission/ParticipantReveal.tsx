@@ -27,8 +27,8 @@ export function ParticipantReveal({ state, mission, myPlayerId }: { state: Sanit
     <section id={reviewId} hidden={!details} aria-label="Revisão das alternativas" className="rounded-2xl border border-teal-400 bg-slate-900 p-5 space-y-4">
       <h2 className="text-xl font-bold text-teal-200">Todas as alternativas desta missão</h2>
       <p className="text-base text-slate-300">Consulta para reflexão. Sua decisão já está registrada e não será alterada.</p>
-      {mission.actions.map(action => <article key={action.id} className="border-t border-slate-600 pt-4 space-y-2"><h3 className="text-lg font-bold">{action.title}</h3><p data-narration="story" className="text-base">{action.description}</p></article>)}
+      {mission.actions.map(action => <article key={action.id} className="border-t border-slate-600 pt-4 space-y-2"><h3 className="text-lg font-bold">{action.title}</h3>{(!mission.dialogue || action.description !== action.title) && <p data-narration="story" className="text-base">{action.description}</p>}</article>)}
     </section>
-    <button type="button" onClick={() => socketService.send({ type: 'OPEN_COLLECTIVE_VOTE' })} className="w-full rounded-xl bg-teal-400 p-4 font-black text-slate-950">Ver o que aconteceu</button>
+    <button type="button" onClick={() => socketService.send({ type: 'OPEN_COLLECTIVE_VOTE' })} className="w-full rounded-xl bg-teal-400 p-4 font-black text-slate-950">{state.missionFlowVersion === 2 ? 'E depois da sua escolha?' : 'Ver o que aconteceu'}</button>
   </div>;
 }

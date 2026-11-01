@@ -1,5 +1,5 @@
 import type { JourneyDefinition } from '../data/journeys';
-import { journeyDefinition } from '../data/journeys';
+import { journeyDefinition, isJourneyAvailable } from '../data/journeys';
 import type { RoomState } from '../types/game';
 import { listAttempts, loadAttempt, migrateLegacySave, type SavedAttempt } from './journeyStorage';
 
@@ -23,7 +23,7 @@ export function savedJourneyAttempts(storage: Storage, journey: string): SavedAt
 
 export function completedJourneyResources(state: Pick<RoomState, 'journeyDefinitionId' | 'completedMissionIds' | 'phase'>,
   definition: JourneyDefinition = journeyDefinition(state.journeyDefinitionId)) {
-  if (state.phase !== 'GAME_SUMMARY' || definition.status !== 'available' || !definition.missionIds.length
+  if (state.phase !== 'GAME_SUMMARY' || !isJourneyAvailable(definition)
       || !definition.missionIds.every(id => state.completedMissionIds.includes(id))) return [];
   return (definition.presentation?.resources || []).filter(resource => {
     if (resource.editorialStatus !== 'approved') return false;

@@ -1,8 +1,10 @@
 import { browserStorage } from './services/browserStorage';
+import { hasMissionChannels } from './services/missionChannels';
+import { LearningCelebration } from './components/ui/LearningCelebration';
 import { INSTITUTIONAL } from './distribution';
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useSyncExternalStore } from 'react';
 import { RoomState, SanitizedRoomState } from './types/game';
-import { MISSIONS } from './data/missions';
+import { GAME_MISSIONS as MISSIONS } from './data/missionRegistry';
 import { socketService } from './services/socket';
 import { Navbar } from './components/ui/Navbar';
 import { JourneyAudio } from './components/ui/JourneyAudio';
@@ -32,6 +34,7 @@ import { ParticipantReveal } from './components/mission/ParticipantReveal';
 import { PilotSummary } from './components/summary/PilotSummary';
 
 export default function App() {
+  const storagePersistent = useSyncExternalStore(browserStorage.subscribe, () => browserStorage.persistent);
   const [state, setState] = useState<SanitizedRoomState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [myPlayerId, setMyPlayerId] = useState<string | null>(socketService.myPlayerId);
@@ -147,9 +150,20 @@ export default function App() {
   const activeMission = state?.activeMissionId
     ? MISSIONS.find((m) => m.id === state.activeMissionId) || MISSIONS[0]
     : MISSIONS[0];
+  useEffect(() => {
+    if (!showWelcome && state?.phase === 'MISSION_CHANNELS') setIsInstitutionalGuideOpen(true);
+  }, [showWelcome, state?.phase, state?.journeyId, state?.activeMissionId]);
+  const closeChannels = () => {
+    setIsInstitutionalGuideOpen(false);
+    if (state?.missionFlowVersion === 2 && state.phase === 'MISSION_CHANNELS' &&
+        (!hasMissionChannels(state) || state.missionChannelActivity?.missions[state.activeMissionId!]?.answer !== undefined)) {
+      socketService.send({ type: 'PROCEED_AFTER_CONSEQUENCE' });
+    }
+  };
 
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'user'}>
+    <LearningCelebration phase={showWelcome ? undefined : state?.phase} />
     <div
       data-game-screen={showWelcome || !state || !myPlayerId ? 'welcome' : 'journey'}
       className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-slate-950"
@@ -200,12 +214,12 @@ export default function App() {
 
       {/* Main content body */}
       <main className={`flex-1 max-w-[1440px] ${showWelcome || !state || !myPlayerId ? '' : 'game-journey'} w-full mx-auto p-4 sm:p-6 flex flex-col`}>
-        {!showWelcome && state?.journeyId && myPlayerId && <div className="mx-auto mb-4 flex w-full max-w-5xl justify-end">
+        {!showWelcome && state?.journeyId && myPlayerId && !(state.missionFlowVersion === 2 && state.phase.startsWith('MISSION_')) && <div className="mx-auto mb-4 flex w-full max-w-5xl justify-end">
           <button type="button" data-channel-invitation onClick={() => setIsInstitutionalGuideOpen(true)} className="min-h-11 w-full max-w-full whitespace-normal break-words rounded-xl border border-amber-300 bg-amber-400 px-4 py-3 text-sm font-bold leading-relaxed text-slate-950 shadow-md hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400 sm:w-auto">
-            Explore os Canais de Atendimento e ganhe pontos!
+            {hasMissionChannels(state) ? 'Canais de Atendimento' : 'Explore os Canais de Atendimento e ganhe pontos!'}
           </button>
         </div>}
-        {!browserStorage.persistent && <p role="status" className="rounded-xl border border-amber-400 p-3 text-sm text-amber-200">O navegador bloqueou o salvamento. Você pode jogar nesta página, mas o progresso poderá ser perdido ao fechá-la.</p>}
+        {!storagePersistent && <p role="status" className="rounded-xl border border-amber-400 p-3 text-sm text-amber-200">Não foi possível salvar seu progresso neste navegador. Você pode continuar jogando, mas suas respostas mais recentes poderão ser perdidas se sair ou atualizar a página.</p>}
         {!showWelcome && state && state.pilotVersion !== 2 && <p className="rounded-xl border border-slate-600 p-3 text-sm">Esta partida salva usa a dinâmica anterior. Ela foi preservada; ao jogar novamente, você encontrará a nova dinâmica dos quatro Guardiões.</p>}
         {showWelcome || !state || !myPlayerId ? (
           /* Welcome screen when not in a room */
@@ -244,6 +258,7 @@ export default function App() {
             )}
 
             {state.phase === 'MISSION_GUARDIAN' && <GuardianEncounter key={`${state.journeyId}-${activeMission.id}`} state={state} mission={activeMission} />}
+            {state.phase === 'MISSION_CHANNELS' && <section className="mx-auto w-full max-w-3xl space-y-4 rounded-2xl border border-teal-500 p-5"><h1 className="text-2xl font-black">Desafio dos Canais de Atendimento</h1><button type="button" onClick={() => setIsInstitutionalGuideOpen(true)} className="min-h-12 rounded-xl bg-teal-400 p-4 font-bold text-slate-950">Continuar desafio dos Canais</button></section>}
             {(state.phase === 'MISSION_EXPLORE' || state.phase === 'MISSION_INDIVIDUAL_CHOICE') && (
               <MissionIndividualChoice
                 mission={activeMission}
@@ -277,8 +292,9 @@ export default function App() {
               />
             )}
 
-            {state.phase === 'MISSION_CONSEQUENCE' && (
-              <MissionConsequence
+            {(state.phase === 'MISSION_CONSEQUENCE' || state.phase === 'MISSION_CARDS') && (
+              <MissionConsequence key={`${state.journeyId}-${activeMission.id}`}
+                onOpenChannels={() => setIsInstitutionalGuideOpen(true)}
                 mission={activeMission}
                 state={state as any}
                 myPlayerId={myPlayerId}
@@ -300,6 +316,7 @@ export default function App() {
 
             {(state.phase === 'GAME_SUMMARY' || state.phase === 'FEEDBACK') && (
               <SummaryForVersion
+                onReturnHome={handleReturnHome}
                 state={state as any}
                 myPlayerId={myPlayerId}
                 onOpenFeedback={() => setIsFeedbackOpen(true)}
@@ -320,11 +337,11 @@ export default function App() {
       </main>
 
       {/* Global Modals */}
-      <RulesModal rulesVersion={showWelcome ? 4 : state?.learningRulesVersion} isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
+      <RulesModal integratedFlow={showWelcome || state?.missionFlowVersion === 2} missionChannels={showWelcome || hasMissionChannels(state)} rulesVersion={showWelcome ? 4 : state?.learningRulesVersion} isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
       <InstitutionalCardModal
         state={showWelcome ? null : state}
         isOpen={isInstitutionalGuideOpen}
-        onClose={() => setIsInstitutionalGuideOpen(false)}
+        onClose={closeChannels}
       />
       <AccessibilityModal
         isOpen={isAccessibilityOpen}
@@ -349,6 +366,6 @@ export default function App() {
   );
 }
 
-function SummaryForVersion(props: React.ComponentProps<typeof GameSummary>) {
+function SummaryForVersion(props: React.ComponentProps<typeof GameSummary> & { onReturnHome: () => void }) {
   return INSTITUTIONAL || props.state.pilotVersion === 2 ? <PilotSummary {...props} /> : <GameSummary {...props} />;
 }

@@ -12,6 +12,7 @@ import { MISSIONS } from '../src/data/missions.ts';
 import { CHANNEL_ACTIVITY_QUESTIONS } from '../src/data/channelActivity.ts';
 import { cityArtworkSource, ORIGINAL_CITY_ARTWORK } from '../src/data/cityArtwork.ts';
 import { staticSiteServer } from './static-site-server.mjs';
+import { restoreLegacyBrowserFixture } from './legacy-browser-fixture.mjs';
 import { verifySite, siteRoot as defaultSiteRoot, projectRoot } from './institutional-package.mjs';
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -430,6 +431,8 @@ try {
     }
     await named('Conhecer avatar ' + PLAYER_AVATARS[caseIndex].name); await click('Escolher avatar');
     await click('Começar'); await phase('BOARD_SELECT');
+    // This suite retains coverage of the approved previous release and its saves.
+    await restoreLegacyBrowserFixture(client); await phase('BOARD_SELECT');
     await selectorRoundTrip(prefix);
     const first = await room(); assert.equal(Object.keys(first.players).length, 4);
     const bots = Object.values(first.players).filter(p => p.isBot); assert.equal(bots.length, 3); assert(!bots.some(p => p.variantIndex === caseIndex));
@@ -575,14 +578,14 @@ try {
     assert(await client.evaluate(`document.body.innerText.includes('Medalha Caminhos da Escuta')`));
     await invitationAccess('resumo e encerramento',prefix);
     if (caseIndex) {
-      assert(await client.evaluate(`document.body.innerText.includes('0 de 5 perguntas respondidas')`));
+      assert.equal(await client.evaluate(`document.querySelector('[data-channel-summary]').textContent`),'0 de 20');
       report.checks.push({summaryWithZeroVoluntaryAnswers:true,medalUnblocked:true});
       for(let i=0;i<5;i++) await channelActivity(i,false,prefix,i===0||i===4);
     } else await channelActivity(4,true,prefix,true);
     const expected = !caseIndex ? 100 : 0;
     const maximum = !caseIndex ? 100 : 95;
-    await client.wait(`document.body.innerText.includes('${expected} de ${maximum} pontos disponíveis')`, 'learning score');
-    assert(await client.evaluate(`document.body.innerText.includes('${!caseIndex ? 20 : 0} de ${!caseIndex ? 20 : 15} pontos de conhecimento disponíveis')`));
+    await client.wait(`document.querySelector('[data-learning-total]')?.textContent.includes('${expected} de ${maximum} pontos disponíveis')`, 'learning score');
+    assert(await client.evaluate(`document.querySelector('[data-score-category="cards"]').textContent.includes('${!caseIndex ? 20 : 0} de ${!caseIndex ? 20 : 15}')`));
     for (const name of guardianNames) assert(await client.evaluate(`document.body.innerText.includes(${JSON.stringify(name)})`), 'Final Guardian choice missing: ' + name);
     await layout('resumo', prefix, true); await evaluationAndComposition(prefix);
     await invitationAccess('composição final',prefix);
@@ -598,7 +601,7 @@ try {
     assert(await client.evaluate(`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.startsWith('Retomar partida anterior')&&b.textContent.includes('4 de 4'));b.click();return true})()`));
     await phase('GAME_SUMMARY');
     assert.equal((await room()).journeyId, first.journeyId);
-    await client.wait(`document.body.innerText.includes('${expected} de ${maximum} pontos disponíveis')`, 'restored score without duplicate awards');
+    await client.wait(`document.querySelector('[data-learning-total]')?.textContent.includes('${expected} de ${maximum} pontos disponíveis')`, 'restored score without duplicate awards');
     await named('Início'); await click('Recomeçar');
     await client.wait(`document.querySelector('#player-nickname')`, 'new attempt avatar');
     assert(await client.evaluate(`document.querySelector('button[aria-label="Conhecer avatar ${PLAYER_AVATARS[caseIndex].name}"]').getAttribute('aria-pressed')==='true'`));
@@ -616,8 +619,11 @@ try {
   await client.call('Page.reload'); await client.wait(`document.body.innerText.includes('Ver resumo')`, 'version 3 resume');
   await click('Ver resumo'); await phase('GAME_SUMMARY');
   assert.equal((await room()).learningRulesVersion,3);
-  await client.wait(`document.body.innerText.includes('100 de 100 pontos disponíveis')`, 'version 3 score unchanged');
-  assert(await client.evaluate(`document.body.innerText.includes('Encontro com o Guardião: +5')`));
+  await client.wait(`document.querySelector('[data-learning-total]')?.textContent.includes('100 de 100 pontos disponíveis')`, 'version 3 score unchanged');
+  assert(await client.evaluate(`document.querySelector('[data-score-category="consultations"]').textContent.includes('20 de 20')`));
+  await named('Regras');
+  assert(await client.evaluate(`document.querySelector('[role=dialog]').textContent.includes('+5 pontos de consulta')`));
+  await named('Fechar');
   await named('Canais'); assert.equal(await client.evaluate(`document.querySelectorAll('[data-channel-activity]').length`),0);
   assert(await client.evaluate(`document.querySelector('[role=dialog]').innerText.includes('Sem pontuação')`));
   await named('Fechar modal');

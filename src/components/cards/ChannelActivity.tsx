@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CHANNEL_ACTIVITY_QUESTIONS } from '../../data/channelActivity';
 import { channelActivityPoints, confirmChannelAnswer, readChannelAnswer, pendingChannelQuestion, rememberChannelQuestion } from '../../services/channelActivity';
 import { browserStorage } from '../../services/browserStorage';
+import { celebrateLearning } from '../../services/learningCelebration';
 
 export function ChannelActivity({ journey }: { journey: string }) {
   const [records, setRecords] = useState(() => Object.fromEntries(CHANNEL_ACTIVITY_QUESTIONS.map(q => [q.id, readChannelAnswer(browserStorage, journey, q.id)])));
@@ -29,6 +30,7 @@ export function ChannelActivity({ journey }: { journey: string }) {
     const saved = confirmChannelAnswer(browserStorage, journey, 4, question.id, selected);
     if (!saved) return;
     setRecords(previous => ({ ...previous, [question.id]: saved }));
+    if (saved.answer === question.correctIndex) celebrateLearning(`${journey}-channels-${question.id}`);
     window.dispatchEvent(new Event('entre-nos-learning-update'));
   };
   const changeQuestion = (next: number) => { setIndex(next); setSelected(null); };

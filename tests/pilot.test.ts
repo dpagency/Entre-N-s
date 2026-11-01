@@ -21,7 +21,7 @@ after(() => {
   else Reflect.deleteProperty(globalThis, 'localStorage');
 });
 
-test('each avatar plays four missions with three other avatars, four guardians and preserved human choices', () => {
+test('legacy snapshots keep the original order, four avatars, four guardians and preserved human choices', () => {
   for (let avatar = 0; avatar < 4; avatar++) {
     restore({ rooms: [], tokens: [], evaluations: [], feedback: [] });
     const frames: any[] = [];
@@ -30,6 +30,8 @@ test('each avatar plays four missions with three other avatars, four guardians a
     send({ type: 'CREATE_ROOM', nickname: 'Teste', characterId: 'alex', variantIndex: avatar, pilotVersion: 2 });
     send({ type: 'START_GAME' });
     const room = () => snapshot().rooms[0][1];
+    // Explicit fixture representing a save written before the integrated flow.
+    delete room().cardStageVersion; delete room().missionFlowVersion; delete room().cardChallenges; delete room().missionChannelActivity;
     const journey = room().journeyId!;
     const bots = Object.values(room().players).filter(p => p.isBot);
     assert.equal(Object.keys(room().players).length, 4);
@@ -109,6 +111,7 @@ test('learning rule versions preserve old Sorte, old credits and new journey opp
   send({ type: 'CREATE_ROOM', nickname: 'Compatibilidade', characterId: 'alex', variantIndex: 0, pilotVersion: 2 });
   send({ type: 'START_GAME' });
   const state = snapshot().rooms[0][1];
+  delete state.cardStageVersion; // Previous integrated attempt, before the separate cards screen.
   assert.equal(state.learningRulesVersion, 4);
   assert.equal(learningPoints(state.journeyId!, {}, state).maximum, 20);
   state.phase = 'MISSION_CONSEQUENCE'; state.activeMissionId = PILOT_MISSIONS[0].id;

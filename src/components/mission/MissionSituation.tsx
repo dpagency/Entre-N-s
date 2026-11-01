@@ -1,3 +1,4 @@
+import { MissionDialogue } from './MissionDialogue';
 import { INSTITUTIONAL } from '../../distribution';
 import React, { useState } from 'react';
 import { MissionDef, RoomState } from '../../types/game';
@@ -47,6 +48,8 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
     });
   };
 
+  if (mission.dialogue) return <MissionDialogue key={`${state.journeyId}-${mission.id}`} mission={mission} state={state} myPlayerId={myPlayerId} />;
+
   // All perspectives remain available before any decision, without playing audio.
   if (INSTITUTIONAL || isSolo) {
     return (
@@ -60,7 +63,7 @@ export const MissionSituation: React.FC<MissionSituationProps> = ({
           </div>
           <MissionPerspectives key={mission.id} perspectives={mission.perspectives} />
           <button type="button" onClick={handleProceedToExplore} className="w-full rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black px-5 py-3 flex justify-center items-center gap-2">
-            {state.pilotVersion === 2 ? 'Desafio dos Guardiões da Integridade' : 'O que você faria?'} <ArrowRight className="w-4 h-4 shrink-0" />
+            {state.missionFlowVersion === 2 ? 'Tomar uma decisão' : state.pilotVersion === 2 ? 'Desafio dos Guardiões da Integridade' : 'O que você faria?'} <ArrowRight className="w-4 h-4 shrink-0" />
           </button>
           <button type="button" aria-expanded={showExtra} onClick={() => setShowExtra(!showExtra)} className="w-full text-sm text-slate-400 underline underline-offset-4">{showExtra ? 'Ocultar informações adicionais' : 'Saber mais (opcional)'}</button>
           {showExtra && <div className="rounded-xl bg-slate-950/60 p-4 text-sm text-slate-300 space-y-3">

@@ -1,0 +1,160 @@
+import { test, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+process.env.ENTRE_NOS_LOCAL_JOURNEYS = '1';
+const engine = await import('../../src/game/engine');
+const { journeyMissions, playableJourney, ORIGINAL_JOURNEY_ID } = await import('../../src/data/journeys');
+const { GUARDIAN_QUESTIONS } = await import('../../src/data/pilot');
+const { presentCardQuestion, confirmCardAnswer } = await import('../../src/services/cardKnowledge');
+const { PATH_SCENARIOS } = await import('../../src/data/pathScenarios');
+const { SECOND_CHANCE_SCENARIOS, SETBACK_SCENARIOS } = await import('../../src/data/fortuneScenarios');
+const { CHANNEL_ACTIVITY_QUESTIONS } = await import('../../src/data/channelActivity');
+const { confirmChannelAnswer } = await import('../../src/services/channelActivity');
+const { learningPoints } = await import('../../src/services/learningScore');
+const { completedJourneyResources } = await import('../../src/services/journeySelection');
+const { archiveSnapshot, loadAttempt } = await import('../../src/services/journeyStorage');
+const { browserStorage } = await import('../../src/services/browserStorage');
+type Message = import('../../src/types/game').ClientMessage;
+const id = 'entre-escolhas-e-cuidados';
+const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+const values = new Map<string, string>();
+before(() => Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
+  getItem: (k: string) => values.get(k) ?? null, setItem: (k: string, v: string) => values.set(k, v), removeItem: (k: string) => values.delete(k),
+} }));
+after(() => { if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor); else Reflect.deleteProperty(globalThis, 'localStorage'); });
+
+for (let alternative = 0; alternative < 4; alternative++) test(`legacy local attempt completes all four missions with alternative ${String.fromCharCode(65 + alternative)} and unchanged awards`, () => {
+  engine.restore({ rooms: [], tokens: [], evaluations: [], feedback: [] });
+  const connection = { readyState: 1, send: (_: string) => {} };
+  const send = (m: Message) => engine.handleClientMessage(connection, m);
+  send({ type: 'CREATE_ROOM', pilotVersion: 2, journeyDefinitionId: id, nickname: 'Teste', characterId: 'alex', variantIndex: alternative });
+  send({ type: 'START_GAME' });
+  const room = () => engine.snapshot().rooms[0][1];
+  delete room().cardStageVersion; delete room().missionFlowVersion; delete room().cardChallenges;
+  const attempt = room().journeyId!;
+  assert.equal(playableJourney(id).id, id);
+  assert.equal(Object.keys(room().players).length, 4);
+  for (const mission of journeyMissions(id)) {
+    send({ type: 'START_MISSION', missionId: 'missao-1' }); assert.equal(room().phase, 'BOARD_SELECT');
+    send({ type: 'VOTE_DESTINATION', regionId: mission.regionId }); send({ type: 'CONFIRM_DESTINATION' });
+    assert.equal(room().activeMissionId, mission.id);
+    send({ type: 'EXPLORE_MISSION' }); assert.equal(room().phase, 'MISSION_SITUATION');
+    send({ type: 'SET_DIALOGUE_STEP', step: -1 }); assert.equal(room().dialoguePositions?.[mission.id], undefined);
+    send({ type: 'SET_DIALOGUE_STEP', step: 1 });
+    archiveSnapshot(browserStorage, engine.snapshot());
+    const restored = loadAttempt(browserStorage, id, attempt)!;
+    assert.equal(restored.snapshot.rooms[0][1].dialoguePositions?.[mission.id], 1);
+    send({ type: 'SET_DIALOGUE_STEP', step: mission.dialogue!.length - 1 });
+    send({ type: 'EXPLORE_MISSION' }); assert.equal(room().phase, 'MISSION_GUARDIAN');
+    const encounter = room().guardianEncounters![mission.id];
+    const q = GUARDIAN_QUESTIONS.find(q => q.guardians.includes(encounter.guardianId))!;
+    const beforePoints = learningPoints(attempt, room().fortuneCards, room()).total;
+    send({ type: 'OPEN_GUARDIAN_CHALLENGE', questionId: q.id });
+    assert.equal(learningPoints(attempt, room().fortuneCards, room()).total, beforePoints);
+    send({ type: 'SUBMIT_GUARDIAN_ANSWER', answer: q.isTrue });
+    send({ type: 'SUBMIT_GUARDIAN_ANSWER', answer: !q.isTrue });
+    assert.equal(encounter.answer, q.isTrue);
+    send({ type: 'COMPLETE_GUARDIAN_CHALLENGE' });
+    send({ type: 'SUBMIT_INDIVIDUAL_CHOICE', actionId: mission.actions[alternative].id });
+    send({ type: 'SUBMIT_INDIVIDUAL_CHOICE', actionId: mission.actions[(alternative + 1) % 4].id });
+    send({ type: 'PROCEED_TO_REVEAL' }); send({ type: 'OPEN_COLLECTIVE_VOTE' });
+    assert.equal(room().chosenCollectiveActionId, mission.actions[alternative].id);
+    assert.equal(learningPoints(attempt, room().fortuneCards, room()).total, beforePoints + 15);
+    send({ type: 'DRAW_FORTUNE_CARD', cardIndex: alternative % 3 });
+    const fortune = room().fortuneCards![mission.id];
+    const record = presentCardQuestion(browserStorage, attempt, mission.id, fortune.outcome as any);
+    const question = [...PATH_SCENARIOS, ...SECOND_CHANCE_SCENARIOS, ...SETBACK_SCENARIOS].find(q => q.id === record.questionId)!;
+    confirmCardAnswer(browserStorage, attempt, mission.id, question.correctIndex);
+    confirmCardAnswer(browserStorage, attempt, mission.id, question.correctIndex);
+    // Completion is gated by participation, never by the correctness of a narrative choice.
+    send({ type: 'PROCEED_AFTER_CONSEQUENCE' });
+    assert.equal(room().phase, 'MISSION_CONSEQUENCE');
+    send({ type: 'OPEN_MISSION_CHANNEL' });
+    const participation = room().missionChannelActivity!.missions[mission.id];
+    const channel = CHANNEL_ACTIVITY_QUESTIONS.find(q => q.id === participation.questionId)!;
+    const prior = learningPoints(attempt, room().fortuneCards, room()).total;
+    send({ type: 'ANSWER_MISSION_CHANNEL', questionId: 'invalid', answer: channel.correctIndex });
+    send({ type: 'ANSWER_MISSION_CHANNEL', questionId: channel.id, answer: 10 });
+    assert.equal(participation.answer, undefined);
+    send({ type: 'ANSWER_MISSION_CHANNEL', questionId: channel.id, answer: channel.correctIndex });
+    send({ type: 'ANSWER_MISSION_CHANNEL', questionId: channel.id, answer: (channel.correctIndex + 1) % 3 });
+    send({ type: 'OPEN_MISSION_CHANNEL' });
+    assert.equal(participation.answer, channel.correctIndex);
+    assert.equal(learningPoints(attempt, room().fortuneCards, room()).total, prior + 5);
+    archiveSnapshot(browserStorage, engine.snapshot());
+    assert.deepEqual(loadAttempt(browserStorage, id, attempt)!.snapshot.rooms[0][1].missionChannelActivity, room().missionChannelActivity);
+    send({ type: 'PROCEED_AFTER_CONSEQUENCE' });
+  }
+  for (const q of CHANNEL_ACTIVITY_QUESTIONS) {
+    confirmChannelAnswer(browserStorage, attempt, 4, q.id, q.correctIndex);
+    confirmChannelAnswer(browserStorage, attempt, 4, q.id, q.correctIndex);
+  }
+  assert.equal(room().phase, 'GAME_SUMMARY');
+  assert.equal(new Set(Object.values(room().missionChannelActivity!.missions).map(r => r.questionId)).size, 4);
+  const points = learningPoints(attempt, room().fortuneCards, room());
+  assert.equal(points.total, 100); assert.equal(points.maximum, 100);
+  assert.equal(completedJourneyResources(room())[0].label, 'Conhecer o Guia Lilás');
+  assert.equal(completedJourneyResources({ ...room(), phase: 'BOARD_SELECT' }).length, 0);
+  archiveSnapshot(browserStorage, engine.snapshot());
+  const saved = loadAttempt(browserStorage, id, attempt)!;
+  engine.restore(saved.snapshot as ReturnType<typeof engine.snapshot>);
+  assert.equal(learningPoints(attempt, room().fortuneCards, room()).total, 100);
+  const oldId = room().journeyId;
+  const another = { readyState: 1, send: (_: string) => {} };
+  engine.handleClientMessage(another, { type: 'CREATE_ROOM', pilotVersion: 2, nickname: 'Original', characterId: 'alex', variantIndex: 0, journeyDefinitionId: ORIGINAL_JOURNEY_ID });
+  engine.handleClientMessage(another, { type: 'START_GAME' });
+  const original = engine.snapshot().rooms.find(([, r]) => r.journeyDefinitionId === ORIGINAL_JOURNEY_ID)![1];
+  assert.notEqual(original.journeyId, oldId); assert.equal(original.completedMissionIds.length, 0);
+  assert.equal(learningPoints(original.journeyId!, original.fortuneCards, original).total, 0);
+  assert.equal(loadAttempt(browserStorage, id, attempt)!.snapshot.rooms[0][1].completedMissionIds.length, 4);
+});
+
+test('mission channels do not award access, do not repeat after reload, and accept incorrect answers', () => {
+  engine.restore({ rooms: [], tokens: [], evaluations: [], feedback: [] });
+  const connection = { readyState: 1, send: (_: string) => {} };
+  const send = (m: Message) => engine.handleClientMessage(connection, m);
+  send({ type: 'CREATE_ROOM', pilotVersion: 2, journeyDefinitionId: id, nickname: 'Teste', characterId: 'alex', variantIndex: 0 });
+  send({ type: 'START_GAME' });
+  const room = () => engine.snapshot().rooms[0][1];
+  delete room().cardStageVersion; delete room().missionFlowVersion; delete room().cardChallenges;
+  send({ type: 'OPEN_MISSION_CHANNEL' });
+  assert.deepEqual(room().missionChannelActivity!.missions, {});
+  send({ type: 'VOTE_DESTINATION', regionId: 'praca' }); send({ type: 'CONFIRM_DESTINATION' });
+  send({ type: 'SET_DIALOGUE_STEP', step: 2 });
+  send({ type: 'OPEN_MISSION_CHANNEL' });
+  const pending = room().missionChannelActivity!.missions['j2-m01'];
+  const q = CHANNEL_ACTIVITY_QUESTIONS.find(q => q.id === pending.questionId)!;
+  const saved = structuredClone(engine.snapshot());
+  engine.restore(saved);
+  assert.equal(room().dialoguePositions!['j2-m01'], 2);
+  // Reconnect with the saved token exactly as the browser does after a reload.
+  const token = saved.tokens[0][0];
+  send({ type: 'JOIN_ROOM', roomCode: room().roomCode, sessionToken: token, nickname: 'Teste', characterId: 'alex', variantIndex: 0 });
+  send({ type: 'OPEN_MISSION_CHANNEL' });
+  assert.deepEqual(room().missionChannelActivity!.missions['j2-m01'], pending);
+  send({ type: 'ANSWER_MISSION_CHANNEL', questionId: q.id, answer: (q.correctIndex + 1) % 3 });
+  send({ type: 'ANSWER_MISSION_CHANNEL', questionId: q.id, answer: q.correctIndex });
+  assert.equal(learningPoints(room().journeyId!, room().fortuneCards, room()).channelPoints, 0);
+  assert.equal(learningPoints(room().journeyId!, room().fortuneCards, room()).channelAnswered, 1);
+  assert.equal(room().dialoguePositions!['j2-m01'], 2);
+});
+
+test('older Journey 2 attempts preserve v4 credits and have no retroactive mission gate', () => {
+  engine.restore({ rooms: [], tokens: [], evaluations: [], feedback: [] });
+  const connection = { readyState: 1, send: (_: string) => {} };
+  const send = (m: Message) => engine.handleClientMessage(connection, m);
+  send({ type: 'CREATE_ROOM', pilotVersion: 2, journeyDefinitionId: id, nickname: 'Anterior', characterId: 'alex', variantIndex: 0 });
+  send({ type: 'START_GAME' });
+  const room = engine.snapshot().rooms[0][1];
+  delete room.cardStageVersion; delete room.missionFlowVersion; delete room.cardChallenges;
+  delete room.missionChannelActivity; // Snapshot from the previous local implementation.
+  const q = CHANNEL_ACTIVITY_QUESTIONS[0];
+  confirmChannelAnswer(browserStorage, room.journeyId!, 4, q.id, q.correctIndex);
+  send({ type: 'OPEN_MISSION_CHANNEL' });
+  assert.equal(room.missionChannelActivity, undefined);
+  assert.equal(learningPoints(room.journeyId!, room.fortuneCards, room).channelPoints, 4);
+  room.phase = 'MISSION_CONSEQUENCE'; room.activeMissionId = 'j2-m01';
+  room.fortuneCards = { 'j2-m01': { cardIndex: 0, outcome: 'caminhos' } };
+  send({ type: 'PROCEED_AFTER_CONSEQUENCE' });
+  assert.equal(room.phase, 'BOARD_SELECT');
+  assert.deepEqual(room.completedMissionIds, ['j2-m01']);
+});

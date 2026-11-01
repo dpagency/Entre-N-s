@@ -66,7 +66,7 @@ export default defineConfig(async env => {
   const shared = typeof originalConfig === 'function' ? await originalConfig(env) : originalConfig;
   return mergeConfig(shared, {
     mode: 'institutional',
-    define: { __ENTRE_NOS_INSTITUTIONAL__: 'true', __ENTRE_NOS_ASSET_BASE__: JSON.stringify(publicBase) },
+    define: { __ENTRE_NOS_INSTITUTIONAL__: 'true', __ENTRE_NOS_LOCAL_JOURNEYS__: 'false', __ENTRE_NOS_ASSET_BASE__: JSON.stringify(publicBase) },
     envDir: false,
     envPrefix: [],
     base: publicBase,
