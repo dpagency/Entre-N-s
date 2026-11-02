@@ -214,11 +214,6 @@ export default function App() {
 
       {/* Main content body */}
       <main className={`flex-1 max-w-[1440px] ${showWelcome || !state || !myPlayerId ? '' : 'game-journey'} w-full mx-auto p-4 sm:p-6 flex flex-col`}>
-        {!showWelcome && state?.journeyId && myPlayerId && !(state.missionFlowVersion === 2 && state.phase.startsWith('MISSION_')) && <div className="mx-auto mb-4 flex w-full max-w-5xl justify-end">
-          <button type="button" data-channel-invitation onClick={() => setIsInstitutionalGuideOpen(true)} className="min-h-11 w-full max-w-full whitespace-normal break-words rounded-xl border border-amber-300 bg-amber-400 px-4 py-3 text-sm font-bold leading-relaxed text-slate-950 shadow-md hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400 sm:w-auto">
-            {hasMissionChannels(state) ? 'Canais de Atendimento' : 'Explore os Canais de Atendimento e ganhe pontos!'}
-          </button>
-        </div>}
         {!storagePersistent && <p role="status" className="rounded-xl border border-amber-400 p-3 text-sm text-amber-200">Não foi possível salvar seu progresso neste navegador. Você pode continuar jogando, mas suas respostas mais recentes poderão ser perdidas se sair ou atualizar a página.</p>}
         {!showWelcome && state && state.pilotVersion !== 2 && <p className="rounded-xl border border-slate-600 p-3 text-sm">Esta partida salva usa a dinâmica anterior. Ela foi preservada; ao jogar novamente, você encontrará a nova dinâmica dos quatro Guardiões.</p>}
         {showWelcome || !state || !myPlayerId ? (

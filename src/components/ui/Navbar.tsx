@@ -1,7 +1,6 @@
 import React from 'react';
-import { INSTITUTIONAL } from '../../distribution';
 import { SanitizedRoomState } from '../../types/game';
-import { BookOpen, Eye, Scale, Home, Wifi, WifiOff } from 'lucide-react';
+import { BookOpen, Eye, Scale, Home } from 'lucide-react';
 
 interface NavbarProps {
   state: SanitizedRoomState | null;
@@ -14,7 +13,6 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   state,
-  isConnected,
   onOpenRules,
   onOpenInstitutionalGuide,
   onOpenAccessibility,
@@ -33,45 +31,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               Entre Nós
             </span>
           </div>
-          <span className="max-w-56 text-xs leading-relaxed text-slate-300">Jogo sério cooperativo de ética pública</span>
+          <span className="max-w-56 text-xs leading-relaxed text-slate-300">Jogo sério de aprendizagem e reflexão sobre ética pública</span>
         </div>
-
-        {/* Room Code Badge (if in a room) */}
-        {!INSTITUTIONAL && state && (
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Sala:
-            </span>
-            <span className="font-mono font-bold text-xs text-amber-400">
-              {state.roomCode}
-            </span>
-          </div>
-        )}
 
         {/* Right Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Connection status dot */}
-          <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-colors ${
-              isConnected
-                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
-                : 'bg-rose-950/60 text-rose-300 border-rose-500/40 animate-pulse'
-            }`}
-            title={INSTITUTIONAL ? 'Jogo individual; progresso salvo neste navegador' : isConnected ? 'Conectado ao servidor' : 'Reconectando...'}
-          >
-            {isConnected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-            <span className="hidden md:inline">{INSTITUTIONAL ? 'Jogo individual' : isConnected ? 'Online' : 'Reconectando'}</span>
-          </div>
-
           {/* Institutional Guide Button */}
           <button
             onClick={onOpenInstitutionalGuide}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-teal-300 border border-slate-800 text-sm font-semibold flex items-center gap-1.5 transition-colors"
+            className="min-h-11 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 border border-amber-300 text-sm font-bold flex items-center gap-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
             title="Guia de Canais Institucionais"
             aria-label="Canais"
           >
-            <Scale className="w-4 h-4 text-teal-400" />
-            <span className="hidden lg:inline">Canais</span>
+            <Scale className="w-4 h-4" />
+            <span>Canais</span>
           </button>
 
           {/* Rules Button */}

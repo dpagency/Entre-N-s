@@ -3,6 +3,7 @@ import { CHANNEL_ACTIVITY_QUESTIONS } from '../../data/channelActivity';
 import { channelActivityPoints, confirmChannelAnswer, readChannelAnswer, pendingChannelQuestion, rememberChannelQuestion } from '../../services/channelActivity';
 import { browserStorage } from '../../services/browserStorage';
 import { celebrateLearning } from '../../services/learningCelebration';
+import { revealChannelFeedback } from '../../services/channelFeedback';
 
 export function ChannelActivity({ journey }: { journey: string }) {
   const [records, setRecords] = useState(() => Object.fromEntries(CHANNEL_ACTIVITY_QUESTIONS.map(q => [q.id, readChannelAnswer(browserStorage, journey, q.id)])));
@@ -23,7 +24,8 @@ export function ChannelActivity({ journey }: { journey: string }) {
       const frame = requestAnimationFrame(() => (questionText.current ?? completion.current)?.scrollIntoView({ block: 'start' }));
       return () => cancelAnimationFrame(frame);
     }
-    (record ? feedback.current : questionText.current)?.focus();
+    if (record) revealChannelFeedback(feedback.current);
+    else questionText.current?.focus();
   }, [journey, question?.id, record]);
   const confirm = () => {
     if (selected === null || record || !question) return;

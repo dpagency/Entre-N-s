@@ -1,4 +1,5 @@
 import { browserStorage } from '../../services/browserStorage';
+import { revealChannelFeedback } from '../../services/channelFeedback';
 import React, { useState, useRef, useEffect } from 'react';
 
 import { INSTITUTIONAL_CHANNELS } from '../../data/institutionalChannels';
@@ -53,12 +54,8 @@ export const InstitutionalCardModal: React.FC<InstitutionalCardModalProps> = ({
   }, [isOpen, roomCode, missionId, voluntary]);
   useEffect(() => {
     if (!isOpen || currentQuiz?.answer === undefined) return;
-    const feedback = feedbackRef.current;
-    const scroller = window.innerWidth < 768 ? contentRef.current : detailsRef.current;
-    feedback?.focus({ preventScroll: true });
-    if (feedback && scroller) {
-      scroller.scrollTop += feedback.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16;
-    }
+    const frame = requestAnimationFrame(() => revealChannelFeedback(feedbackRef.current));
+    return () => cancelAnimationFrame(frame);
   }, [isOpen, currentQuiz?.roomCode, currentQuiz?.missionId, currentQuiz?.answer]);
   const answerQuiz = (answer: boolean) => {
     if (!currentQuiz || !question || currentQuiz.answer !== undefined) return;

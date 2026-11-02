@@ -7,6 +7,8 @@
     "dev": "tsx server.ts",
     "build": "vite build",
     "build:institutional": "vite build --config vite.institutional.config.ts --mode institutional",
+    "build:pilot": "vite build --config vite.pilot.config.ts --mode pilot",
+    "package:pilot": "npm run build:pilot && node scripts/pilot-package.mjs",
     "verify:institutional": "node scripts/institutional-package.mjs verify",
     "package:institutional": "npm run build:institutional && node scripts/institutional-package.mjs package",
     "test:institutional:browser": "node --import tsx scripts/verify-institutional-browser.mjs",

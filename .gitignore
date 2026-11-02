@@ -9,3 +9,5 @@ coverage/
 *.log
 .env*
 !.env.example
+/entre-nos-duas-jornadas.zip
+/dist-piloto/

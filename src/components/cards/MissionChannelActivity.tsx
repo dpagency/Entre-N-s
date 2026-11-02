@@ -4,6 +4,7 @@ import { CHANNEL_ACTIVITY_QUESTIONS } from '../../data/channelActivity';
 import { missionChannelPoints } from '../../services/missionChannels';
 import { socketService } from '../../services/socket';
 import { celebrateLearning } from '../../services/learningCelebration';
+import { revealChannelFeedback } from '../../services/channelFeedback';
 
 export function MissionChannelActivity({ state, onExploreChannels }: { state: SanitizedRoomState; onExploreChannels: () => void }) {
   const missionId = state.activeMissionId;
@@ -15,7 +16,11 @@ export function MissionChannelActivity({ state, onExploreChannels }: { state: Sa
   const questionText = useRef<HTMLParagraphElement>(null);
   const progress = missionChannelPoints(state);
   useEffect(() => { if (active) socketService.send({ type: 'OPEN_MISSION_CHANNEL' }); }, [active, missionId]);
-  useEffect(() => { if (record?.answer !== undefined) feedback.current?.focus(); }, [record?.answer]);
+  useEffect(() => {
+    if (record?.answer === undefined) return;
+    const frame = requestAnimationFrame(() => revealChannelFeedback(feedback.current));
+    return () => cancelAnimationFrame(frame);
+  }, [record?.answer, missionId]);
   useEffect(() => {
     if (!active || !q || record?.answer !== undefined || state.missionFlowVersion !== 2) return;
     const frame = requestAnimationFrame(() => questionText.current?.focus());
@@ -36,7 +41,7 @@ export function MissionChannelActivity({ state, onExploreChannels }: { state: Sa
       </div>
       {record.answer === undefined ? <button type="button" disabled={selected === null} onClick={confirm} className="min-h-12 w-full rounded-xl bg-teal-400 p-3 font-bold text-slate-950 disabled:opacity-40">Confirmar resposta dos Canais</button>
         : <div data-channel-feedback ref={feedback} tabIndex={-1} role="status" className="space-y-2 rounded-xl border border-teal-400 bg-slate-950 p-4">
-          <p className="font-bold text-teal-200">{record.answer === q.correctIndex ? 'Resposta adequada · +5 pontos' : state.missionFlowVersion === 2 ? 'Vamos aprender juntos:' : 'Resposta inadequada · 0 ponto, sem penalidade'}</p>
+          <p className="font-bold text-teal-200">{record.answer === q.correctIndex ? 'Resposta adequada · +5 pontos' : 'Resposta inadequada · 0 ponto, sem penalidade'}</p>
           <p>{q.feedback[record.answer]}</p><p>{q.rationale}</p><p><strong>Alternativa mais adequada:</strong> {q.options[q.correctIndex]}</p><p className="text-sm text-slate-300">{q.basis}</p>
           {state.missionFlowVersion !== 2 && <p>Participação desta missão registrada. Você pode voltar à narrativa.</p>}
           <button type="button" onClick={onExploreChannels} className="min-h-12 w-full rounded-xl bg-teal-400 p-3 font-bold text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">Fechar pergunta</button>
